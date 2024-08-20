@@ -38,11 +38,7 @@ public class MapGenerator : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-    }
-
-    private void Start()
-    {
-        Chunks = new Chunk[Mathf.CeilToInt((float)_mapManager.Width /  CHUNK_SIZE), Mathf.CeilToInt((float)_mapManager.Height / CHUNK_SIZE)];
+        Chunks = new Chunk[Mathf.CeilToInt((float)_mapManager.Width / CHUNK_SIZE), Mathf.CeilToInt((float)_mapManager.Height / CHUNK_SIZE)];
     }
 
     public void Generate()
@@ -101,6 +97,8 @@ public class MapGenerator : MonoBehaviour
 
     public IEnumerator GenerateOres()
     {
+        if (Ores == null || Ores.Count == 0) yield break;
+
         while (true)
         {
             yield return new WaitForSeconds(OreGenerateTickInterval);
@@ -122,8 +120,7 @@ public class MapGenerator : MonoBehaviour
 
                         if (spawnSpace != Vector2Int.zero)
                         {
-                            OreObject spawnedOre = Instantiate(ore, new Vector3(spawnSpace.x, spawnSpace.y, 0), Quaternion.identity);
-                            spawnedOre.Spawn(chunk, spawnSpace.x, spawnSpace.y);
+                            _mapManager.SpawnObject(ore, spawnSpace.x, spawnSpace.y);
                         }
                     }
                 }
@@ -150,7 +147,13 @@ public class Chunk
         WorldX = X * chunkSize;
         WorldY = Y * chunkSize;
         _chunkSize = chunkSize;
+        Objects = new MapObject[chunkSize, chunkSize];
         _tiles = tiles;
+    }
+
+    public bool IsFreeWorldPos(int x, int y)
+    {
+        return Objects[x - WorldX, y - WorldY] == null;
     }
 
     public void SetTile(int x, int y, TileType type)

@@ -7,10 +7,8 @@ using UnityEngine;
 
 namespace Assets.Scripts.Items
 {
-    public abstract class Item : ScriptableObject
+    [CreateAssetMenu(fileName = "Ore", menuName = "Item/Ore")]
+    public class OreItem : Item
     {
-        public string Name;
-        public Sprite Icon;
-        public int MaxStack;
     }
 }
