@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Items;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,9 @@ namespace Assets.Scripts.MapObjects
 {
     public abstract class MapObject : MonoBehaviour
     {
-        public string Name;
-
         public Chunk Chunk;
+        public BuildingItem BuildingItem;
 
-        public int MaxDurability;
         private int _currentDurability;
 
         private int _x, _y;
@@ -28,7 +27,7 @@ namespace Assets.Scripts.MapObjects
             _x = x; 
             _y = y;
 
-            _currentDurability = MaxDurability;
+            _currentDurability = BuildingItem.MaxDurability;
 
             Chunk.SpawnObject(this);
         }

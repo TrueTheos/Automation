@@ -15,9 +15,48 @@ namespace Assets.Scripts
 
         public InventorySlot[] Items;
 
+        public GameObject CraftingView;
+        public KeyCode CraftingMenuKey;
+        public CraftingOption MainCraftingOption;
+        public GameObject CraftingOptionPrefab;
+        private bool _crafingViewToggle;
+
+        private Player _player;
+
         private void Awake()
         {
             Items = new InventorySlot[MaxSlots];
+
+            _player = GetComponent<Player>();
+        }
+
+        private void Update()
+        {
+            if(Input.GetKeyDown(CraftingMenuKey))
+            {
+                _crafingViewToggle = !_crafingViewToggle;
+
+                CraftingView.gameObject.SetActive(_crafingViewToggle);
+
+                if(_crafingViewToggle)
+                {
+                    OpenCraftingView();
+                }
+            }
+        }
+
+        private void OpenCraftingView()
+        {
+            if (_player.AvailableRecieps.Count == 0) return;
+
+            MainCraftingOption.GetComponent<CraftingOption>().Init(_player.AvailableRecieps[0]);
+
+            for (int i = 1; i < _player.AvailableRecieps.Count; i++)
+            {
+                CraftingOption newOption = Instantiate(CraftingOptionPrefab, CraftingView.transform).GetComponent<CraftingOption>();
+                newOption.Requirements.SetActive(false);
+                newOption.Init(_player.AvailableRecieps[i]);
+            }
         }
 
         public bool HasItems(Item item, int amount)
@@ -81,12 +120,12 @@ namespace Assets.Scripts
 
                     if (toAdd > freeAmount)
                     {
-                        notFullSlot.Amount += freeAmount;
+                        notFullSlot.ItemAmount.Amount += freeAmount;
                         toAdd -= freeAmount;
                     }
                     else
                     {
-                        notFullSlot.Amount += toAdd;
+                        notFullSlot.ItemAmount.Amount += toAdd;
                     }
                 }
                 else
@@ -97,7 +136,7 @@ namespace Assets.Scripts
 
                         int amountToAdd = toAdd > item.MaxStack ? item.MaxStack : toAdd;
 
-                        InventorySlot newSlot = new InventorySlot() { Item = item, Amount = amountToAdd };
+                        InventorySlot newSlot = new InventorySlot() { ItemAmount = new(item, amountToAdd) };
                         toAdd -= amountToAdd;
                         Items[freeSlot] = newSlot;
                     }
@@ -114,7 +153,22 @@ namespace Assets.Scripts
 
     public class InventorySlot
     {
+        public ItemAmount ItemAmount;
+
+        public Item Item => ItemAmount.Item;
+        public int Amount => ItemAmount.Amount;
+    }
+
+    [Serializable]
+    public struct ItemAmount
+    {
         public Item Item;
         public int Amount;
+
+        public ItemAmount(Item item, int amount)
+        {
+            Item = item;
+            Amount = amount;
+        }
     }
 }
