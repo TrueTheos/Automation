@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask PickupLayer;
 
     [SerializeField] private SpriteRenderer _placeObjectPreview;
-    private InventorySlot _selectedItem;
+    private ItemAmountUI _selectedItem;
     private int _selectedObjectIndex;
 
     [SerializeField] private GameObject _hand;
@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         _mapManager = MapManager.Instance;
-        _selectedItem = _inventory.Items[0];
+        _selectedItem = _inventory.HotbarItems[0];
     }
 
     private void Update()
@@ -73,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
 
         if(Input.GetMouseButton(1))
         {
-            if (_selectedItem != null && _selectedItem.Item is BuildingItem buildingItem)
+            if (_selectedItem != null && !_selectedItem.IsEmpty() && _selectedItem.Item is MapItem buildingItem)
             {
                 var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
@@ -82,10 +82,12 @@ public class PlayerMovement : MonoBehaviour
                 {
                     _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y);
                 }
+
+                _inventory.RemoveItemFromSlot(1, _selectedItem);
             }   
         }
 
-        if(_selectedItem != null && _selectedItem.Item is BuildingItem)
+        if(_selectedItem != null && _selectedItem.Item is MapItem)
         {
             var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 gridMousePos = new Vector3(Mathf.FloorToInt(mousePos.x) + .5f, Mathf.FloorToInt(mousePos.y) + .5f, 0);
@@ -121,6 +123,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void ScrollThruItems()
     {
+        if (_inventory.CraftingViewOpen) return;
+
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if(scroll != 0f)
         {
@@ -129,21 +133,23 @@ public class PlayerMovement : MonoBehaviour
                 _selectedObjectIndex--;
                 if (_selectedObjectIndex < 0)
                 {
-                    _selectedObjectIndex = _inventory.MaxSlots - 1;
+                    _selectedObjectIndex = _inventory.HotbarSlots - 1;
                 }             
             }
             else if (scroll < 0f)
             {
                 _selectedObjectIndex++;
-                if (_selectedObjectIndex >= _inventory.MaxSlots)
+                if (_selectedObjectIndex >= _inventory.HotbarSlots)
                 {
                     _selectedObjectIndex = 0;
                 }
             }
 
-            _selectedItem = _inventory.Items[_selectedObjectIndex];
+            if (_selectedItem != null) _selectedItem.DeHighlight();
+            _selectedItem = _inventory.HotbarItems[_selectedObjectIndex];
+            _selectedItem.Highlight();
 
-            if (_selectedItem != null && _selectedItem.Item is BuildingItem buildingItem)
+            if (_selectedItem != null && _selectedItem.Item is MapItem buildingItem)
             {
                 _placeObjectPreview.gameObject.SetActive(true);
 

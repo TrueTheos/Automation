@@ -11,7 +11,7 @@ namespace Assets.Scripts.MapObjects
     public abstract class MapObject : MonoBehaviour
     {
         public Chunk Chunk;
-        public BuildingItem BuildingItem;
+        public MapItem MapItem;
 
         private int _currentDurability;
 
@@ -27,7 +27,7 @@ namespace Assets.Scripts.MapObjects
             _x = x; 
             _y = y;
 
-            _currentDurability = BuildingItem.MaxDurability;
+            _currentDurability = MapItem.MaxDurability;
 
             Chunk.SpawnObject(this);
         }

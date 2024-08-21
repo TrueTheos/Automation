@@ -74,7 +74,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 1642151531, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -98,8 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4518c79a9fb92ab4184ed2651b3a810f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: Coal
-  MaxDurability: 50
+  MapItem: {fileID: 11400000, guid: 7214749c6f0340b4c9735fd6c330cd31, type: 2}
   Drop: {fileID: 11400000, guid: a546707c34a43744e81c3cb64cd3ba50, type: 2}
   DropCountRange: {x: 10, y: 30}
   SpawnTileType: 2

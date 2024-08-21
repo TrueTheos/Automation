@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace Assets.Scripts.Items
 {
-    [CreateAssetMenu(fileName = "Ore", menuName = "Item/Ore")]
-    public class OreItem : Item
+    [CreateAssetMenu(fileName = "Item", menuName = "Item/Item")]
+    public class NormalItem : Item
     {
     }
 }

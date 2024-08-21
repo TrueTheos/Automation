@@ -20,6 +20,7 @@ namespace Assets.Scripts
 
         public Image Background;
         public RectTransform Rect;
+        public Button Button;
 
         public bool IsSelected;
 
@@ -29,6 +30,7 @@ namespace Assets.Scripts
         {
             _normalColor = Background.color;
             _initialScale = transform.localScale;
+            Button = GetComponentInChildren<Button>();
         }
 
         public void Init(CraftRecipe recipe)
@@ -38,9 +40,9 @@ namespace Assets.Scripts
 
             foreach (var requirement in recipe.Requirements)
             {
-                RequirementItemUI requirementItemUI = Instantiate(RequirementPrefab, RequirementsParent.transform).GetComponent<RequirementItemUI>();
-                requirementItemUI.Icon.sprite = requirement.Item.Icon;
-                requirementItemUI.AmountText.text = requirement.Amount.ToString();
+                ItemAmountUI requirementItemUI = Instantiate(RequirementPrefab, RequirementsParent.transform).GetComponent<ItemAmountUI>();
+
+                requirementItemUI.Init(requirement);
             }
         }
 
@@ -58,6 +60,7 @@ namespace Assets.Scripts
                 RequirementsParent.SetActive(false);
             }
             IsSelected = false;
+            Button.interactable = true;
         }
 
         public void Select()

@@ -46,8 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6baab9dbe165fd439dfe236b93868bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: 
-  MaxDurability: 0
+  MapItem: {fileID: 11400000, guid: f6b97646b3f4ecb4cb91524735f4f38a, type: 2}
 --- !u!212 &3121999503643082909
 SpriteRenderer:
   m_ObjectHideFlags: 0

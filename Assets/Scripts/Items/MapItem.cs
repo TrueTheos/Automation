@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace Assets.Scripts.Items
 {
-    [CreateAssetMenu(fileName = "Building", menuName = "Item/Building")]
-    public class BuildingItem : Item
+    [CreateAssetMenu(fileName = "MapItem", menuName = "Item/Map Item")]
+    public class MapItem : Item
     {
         public MapObject Prefab;
         public int MaxDurability;

@@ -12,11 +12,9 @@ using DG.Tweening;
 namespace Assets.Scripts
 {
     public class Inventory : MonoBehaviour
-    {
-        public int MaxSlots;
+    {       
 
-        public InventorySlot[] Items;
-
+        [Header("Crafting")]
         public RectTransform CraftingView;
         public RectTransform CraftingOptionsParent;
         private int _selectedCraftingOptionIndex;
@@ -25,14 +23,27 @@ namespace Assets.Scripts
         public KeyCode CraftingMenuKey;
         public GameObject CraftingOptionPrefab;
         private bool _crafingViewToggle;
-
+        public bool CraftingViewOpen => _crafingViewToggle;
         private float _craftingOptionsTargetPos;
+
+        [Header("HotBar")]
+        public ItemAmountUI[] HotbarItems;
+        public int HotbarSlots;
+        public RectTransform HotbarView;
+        public RectTransform HotbarSlotsParent;
+        public ItemAmountUI HotbarSlotPrefab;
 
         private Player _player;
 
         private void Awake()
         {
-            Items = new InventorySlot[MaxSlots];
+            HotbarItems = new ItemAmountUI[HotbarSlots];
+
+            for (int i = 0; i < HotbarSlots; i++)
+            {
+                ItemAmountUI itemAmountUI = Instantiate(HotbarSlotPrefab, HotbarSlotsParent.transform);
+                HotbarItems[i] = itemAmountUI;
+            }
 
             _player = GetComponent<Player>();
         }
@@ -60,8 +71,7 @@ namespace Assets.Scripts
             {
                 if(_selectedCraftingOption == null)
                 {
-                    _selectedCraftingOption = CraftingOptionsParent.transform.GetChild(0).GetComponent<CraftingOption>();
-                    _selectedCraftingOption.Highlight(SelectedCraftColor);
+                    MoveTowardsCraftOption(CraftingOptionsParent.transform.GetChild(0).GetComponent<CraftingOption>());
                 }
 
                 float scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -84,16 +94,21 @@ namespace Assets.Scripts
                         }
                     }
 
-                    MoveTowardsCraftOption(CraftingOptionsParent.transform.GetChild(_selectedCraftingOptionIndex).GetComponent<CraftingOption>());
+                    MoveTowardsCraftOption(CraftingOptionsParent.transform.GetChild(_selectedCraftingOptionIndex).GetComponent<CraftingOption>());            
                 }   
             }
+        }
+
+        private void OnSelect()
+        {
+            _selectedCraftingOption.Select();
+
+            _selectedCraftingOption.Button.interactable = MatchesRequirements(_selectedCraftingOption.Recipe.Requirements);
         }
 
         private void OpenCraftingView()
         {
             if (_player.AvailableRecieps.Count == 0) return;
-
-            //MainCraftingOption.GetComponent<CraftingOption>().Init(_player.AvailableRecieps[0]);
 
             foreach (Transform child in CraftingOptionsParent.transform)
             {
@@ -105,13 +120,17 @@ namespace Assets.Scripts
                 CraftingOption newOption = Instantiate(CraftingOptionPrefab, CraftingOptionsParent.transform).GetComponent<CraftingOption>();
                 newOption.RequirementsParent.SetActive(false);
                 newOption.Init(_player.AvailableRecieps[i]);
-                newOption.GetComponentInChildren<Button>().onClick.AddListener(delegate { CraftOptionClick(newOption); });
+                newOption.Button.onClick.AddListener(delegate { CraftOptionClick(newOption); });
             }
         }
 
         private void MoveTowardsCraftOption(CraftingOption craft)
         {
-            _selectedCraftingOption?.DeHighlight();
+            if(_selectedCraftingOption != null)
+            {
+                _selectedCraftingOption.DeHighlight();
+            }
+            
             _selectedCraftingOption = craft;
             _selectedCraftingOption.Highlight(SelectedCraftColor);
 
@@ -120,7 +139,7 @@ namespace Assets.Scripts
             float distance = Mathf.Abs(target);
             float duration = Mathf.Clamp(1f - (distance / 10f), 0.2f, 1f);
             DOTween.Kill(CraftingOptionsParent);
-            CraftingOptionsParent.DOAnchorPosY(CraftingOptionsParent.position.y + target, duration, true).onComplete = _selectedCraftingOption.Select;
+            CraftingOptionsParent.DOAnchorPosY(CraftingOptionsParent.position.y + target, duration, true).onComplete = OnSelect;
         }
 
         public void CraftOptionClick(CraftingOption craft)
@@ -151,23 +170,28 @@ namespace Assets.Scripts
 
         public bool HasItems(Item item, int amount)
         {
-            if (!Items.Any(x => x != null && x.Item != null && x.Item == item)) return false;
-            return Items.First(x => x.Item == item).Amount >= amount;
+            if (!HotbarItems.Any(x => !x.IsEmpty() && x.Item == item)) return false;
+            return HotbarItems.First(x => x.Item == item).Amount >= amount;
         }
 
         public bool HasEmptySlot()
         {
-            return Items.Any(x => x == null);
+            return HotbarItems.Any(x => x == null || x.IsEmpty());
         }
 
         public int GetEmptySlotIndex()
         {
-            return Array.IndexOf(Items, Items.First(x => x == null));
+            return Array.IndexOf(HotbarItems, HotbarItems.First(x => x == null || x.IsEmpty()));
         }
 
-        public InventorySlot GetNotFullSlot(Item item)
+        public ItemAmountUI GetEmptySlot()
         {
-            return Items.FirstOrDefault(x => x != null && x.Item == item && x.Amount < x.Item.MaxStack);
+            return HotbarItems.First(x => x.IsEmpty());
+        }
+
+        public ItemAmountUI GetNotFullSlot(Item item)
+        {
+            return HotbarItems.FirstOrDefault(x => x != null && x.Item == item && x.Amount < x.Item.MaxStack);
         }
 
         public bool CanAddItem(ItemObject itemObj)
@@ -183,28 +207,40 @@ namespace Assets.Scripts
             }
         }
 
+        public void RemoveItemFromSlot(int amount, ItemAmountUI ui)
+        {
+            ui.ItemAmount.Amount -= amount;
+
+            if(ui.ItemAmount.Amount <= 0)
+            {
+                ui.ItemAmount = new();
+            }
+
+            UpdateHotbarUI();
+        }
+
         public void RemoveItem(Item item, int amount)
         {
             int remainingAmount = amount;
 
-            for (int i = 0; i < Items.Length; i++)
+            for (int i = 0; i < HotbarItems.Length; i++)
             {
-                if (Items[i] != null && Items[i].Item == item)
+                if (HotbarItems[i] != null && HotbarItems[i].Item == item)
                 {
-                    if (Items[i].Amount >= remainingAmount)
+                    if (HotbarItems[i].Amount >= remainingAmount)
                     {
-                        Items[i].ItemAmount.Amount -= remainingAmount;
-                        if (Items[i].Amount == 0)
+                        HotbarItems[i].ItemAmount.Amount -= remainingAmount;
+                        if (HotbarItems[i].Amount == 0)
                         {
-                            Items[i] = null;
+                            HotbarItems[i] = null;
                         }
                         remainingAmount = 0;
                         break;
                     }
                     else
                     {
-                        remainingAmount -= Items[i].Amount;
-                        Items[i] = null;
+                        remainingAmount -= HotbarItems[i].Amount;
+                        HotbarItems[i].ItemAmount = new();
                     }
                 }
             }
@@ -213,11 +249,13 @@ namespace Assets.Scripts
             {
                 throw new Exception($"Unable to remove {remainingAmount} of {item.Name} from the inventory.");
             }
+
+            UpdateHotbarUI();
         }
 
         public void AddItem(ItemAmount item, bool dropTheRest = false)
         {
-             int leftOver = AddItem(item.Item, item.Amount);
+            int leftOver = AddItem(item.Item, item.Amount);
 
             if(dropTheRest && leftOver > 0)
             {
@@ -243,6 +281,14 @@ namespace Assets.Scripts
             Destroy(itemObj.gameObject);
         }
 
+        private void UpdateHotbarUI()
+        {
+            foreach (var item in HotbarItems)
+            {
+                item.UpdateUI();
+            }
+        }
+
         /// <summary>
         /// Add item to the inventory
         /// </summary>
@@ -255,7 +301,7 @@ namespace Assets.Scripts
 
             while (toAdd > 0)
             {
-                InventorySlot notFullSlot = GetNotFullSlot(item);
+                ItemAmountUI notFullSlot = GetNotFullSlot(item);
 
                 if (notFullSlot != null)
                 {
@@ -269,11 +315,25 @@ namespace Assets.Scripts
                     else
                     {
                         notFullSlot.ItemAmount.Amount += toAdd;
+                        toAdd -= toAdd;
                     }
                 }
                 else
                 {
                     if (HasEmptySlot())
+                    {
+                        ItemAmountUI emptySlot = GetEmptySlot();
+                        int amountToAdd = toAdd > item.MaxStack ? item.MaxStack : toAdd;
+
+                        emptySlot.Init(new ItemAmount(item, amountToAdd));
+                        toAdd -= amountToAdd;
+                    }
+                    else
+                    {
+                        UpdateHotbarUI();
+                        return toAdd;
+                    }
+                    /*if (HasEmptySlot())
                     {
                         int freeSlot = GetEmptySlotIndex();
 
@@ -281,25 +341,18 @@ namespace Assets.Scripts
 
                         InventorySlot newSlot = new InventorySlot() { ItemAmount = new(item, amountToAdd) };
                         toAdd -= amountToAdd;
-                        Items[freeSlot] = newSlot;
+                        HotbarItems[freeSlot] = newSlot;
                     }
                     else
                     {
                         return toAdd;
-                    }
+                    }*/
                 }
             }
 
+            UpdateHotbarUI();
             return toAdd;
         }
-    }
-
-    public class InventorySlot
-    {
-        public ItemAmount ItemAmount;
-
-        public Item Item => ItemAmount.Item;
-        public int Amount => ItemAmount.Amount;
     }
 
     [Serializable]

@@ -668,14 +668,60 @@ MonoBehaviour:
   StoneBiomeThreshold: 0.3
   CHUNK_SIZE: 32
   OreGenerateTickInterval: 0
-  MaximumOres: 0
+  MaximumOres: 10
   SpawnProbability:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -0.14166827
+      outSlope: -0.14166827
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.36560977
+      value: 0.9482047
+      inSlope: -0.4331737
+      outSlope: -0.4331737
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.60580456
+      value: 0.77414054
+      inSlope: -2.1982007
+      outSlope: -2.1982007
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.77056485
+      value: 0.16918652
+      inSlope: -2.2088473
+      outSlope: -2.2088473
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.0031433
+      value: -0.004310608
+      inSlope: -0.74597245
+      outSlope: -0.74597245
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Ores: []
+  Ores:
+  - {fileID: 129681216205148547, guid: 6f0a3cf3f43bc7d44bb96ea3ba0f8dec, type: 3}
   _mapManager: {fileID: 674382116}
 --- !u!1 &788184167
 GameObject:
@@ -772,6 +818,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 997834711}
+  - {fileID: 2032752589}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -100943,7 +100990,7 @@ GameObject:
   - component: {fileID: 997834714}
   - component: {fileID: 997834713}
   m_Layer: 5
-  m_Name: Scroll View
+  m_Name: CraftingView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -101070,10 +101117,6 @@ MonoBehaviour:
   Art: {fileID: 158156721}
   AvailableRecieps:
   - {fileID: 11400000, guid: e0760229dd2735c4b81bf3a38caeee6c, type: 2}
-  - {fileID: 11400000, guid: e0760229dd2735c4b81bf3a38caeee6c, type: 2}
-  - {fileID: 11400000, guid: e0760229dd2735c4b81bf3a38caeee6c, type: 2}
-  - {fileID: 11400000, guid: e0760229dd2735c4b81bf3a38caeee6c, type: 2}
-  - {fileID: 11400000, guid: e0760229dd2735c4b81bf3a38caeee6c, type: 2}
 --- !u!114 &1160012601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101176,12 +101219,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1500cc711d59d364e912078728b6a9a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxSlots: 10
   CraftingView: {fileID: 997834711}
   CraftingOptionsParent: {fileID: 1660039649}
   SelectedCraftColor: {r: 1, g: 0.82583797, b: 0, a: 0.6313726}
   CraftingMenuKey: 105
   CraftingOptionPrefab: {fileID: 707462854899762040, guid: c458f8ffefa3dd647b96ec09e5cec9aa, type: 3}
+  HotbarItems: []
+  HotbarSlots: 9
+  HotbarView: {fileID: 2032752589}
+  HotbarSlotsParent: {fileID: 2032752589}
+  HotbarSlotPrefab: {fileID: 4000453861720801670, guid: 7e0ccb219093b234f942b07a6baa16c6, type: 3}
 --- !u!1 &1333024470
 GameObject:
   m_ObjectHideFlags: 0
@@ -101412,6 +101459,108 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1160012602}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2032752588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2032752589}
+  - component: {fileID: 2032752592}
+  - component: {fileID: 2032752591}
+  - component: {fileID: 2032752590}
+  m_Layer: 5
+  m_Name: QuickInventory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2032752589
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032752588}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 788184171}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 50}
+  m_SizeDelta: {x: 0, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2032752590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032752588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &2032752591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032752588}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &2032752592
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032752588}
+  m_CullTransparentMesh: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

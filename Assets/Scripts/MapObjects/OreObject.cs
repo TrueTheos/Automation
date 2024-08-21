@@ -12,7 +12,7 @@ namespace Assets.Scripts.MapObjects
     [RequireComponent(typeof(BoxCollider2D))]
     public class OreObject : MapObject
     {
-        public Item Drop;
+        public NormalItem Drop;
         public Vector2Int DropCountRange;
         public TileType SpawnTileType;
 

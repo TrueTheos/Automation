@@ -52,11 +52,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644cdd83394ed7f40ac7e7de6966d363, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Requirements: {fileID: 8613364389352270516}
+  RequirementsParent: {fileID: 8613364389352270516}
   Icon: {fileID: 912220755911595352}
   RequirementPrefab: {fileID: 2205682249249908787, guid: 7e0ccb219093b234f942b07a6baa16c6, type: 3}
+  Recipe: {fileID: 0}
   Background: {fileID: 8964515022251103003}
   Rect: {fileID: 1857974359676008288}
+  Button: {fileID: 0}
   IsSelected: 0
 --- !u!114 &926611012661524334
 MonoBehaviour:
@@ -222,7 +224,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
