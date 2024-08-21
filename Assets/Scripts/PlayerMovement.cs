@@ -81,9 +81,8 @@ public class PlayerMovement : MonoBehaviour
                 if (_mapManager.IsFree(gridMousePos.x, gridMousePos.y))
                 {
                     _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y);
-                }
-
-                _inventory.RemoveItemFromSlot(1, _selectedItem);
+                    _inventory.RemoveItemFromSlot(1, _selectedItem);
+                }             
             }   
         }
 
