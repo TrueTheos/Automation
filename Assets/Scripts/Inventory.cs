@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+using DG.Tweening;
 
 namespace Assets.Scripts
 {
@@ -15,11 +17,16 @@ namespace Assets.Scripts
 
         public InventorySlot[] Items;
 
-        public GameObject CraftingView;
+        public RectTransform CraftingView;
+        public RectTransform CraftingOptionsParent;
+        private int _selectedCraftingOptionIndex;
+        private CraftingOption _selectedCraftingOption;
+        public Color SelectedCraftColor;
         public KeyCode CraftingMenuKey;
-        public CraftingOption MainCraftingOption;
         public GameObject CraftingOptionPrefab;
         private bool _crafingViewToggle;
+
+        private float _craftingOptionsTargetPos;
 
         private Player _player;
 
@@ -28,6 +35,11 @@ namespace Assets.Scripts
             Items = new InventorySlot[MaxSlots];
 
             _player = GetComponent<Player>();
+        }
+
+        private void Start()
+        {
+            _craftingOptionsTargetPos = CraftingOptionsParent.rect.height / 10;
         }
 
         private void Update()
@@ -43,20 +55,98 @@ namespace Assets.Scripts
                     OpenCraftingView();
                 }
             }
+
+            if(_crafingViewToggle)
+            {
+                if(_selectedCraftingOption == null)
+                {
+                    _selectedCraftingOption = CraftingOptionsParent.transform.GetChild(0).GetComponent<CraftingOption>();
+                    _selectedCraftingOption.Highlight(SelectedCraftColor);
+                }
+
+                float scroll = Input.GetAxis("Mouse ScrollWheel");
+                if (scroll != 0f)
+                {
+                    if (scroll > 0f)
+                    {
+                        _selectedCraftingOptionIndex--;
+                        if (_selectedCraftingOptionIndex < 0)
+                        {
+                            _selectedCraftingOptionIndex = 0;
+                        }
+                    }
+                    else if (scroll < 0f)
+                    {
+                        _selectedCraftingOptionIndex++;
+                        if (_selectedCraftingOptionIndex >= CraftingOptionsParent.transform.childCount)
+                        {
+                            _selectedCraftingOptionIndex = CraftingOptionsParent.transform.childCount - 1;
+                        }
+                    }
+
+                    MoveTowardsCraftOption(CraftingOptionsParent.transform.GetChild(_selectedCraftingOptionIndex).GetComponent<CraftingOption>());
+                }   
+            }
         }
 
         private void OpenCraftingView()
         {
             if (_player.AvailableRecieps.Count == 0) return;
 
-            MainCraftingOption.GetComponent<CraftingOption>().Init(_player.AvailableRecieps[0]);
+            //MainCraftingOption.GetComponent<CraftingOption>().Init(_player.AvailableRecieps[0]);
 
-            for (int i = 1; i < _player.AvailableRecieps.Count; i++)
+            foreach (Transform child in CraftingOptionsParent.transform)
             {
-                CraftingOption newOption = Instantiate(CraftingOptionPrefab, CraftingView.transform).GetComponent<CraftingOption>();
-                newOption.Requirements.SetActive(false);
-                newOption.Init(_player.AvailableRecieps[i]);
+                Destroy(child.gameObject);
             }
+
+            for (int i = 0; i < _player.AvailableRecieps.Count; i++)
+            {
+                CraftingOption newOption = Instantiate(CraftingOptionPrefab, CraftingOptionsParent.transform).GetComponent<CraftingOption>();
+                newOption.RequirementsParent.SetActive(false);
+                newOption.Init(_player.AvailableRecieps[i]);
+                newOption.GetComponentInChildren<Button>().onClick.AddListener(delegate { CraftOptionClick(newOption); });
+            }
+        }
+
+        private void MoveTowardsCraftOption(CraftingOption craft)
+        {
+            _selectedCraftingOption?.DeHighlight();
+            _selectedCraftingOption = craft;
+            _selectedCraftingOption.Highlight(SelectedCraftColor);
+
+            float selectedChildPos = _selectedCraftingOption.Rect.position.y;
+            float target = _craftingOptionsTargetPos - selectedChildPos - _selectedCraftingOption.Rect.rect.height;
+            float distance = Mathf.Abs(target);
+            float duration = Mathf.Clamp(1f - (distance / 10f), 0.2f, 1f);
+            DOTween.Kill(CraftingOptionsParent);
+            CraftingOptionsParent.DOAnchorPosY(CraftingOptionsParent.position.y + target, duration, true).onComplete = _selectedCraftingOption.Select;
+        }
+
+        public void CraftOptionClick(CraftingOption craft)
+        {
+            if (craft.IsSelected)
+            {
+                if(MatchesRequirements(craft.Recipe.Requirements))
+                {
+                    RemoveItems(craft.Recipe.Requirements);
+                    AddItem(craft.Recipe.Result, true);
+                }
+            }
+            else
+            {
+                MoveTowardsCraftOption(craft);
+            }
+        }
+
+        public bool MatchesRequirements(List<ItemAmount> requirements)
+        {
+            foreach (var req in requirements)
+            {
+                if (!HasItems(req.Item, req.Amount)) return false;
+            }
+
+            return true;
         }
 
         public bool HasItems(Item item, int amount)
@@ -85,7 +175,60 @@ namespace Assets.Scripts
             return GetNotFullSlot(itemObj.ItemData) != null;
         }
 
-        public void AddItem(ItemObject itemObj, bool dropTheRest = false)
+        public void RemoveItems(List<ItemAmount> items)
+        {
+            foreach (var item in items)
+            {
+                RemoveItem(item.Item, item.Amount);
+            }
+        }
+
+        public void RemoveItem(Item item, int amount)
+        {
+            int remainingAmount = amount;
+
+            for (int i = 0; i < Items.Length; i++)
+            {
+                if (Items[i] != null && Items[i].Item == item)
+                {
+                    if (Items[i].Amount >= remainingAmount)
+                    {
+                        Items[i].ItemAmount.Amount -= remainingAmount;
+                        if (Items[i].Amount == 0)
+                        {
+                            Items[i] = null;
+                        }
+                        remainingAmount = 0;
+                        break;
+                    }
+                    else
+                    {
+                        remainingAmount -= Items[i].Amount;
+                        Items[i] = null;
+                    }
+                }
+            }
+
+            if (remainingAmount > 0)
+            {
+                throw new Exception($"Unable to remove {remainingAmount} of {item.Name} from the inventory.");
+            }
+        }
+
+        public void AddItem(ItemAmount item, bool dropTheRest = false)
+        {
+             int leftOver = AddItem(item.Item, item.Amount);
+
+            if(dropTheRest && leftOver > 0)
+            {
+                MapManager.Instance.SpawnItem(item.Item, 
+                    transform.position.x, 
+                    transform.position.y, 
+                    leftOver);
+            }
+        }
+
+        public void PickupItem(ItemObject itemObj, bool dropTheRest = false)
         {
             int leftOver = AddItem(itemObj.ItemData, itemObj.Stack);
 

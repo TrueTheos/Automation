@@ -108,7 +108,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (distanceToPlayer <= PickupRange)
                 {
-                    _inventory.AddItem(item);
+                    _inventory.PickupItem(item);
                     AudioManager.Instance.PickupItem();
                 }
             }
