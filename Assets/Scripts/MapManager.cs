@@ -27,7 +27,7 @@ public class MapManager : MonoBehaviour
     {
         MapObject spawnedOre = Instantiate(obj, new Vector3(x + .5f, y + .5f, 0), Quaternion.identity);
         Chunk chunk = _generator.GetChunk(x, y);
-        spawnedOre.Spawn(chunk, x, y);
+        spawnedOre.Place(chunk, x, y);
     }
 
     public bool IsFree(int x, int y)

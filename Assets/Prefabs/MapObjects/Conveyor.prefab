@@ -47,6 +47,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapItem: {fileID: 11400000, guid: f6b97646b3f4ecb4cb91524735f4f38a, type: 2}
+  Parent: {fileID: 0}
+  Child: {fileID: 0}
+  Sprite: {fileID: 3121999503643082909}
+  BeltSprites:
+    dictionary:
+    - Key: 0
+      Value: {fileID: -174329239, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 1
+      Value: {fileID: -651349940, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 2
+      Value: {fileID: -129201297, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 3
+      Value: {fileID: -1271546529, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 4
+      Value: {fileID: -1829461225, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 5
+      Value: {fileID: 716825239, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 6
+      Value: {fileID: -16094604, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 7
+      Value: {fileID: 2032749599, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 8
+      Value: {fileID: -1695136957, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 9
+      Value: {fileID: -1805465621, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 10
+      Value: {fileID: 1551788588, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 11
+      Value: {fileID: 1682321225, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+  inputConnection: 1
+  outputConnection: 2
 --- !u!212 &3121999503643082909
 SpriteRenderer:
   m_ObjectHideFlags: 0

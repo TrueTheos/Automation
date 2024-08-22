@@ -95,6 +95,11 @@ public class MapGenerator : MonoBehaviour
         return Chunks[x / CHUNK_SIZE, y / CHUNK_SIZE];
     }
 
+    public MapObject GetObjectAtPos(int x, int y)
+    {
+        return GetChunk(x, y).GetObjectAtPos(x,y);
+    }
+
     public IEnumerator GenerateOres()
     {
         if (Ores == null || Ores.Count == 0) yield break;
@@ -165,6 +170,11 @@ public class Chunk
     {
         if (obj is OreObject) OresCount++;
         Objects[obj.X - WorldX, obj.Y - WorldY] = obj;
+    }
+
+    public MapObject GetObjectAtPos(int x, int y)
+    {
+        return Objects[x - WorldX, y - WorldY];
     }
 
     public void DestroyObject(MapObject obj)

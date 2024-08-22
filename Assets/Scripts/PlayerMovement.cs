@@ -65,7 +65,6 @@ public class PlayerMovement : MonoBehaviour
         {
             _rb.velocity = _moveInput * MoveSpeed;
         }
-        //
 
         if(Input.GetMouseButton(0))
         {

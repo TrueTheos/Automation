@@ -20,7 +20,9 @@ namespace Assets.Scripts.MapObjects
         public int X => _x;
         public int Y => _y;
 
-        public void Spawn(Chunk chunk, int x, int y)
+        private GameManager _gameManager;
+
+        public void Place(Chunk chunk, int x, int y)
         {
             Chunk = chunk;
             
@@ -30,7 +32,13 @@ namespace Assets.Scripts.MapObjects
             _currentDurability = MapItem.MaxDurability;
 
             Chunk.SpawnObject(this);
+
+            _gameManager = GameManager.Instance;
+
+            OnPlace();
         }
+
+        protected virtual void OnPlace() { }
 
         public void Hit(int power)
         {
