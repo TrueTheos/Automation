@@ -17,6 +17,9 @@ namespace Assets.Scripts.MapObjects
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
 
+        private static Queue<ConveyorBeltObject> _updateQueue = new Queue<ConveyorBeltObject>();
+        private static HashSet<ConveyorBeltObject> _enqueuedBelts = new HashSet<ConveyorBeltObject>();
+
         public enum ConnectionType
         {
             None,
@@ -26,8 +29,10 @@ namespace Assets.Scripts.MapObjects
             Down
         }
 
-        public ConnectionType inputConnection = ConnectionType.None;
-        public ConnectionType outputConnection = ConnectionType.None;
+        private BeltDirection _direction;
+
+        public ConnectionType InputConnection = ConnectionType.None;
+        public ConnectionType OutputConnection = ConnectionType.None;
 
         protected override void OnPlace()
         {
@@ -36,9 +41,12 @@ namespace Assets.Scripts.MapObjects
 
         public void UpdateSprite(ConnectionType comingFrom)
         {
-            BeltDirection dir = GetBeltDirection();
-            Sprite.sprite = BeltSprites[dir];
-            UpdateNeighbors(comingFrom);
+            if(comingFrom == ConnectionType.None || _direction != GetBeltDirection())
+            {
+                _direction = GetBeltDirection();
+                Sprite.sprite = BeltSprites[_direction];
+                UpdateNeighbors(comingFrom);
+            }
         }
 
         private void UpdateNeighbors(ConnectionType comingFrom)
@@ -55,33 +63,46 @@ namespace Assets.Scripts.MapObjects
 
         private BeltDirection GetBeltDirection()
         {
-            // This method should return the correct sprite index based on input and output connections
-            // You'll need to map your sprite array indices to the various combinations
+            if(Child == null && InputConnection != ConnectionType.None)
+            {
+                if (InputConnection == ConnectionType.Left) return BeltDirection.WE;
+                if (InputConnection == ConnectionType.Up) return BeltDirection.NS;
+                if (InputConnection == ConnectionType.Right) return BeltDirection.EW;
+                if (InputConnection == ConnectionType.Down) return BeltDirection.SN;
+            }
 
-            if (inputConnection == ConnectionType.Left && outputConnection == ConnectionType.Right)
+            if (Parent == null && OutputConnection != ConnectionType.None)
+            {
+                if (OutputConnection == ConnectionType.Left) return BeltDirection.EW;
+                if (OutputConnection == ConnectionType.Up) return BeltDirection.SN;
+                if (OutputConnection == ConnectionType.Right) return BeltDirection.WE;
+                if (OutputConnection == ConnectionType.Down) return BeltDirection.NS;
+            }
+
+            if (InputConnection == ConnectionType.Left && OutputConnection == ConnectionType.Right)
                 return BeltDirection.WE;
-            if (inputConnection == ConnectionType.Right && outputConnection == ConnectionType.Left)
+            if (InputConnection == ConnectionType.Right && OutputConnection == ConnectionType.Left)
                 return BeltDirection.EW;
-            if (inputConnection == ConnectionType.Down && outputConnection == ConnectionType.Up)
+            if (InputConnection == ConnectionType.Down && OutputConnection == ConnectionType.Up)
                 return BeltDirection.SN;
-            if (inputConnection == ConnectionType.Up && outputConnection == ConnectionType.Down)
+            if (InputConnection == ConnectionType.Up && OutputConnection == ConnectionType.Down)
                 return BeltDirection.NS;
 
-            if (inputConnection == ConnectionType.Left && outputConnection == ConnectionType.Up)
+            if (InputConnection == ConnectionType.Left && OutputConnection == ConnectionType.Up)
                 return BeltDirection.WN;
-            if (inputConnection == ConnectionType.Up && outputConnection == ConnectionType.Left)
+            if (InputConnection == ConnectionType.Up && OutputConnection == ConnectionType.Left)
                 return BeltDirection.NW;
-            if (inputConnection == ConnectionType.Right && outputConnection == ConnectionType.Up)
+            if (InputConnection == ConnectionType.Right && OutputConnection == ConnectionType.Up)
                 return BeltDirection.EN;
-            if (inputConnection == ConnectionType.Up && outputConnection == ConnectionType.Right)
+            if (InputConnection == ConnectionType.Up && OutputConnection == ConnectionType.Right)
                 return BeltDirection.NE;
-            if (inputConnection == ConnectionType.Left && outputConnection == ConnectionType.Down)
+            if (InputConnection == ConnectionType.Left && OutputConnection == ConnectionType.Down)
                 return BeltDirection.WS;
-            if (inputConnection == ConnectionType.Down && outputConnection == ConnectionType.Left)
+            if (InputConnection == ConnectionType.Down && OutputConnection == ConnectionType.Left)
                 return BeltDirection.SW;
-            if (inputConnection == ConnectionType.Right && outputConnection == ConnectionType.Down)
+            if (InputConnection == ConnectionType.Right && OutputConnection == ConnectionType.Down)
                 return BeltDirection.ES;
-            if (inputConnection == ConnectionType.Down && outputConnection == ConnectionType.Right)
+            if (InputConnection == ConnectionType.Down && OutputConnection == ConnectionType.Right)
                 return BeltDirection.SE;
 
             return BeltDirection.WE;
@@ -98,8 +119,47 @@ namespace Assets.Scripts.MapObjects
                 {
                     Parent = neighbor;
                     neighbor.Child = this;
-                    neighbor.outputConnection = neighborInput;
-                    inputConnection = neighborOutput;
+                    neighbor.OutputConnection = neighborInput;
+
+                    if(neighbor.InputConnection == ConnectionType.None)
+                    {
+                        if (neighborInput == ConnectionType.Left) neighbor.InputConnection = ConnectionType.Right;
+                        if (neighborInput == ConnectionType.Up) neighbor.InputConnection = ConnectionType.Down;
+                        if (neighborInput == ConnectionType.Right) neighbor.InputConnection = ConnectionType.Left;
+                        if (neighborInput == ConnectionType.Down) neighbor.InputConnection = ConnectionType.Up;
+                    }
+                    InputConnection = neighborOutput;
+
+                    if(OutputConnection == ConnectionType.None) 
+                    {
+                        if (neighborOutput == ConnectionType.Left) OutputConnection = ConnectionType.Right;
+                        if (neighborOutput == ConnectionType.Up) OutputConnection = ConnectionType.Down;
+                        if (neighborOutput == ConnectionType.Right) OutputConnection = ConnectionType.Left;
+                        if (neighborOutput == ConnectionType.Down) OutputConnection = ConnectionType.Up;
+                    }
+                }
+                else if(Child == null && neighbor.Parent == null)
+                {
+                    Child = neighbor;
+                    neighbor.Parent = this;
+                    neighbor.InputConnection = neighborInput;
+
+                    if (neighbor.InputConnection == ConnectionType.None)
+                    {
+                        if (neighborInput == ConnectionType.Left) neighbor.InputConnection = ConnectionType.Right;
+                        if (neighborInput == ConnectionType.Up) neighbor.InputConnection = ConnectionType.Down;
+                        if (neighborInput == ConnectionType.Right) neighbor.InputConnection = ConnectionType.Left;
+                        if (neighborInput == ConnectionType.Down) neighbor.InputConnection = ConnectionType.Up;
+                    }
+                    OutputConnection = neighborOutput;
+
+                    if (OutputConnection == ConnectionType.None)
+                    {
+                        if (neighborOutput == ConnectionType.Left) OutputConnection = ConnectionType.Right;
+                        if (neighborOutput == ConnectionType.Up) OutputConnection = ConnectionType.Down;
+                        if (neighborOutput == ConnectionType.Right) OutputConnection = ConnectionType.Left;
+                        if (neighborOutput == ConnectionType.Down) OutputConnection = ConnectionType.Up;
+                    }
                 }
 
                 neighbor.UpdateSprite(neighborOutput);
