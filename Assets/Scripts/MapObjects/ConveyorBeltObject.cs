@@ -17,8 +17,13 @@ namespace Assets.Scripts.MapObjects
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
 
-        private static Queue<ConveyorBeltObject> _updateQueue = new Queue<ConveyorBeltObject>();
-        private static HashSet<ConveyorBeltObject> _enqueuedBelts = new HashSet<ConveyorBeltObject>();
+        private Dictionary<ConnectionType, ConnectionType> _oppositeDirection = new()
+        {
+            {ConnectionType.Left, ConnectionType.Right },
+            {ConnectionType.Right, ConnectionType.Left },
+            {ConnectionType.Up, ConnectionType.Down },
+            {ConnectionType.Down, ConnectionType.Up },
+        };
 
         public enum ConnectionType
         {
@@ -123,19 +128,13 @@ namespace Assets.Scripts.MapObjects
 
                     if(neighbor.InputConnection == ConnectionType.None)
                     {
-                        if (neighborInput == ConnectionType.Left) neighbor.InputConnection = ConnectionType.Right;
-                        if (neighborInput == ConnectionType.Up) neighbor.InputConnection = ConnectionType.Down;
-                        if (neighborInput == ConnectionType.Right) neighbor.InputConnection = ConnectionType.Left;
-                        if (neighborInput == ConnectionType.Down) neighbor.InputConnection = ConnectionType.Up;
+                        neighbor.InputConnection = _oppositeDirection[neighborInput];
                     }
                     InputConnection = neighborOutput;
 
                     if(OutputConnection == ConnectionType.None) 
                     {
-                        if (neighborOutput == ConnectionType.Left) OutputConnection = ConnectionType.Right;
-                        if (neighborOutput == ConnectionType.Up) OutputConnection = ConnectionType.Down;
-                        if (neighborOutput == ConnectionType.Right) OutputConnection = ConnectionType.Left;
-                        if (neighborOutput == ConnectionType.Down) OutputConnection = ConnectionType.Up;
+                        OutputConnection = _oppositeDirection[neighborOutput];
                     }
                 }
                 else if(Child == null && neighbor.Parent == null)
@@ -146,19 +145,14 @@ namespace Assets.Scripts.MapObjects
 
                     if (neighbor.InputConnection == ConnectionType.None)
                     {
-                        if (neighborInput == ConnectionType.Left) neighbor.InputConnection = ConnectionType.Right;
-                        if (neighborInput == ConnectionType.Up) neighbor.InputConnection = ConnectionType.Down;
-                        if (neighborInput == ConnectionType.Right) neighbor.InputConnection = ConnectionType.Left;
-                        if (neighborInput == ConnectionType.Down) neighbor.InputConnection = ConnectionType.Up;
+                        neighbor.InputConnection = _oppositeDirection[neighborInput];
                     }
+
                     OutputConnection = neighborOutput;
 
                     if (OutputConnection == ConnectionType.None)
                     {
-                        if (neighborOutput == ConnectionType.Left) OutputConnection = ConnectionType.Right;
-                        if (neighborOutput == ConnectionType.Up) OutputConnection = ConnectionType.Down;
-                        if (neighborOutput == ConnectionType.Right) OutputConnection = ConnectionType.Left;
-                        if (neighborOutput == ConnectionType.Down) OutputConnection = ConnectionType.Up;
+                        OutputConnection = _oppositeDirection[neighborOutput];
                     }
                 }
 

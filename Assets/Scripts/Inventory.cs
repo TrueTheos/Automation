@@ -57,7 +57,7 @@ namespace Assets.Scripts
         {
             if(Input.GetKeyDown(CraftingMenuKey))
             {
-                _crafingViewToggle = !_crafingViewToggle;
+                _crafingViewToggle = true;
 
                 CraftingView.gameObject.SetActive(_crafingViewToggle);
 
@@ -66,12 +66,17 @@ namespace Assets.Scripts
                     OpenCraftingView();
                 }
             }
+            if(Input.GetKeyUp(CraftingMenuKey))
+            {
+                _crafingViewToggle = false;
+                CraftingView.gameObject.SetActive(_crafingViewToggle);
+            }
 
             if(_crafingViewToggle)
             {
                 if(_selectedCraftingOption == null)
                 {
-                    MoveTowardsCraftOption(CraftingOptionsParent.transform.GetChild(0).GetComponent<CraftingOption>());
+                    MoveTowardsCraftOption(CraftingOptionsParent.transform.GetChild(_selectedCraftingOptionIndex).GetComponent<CraftingOption>());
                 }
 
                 float scroll = Input.GetAxis("Mouse ScrollWheel");

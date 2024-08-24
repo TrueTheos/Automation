@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Items;
+using DG.Tweening;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,10 @@ namespace Assets.Scripts.MapObjects
         {
             _currentDurability -= power;
 
-            if(_currentDurability <= 0)
+            transform.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), 0.5f, 10, 1);
+            //transform.DOShakePosition(0.5f, 0.2f, 10, 90, false, true);
+
+            if (_currentDurability <= 0)
             {
                 Break();
             }

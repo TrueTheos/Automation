@@ -36,6 +36,9 @@ public class PlayerMovement : MonoBehaviour
 
     private Camera _cam;
 
+    private bool _isClicking = false;
+    private float _lastClickTime = 0f;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -48,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
     {
         _mapManager = MapManager.Instance;
         _selectedItem = _inventory.HotbarItems[0];
+        _destroyTimer = DestroyInterval;
     }
 
     private void Update()
@@ -66,7 +70,16 @@ public class PlayerMovement : MonoBehaviour
             _rb.velocity = _moveInput * MoveSpeed;
         }
 
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
+        {
+            _isClicking = true;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            _isClicking = false;
+        }
+
+        if (_isClicking || Input.GetMouseButton(0))
         {
             HandleHittingObject();
         }
@@ -122,6 +135,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void ScrollThruItems()
     {
+        for (int i = 1; i <= 9; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha0 + i) || Input.GetKeyDown(KeyCode.Keypad0 + i))
+            {
+                _selectedObjectIndex = Mathf.Clamp(i, 1, _inventory.HotbarSlots) - 1;
+                OnChangeSlot();
+            }
+        }
+
         if (_inventory.CraftingViewOpen) return;
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -144,22 +166,26 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
 
-            if (_selectedItem != null) _selectedItem.DeHighlight();
-            _selectedItem = _inventory.HotbarItems[_selectedObjectIndex];
-            _selectedItem.Highlight();
+            OnChangeSlot();
+        }        
+    }
 
-            if (_selectedItem != null && _selectedItem.Item is MapItem buildingItem)
-            {
-                _placeObjectPreview.gameObject.SetActive(true);
+    private void OnChangeSlot()
+    {
+        if (_selectedItem != null) _selectedItem.DeHighlight();
+        _selectedItem = _inventory.HotbarItems[_selectedObjectIndex];
+        _selectedItem.Highlight();
 
-                _placeObjectPreview.sprite = _selectedItem.Item.Icon;
-            }
-            else
-            {
-                _placeObjectPreview.gameObject.SetActive(false);
-            }
+        if (_selectedItem != null && _selectedItem.Item is MapItem buildingItem)
+        {
+            _placeObjectPreview.gameObject.SetActive(true);
+
+            _placeObjectPreview.sprite = _selectedItem.Item.Icon;
         }
-        
+        else
+        {
+            _placeObjectPreview.gameObject.SetActive(false);
+        }
     }
 
     private void UpdateHand()
@@ -194,17 +220,29 @@ public class PlayerMovement : MonoBehaviour
     {
         _destroyTimer += Time.deltaTime;
 
-        if(_destroyTimer >= DestroyInterval)
+        if (_isClicking)
         {
-            _destroyTimer = 0;
-
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
-
-            if (hit.collider != null && hit.collider.gameObject.TryGetComponent(out MapObject mapObj))
+            if (Time.time - _lastClickTime >= DestroyInterval)
             {
-                mapObj.Hit(DestroyPower);
+                HitObject();
+                _lastClickTime = Time.time;
             }
+        }
+        else if (_destroyTimer >= DestroyInterval)
+        {
+            HitObject();
+            _destroyTimer = 0;
+        }
+    }
+
+    private void HitObject()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+        if (hit.collider != null && hit.collider.gameObject.TryGetComponent(out MapObject mapObj))
+        {
+            mapObj.Hit(DestroyPower);
         }
     }
 
