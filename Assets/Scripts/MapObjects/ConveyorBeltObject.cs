@@ -1,8 +1,11 @@
+using Assets.Scripts.Items;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.Port;
 
 namespace Assets.Scripts.MapObjects
 {
@@ -13,6 +16,9 @@ namespace Assets.Scripts.MapObjects
         public ConveyorBeltObject Child;
 
         public SpriteRenderer Sprite;
+
+        public ItemObject IncomingItem;
+        public ItemObject Item;
 
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
@@ -42,6 +48,65 @@ namespace Assets.Scripts.MapObjects
         protected override void OnPlace()
         {
             UpdateSprite(ConnectionType.None);
+            GameManager.Instance.AddBelt(this);
+        }
+
+        public void MoveItems()
+        {
+            if(IncomingItem != null)
+            {
+                if(Item != null)
+                {
+                    if (Child != null)
+                    {
+                        if (Child.CanAcceptItem() && Item != null)
+                        {
+                            Child.AcceptItem(Item);
+                            Item = null;
+                        }
+                    }
+                }               
+
+                if(Item == null)
+                {
+                    Item = IncomingItem;
+                    IncomingItem = null;
+                    Item.MoveToPosition(transform.position);
+                }
+            }     
+            else
+            {
+                if (Item != null)
+                {
+                    if (Child != null)
+                    {
+                        if (Child.CanAcceptItem() && Item != null)
+                        {
+                            Child.AcceptItem(Item);
+                            Item = null;
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool CanAcceptItem()
+        {
+            return Item == null || (Child != null && Child.CanAcceptItem());
+        }
+
+        public void AcceptItem(ItemObject item)
+        {
+            IncomingItem = item;
+        }
+
+        public void SpawnItem(NormalItem item)
+        {
+            if (CanAcceptItem())
+            {
+                ItemObject newItemObject = MapManager.Instance.SpawnItem(item, transform.position.x, transform.position.y, 1);
+                AcceptItem(newItemObject);
+            }
         }
 
         public void UpdateSprite(ConnectionType comingFrom)

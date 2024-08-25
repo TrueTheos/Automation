@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Assets.Scripts.MapObjects;
+using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,11 @@ namespace Assets.Scripts.Items
     {
         public Item ItemData;
         public int Stack;
+
+        public void MoveToPosition(Vector3 newPosition)
+        {
+            transform.DOMove(newPosition, .5f).SetEase(Ease.Linear);
+        }
 
         public void Init(Item item, int count)
         {

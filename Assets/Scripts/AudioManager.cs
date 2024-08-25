@@ -11,6 +11,7 @@ namespace Assets.Scripts
     public class AudioManager : MonoBehaviour
     {
         [SerializeField] private AudioClip PickupItemSound;
+        [SerializeField] private AudioClip CraftSound;
 
         private static AudioSource _audioSource;
 
@@ -25,6 +26,11 @@ namespace Assets.Scripts
         public void PickupItem()
         {
             _audioSource.PlayOneShot(PickupItemSound);
+        }
+
+        public void Craft()
+        {
+            _audioSource.PlayOneShot(CraftSound);
         }
     }
 }

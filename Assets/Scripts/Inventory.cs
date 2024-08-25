@@ -155,6 +155,7 @@ namespace Assets.Scripts
                 {
                     RemoveItems(craft.Recipe.Requirements);
                     AddItem(craft.Recipe.Result, true);
+                    AudioManager.Instance.Craft();
                 }
             }
             else

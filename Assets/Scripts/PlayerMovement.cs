@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     private int _selectedObjectIndex;
 
     [SerializeField] private GameObject _hand;
+    private SpriteRenderer _handArt;
 
     private Rigidbody2D _rb;
     private Vector2 _moveInput;
@@ -45,6 +46,7 @@ public class PlayerMovement : MonoBehaviour
         _inventory = GetComponent<Inventory>();
         _cam = Camera.main;
         _player = GetComponent<Player>();
+        _handArt = _hand.GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Start()
@@ -84,26 +86,37 @@ public class PlayerMovement : MonoBehaviour
             HandleHittingObject();
         }
 
-        if(Input.GetMouseButton(1))
-        {
-            if (_selectedItem != null && !_selectedItem.IsEmpty() && _selectedItem.Item is MapItem buildingItem)
-            {
-                var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
 
-                if (_mapManager.IsFree(gridMousePos.x, gridMousePos.y))
+        var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
+        if (Input.GetMouseButton(1))
+        {
+            if (_mapManager.IsFree(gridMousePos.x, gridMousePos.y))
+            {
+                if (_selectedItem != null && !_selectedItem.IsEmpty() && _selectedItem.Item is MapItem buildingItem)
                 {
                     _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y);
                     _inventory.RemoveItemFromSlot(1, _selectedItem);
-                }             
-            }   
+                }
+            }         
         }
-
+        if(Input.GetMouseButtonDown(1))
+        {
+            if (!_mapManager.IsFree(gridMousePos.x, gridMousePos.y))
+            {
+                if (MapGenerator.Instance.GetObjectAtPos(gridMousePos.x, gridMousePos.y) is ConveyorBeltObject conveyorBelt)
+                {
+                    if (_selectedItem != null && _selectedItem.Item is NormalItem normalItem)
+                    {
+                        conveyorBelt.SpawnItem(normalItem);
+                    }
+                }
+            }
+        }
         if(_selectedItem != null && _selectedItem.Item is MapItem)
         {
-            var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 gridMousePos = new Vector3(Mathf.FloorToInt(mousePos.x) + .5f, Mathf.FloorToInt(mousePos.y) + .5f, 0);
-            _placeObjectPreview.gameObject.transform.position = gridMousePos;
+            Vector3 _placeholderPos = new Vector3(.5f + gridMousePos.x, .5f + gridMousePos.y, 0);
+            _placeObjectPreview.gameObject.transform.position = _placeholderPos;
         }
 
         List<ItemObject> items = Physics2D.OverlapCircleAll(transform.position, AttractionRange, PickupLayer).Select(x => x.GetComponent<ItemObject>()).ToList();
@@ -176,14 +189,21 @@ public class PlayerMovement : MonoBehaviour
         _selectedItem = _inventory.HotbarItems[_selectedObjectIndex];
         _selectedItem.Highlight();
 
-        if (_selectedItem != null && _selectedItem.Item is MapItem buildingItem)
+        if (_selectedItem != null && _selectedItem.Item != null)
         {
-            _placeObjectPreview.gameObject.SetActive(true);
-
-            _placeObjectPreview.sprite = _selectedItem.Item.Icon;
+            if (_selectedItem.Item is MapItem buildingItem)
+            {
+                _placeObjectPreview.gameObject.SetActive(true);
+                _placeObjectPreview.sprite = _selectedItem.Item.Icon;           
+            }
+            else
+            {
+                _handArt.sprite = _selectedItem.Item.Icon;
+            }
         }
         else
         {
+            _handArt.sprite = null;
             _placeObjectPreview.gameObject.SetActive(false);
         }
     }
@@ -208,11 +228,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (_hand.transform.eulerAngles.z > 0 && _hand.transform.eulerAngles.z < 180)
         {
-            _hand.GetComponent<SpriteRenderer>().sortingOrder = _player.Art.sortingOrder - 1;
+            _handArt.sortingOrder = _player.Art.sortingOrder - 1;
         }
         else
         {
-            _hand.GetComponent<SpriteRenderer>().sortingOrder = _player.Art.sortingOrder + 1;
+            _handArt.sortingOrder = _player.Art.sortingOrder + 1;
         }
     }
 

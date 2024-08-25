@@ -36,9 +36,10 @@ public class MapManager : MonoBehaviour
         return chunk.IsFreeWorldPos(x, y);
     }
 
-    public void SpawnItem(Item item, float x, float y, int count)
+    public ItemObject SpawnItem(Item item, float x, float y, int count)
     {
         ItemObject itemObj = Instantiate(ItemObject, new Vector3(x,y,0), Quaternion.identity);
         itemObj.Init(item, count);
+        return itemObj;
     }
 }
