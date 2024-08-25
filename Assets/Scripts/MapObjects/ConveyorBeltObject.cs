@@ -23,7 +23,7 @@ namespace Assets.Scripts.MapObjects
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
 
-        private Dictionary<ConnectionType, ConnectionType> _oppositeDirection = new()
+        private static Dictionary<ConnectionType, ConnectionType> _oppositeDirection = new()
         {
             {ConnectionType.Left, ConnectionType.Right },
             {ConnectionType.Right, ConnectionType.Left },
@@ -57,13 +57,10 @@ namespace Assets.Scripts.MapObjects
             {
                 if(Item != null)
                 {
-                    if (Child != null)
+                    if (Child != null && Child.CanAcceptItem())
                     {
-                        if (Child.CanAcceptItem() && Item != null)
-                        {
-                            Child.AcceptItem(Item);
-                            Item = null;
-                        }
+                        Child.AcceptItem(Item);
+                        Item = null;
                     }
                 }               
 
@@ -76,16 +73,10 @@ namespace Assets.Scripts.MapObjects
             }     
             else
             {
-                if (Item != null)
+                if (Item != null && Child != null && Child.CanAcceptItem() && Item != null)
                 {
-                    if (Child != null)
-                    {
-                        if (Child.CanAcceptItem() && Item != null)
-                        {
-                            Child.AcceptItem(Item);
-                            Item = null;
-                        }
-                    }
+                    Child.AcceptItem(Item);
+                    Item = null;
                 }
             }
         }
@@ -126,58 +117,6 @@ namespace Assets.Scripts.MapObjects
             if (comingFrom == ConnectionType.None || comingFrom != ConnectionType.Right) UpdateNeighborConnection(Vector2.left, ConnectionType.Right, ConnectionType.Left);
             if (comingFrom == ConnectionType.None || comingFrom != ConnectionType.Left) UpdateNeighborConnection(Vector2.right, ConnectionType.Left, ConnectionType.Right);
         }
-
-        // N
-        //W E
-        // S
-
-        private BeltDirection GetBeltDirection()
-        {
-            if(Child == null && InputConnection != ConnectionType.None)
-            {
-                if (InputConnection == ConnectionType.Left) return BeltDirection.WE;
-                if (InputConnection == ConnectionType.Up) return BeltDirection.NS;
-                if (InputConnection == ConnectionType.Right) return BeltDirection.EW;
-                if (InputConnection == ConnectionType.Down) return BeltDirection.SN;
-            }
-
-            if (Parent == null && OutputConnection != ConnectionType.None)
-            {
-                if (OutputConnection == ConnectionType.Left) return BeltDirection.EW;
-                if (OutputConnection == ConnectionType.Up) return BeltDirection.SN;
-                if (OutputConnection == ConnectionType.Right) return BeltDirection.WE;
-                if (OutputConnection == ConnectionType.Down) return BeltDirection.NS;
-            }
-
-            if (InputConnection == ConnectionType.Left && OutputConnection == ConnectionType.Right)
-                return BeltDirection.WE;
-            if (InputConnection == ConnectionType.Right && OutputConnection == ConnectionType.Left)
-                return BeltDirection.EW;
-            if (InputConnection == ConnectionType.Down && OutputConnection == ConnectionType.Up)
-                return BeltDirection.SN;
-            if (InputConnection == ConnectionType.Up && OutputConnection == ConnectionType.Down)
-                return BeltDirection.NS;
-
-            if (InputConnection == ConnectionType.Left && OutputConnection == ConnectionType.Up)
-                return BeltDirection.WN;
-            if (InputConnection == ConnectionType.Up && OutputConnection == ConnectionType.Left)
-                return BeltDirection.NW;
-            if (InputConnection == ConnectionType.Right && OutputConnection == ConnectionType.Up)
-                return BeltDirection.EN;
-            if (InputConnection == ConnectionType.Up && OutputConnection == ConnectionType.Right)
-                return BeltDirection.NE;
-            if (InputConnection == ConnectionType.Left && OutputConnection == ConnectionType.Down)
-                return BeltDirection.WS;
-            if (InputConnection == ConnectionType.Down && OutputConnection == ConnectionType.Left)
-                return BeltDirection.SW;
-            if (InputConnection == ConnectionType.Right && OutputConnection == ConnectionType.Down)
-                return BeltDirection.ES;
-            if (InputConnection == ConnectionType.Down && OutputConnection == ConnectionType.Right)
-                return BeltDirection.SE;
-
-            return BeltDirection.WE;
-        }
-
 
         private void UpdateNeighborConnection(Vector2 direction, ConnectionType neighborInput, ConnectionType neighborOutput)
         {
@@ -236,6 +175,52 @@ namespace Assets.Scripts.MapObjects
                 if (belt != null) return belt;
             }
             return null;
+        }
+
+        private BeltDirection GetBeltDirection()
+        {
+            if (Child == null && InputConnection != ConnectionType.None)
+            {
+                if (InputConnection == ConnectionType.Left) return BeltDirection.WE;
+                if (InputConnection == ConnectionType.Up) return BeltDirection.NS;
+                if (InputConnection == ConnectionType.Right) return BeltDirection.EW;
+                if (InputConnection == ConnectionType.Down) return BeltDirection.SN;
+            }
+
+            if (Parent == null && OutputConnection != ConnectionType.None)
+            {
+                if (OutputConnection == ConnectionType.Left) return BeltDirection.EW;
+                if (OutputConnection == ConnectionType.Up) return BeltDirection.SN;
+                if (OutputConnection == ConnectionType.Right) return BeltDirection.WE;
+                if (OutputConnection == ConnectionType.Down) return BeltDirection.NS;
+            }
+
+            if(InputConnection == ConnectionType.Left)
+            {
+                if(OutputConnection == ConnectionType.Right) return BeltDirection.WE;
+                if(OutputConnection == ConnectionType.Up) return BeltDirection.WN;
+                if(OutputConnection == ConnectionType.Down) return BeltDirection.WS;
+            }
+            if(InputConnection == ConnectionType.Right)
+            {
+                if (OutputConnection == ConnectionType.Left) return BeltDirection.EW;
+                if (OutputConnection == ConnectionType.Up) return BeltDirection.EN;
+                if (OutputConnection == ConnectionType.Down) return BeltDirection.ES;
+            }
+            if(InputConnection == ConnectionType.Down)
+            {
+                if (OutputConnection == ConnectionType.Right) return BeltDirection.SE;
+                if (OutputConnection == ConnectionType.Up) return BeltDirection.SN;
+                if (OutputConnection == ConnectionType.Left) return BeltDirection.SW;
+            }
+            if (InputConnection == ConnectionType.Up)
+            {
+                if (OutputConnection == ConnectionType.Right) return BeltDirection.NE;
+                if (OutputConnection == ConnectionType.Down) return BeltDirection.NS;
+                if (OutputConnection == ConnectionType.Left) return BeltDirection.NW;
+            }
+
+            return BeltDirection.WE;
         }
     }
 

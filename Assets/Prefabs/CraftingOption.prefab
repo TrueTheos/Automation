@@ -55,7 +55,12 @@ MonoBehaviour:
   RequirementsParent: {fileID: 8613364389352270516}
   Icon: {fileID: 912220755911595352}
   RequirementPrefab: {fileID: 2205682249249908787, guid: 7e0ccb219093b234f942b07a6baa16c6, type: 3}
+  InitialCraftInterval: 1
+  MinCraftInterval: 0.1
+  acceleration: 0.05
+  ItemsToCraftPerInterval: 1
   Recipe: {fileID: 0}
+  Inventory: {fileID: 0}
   Background: {fileID: 8964515022251103003}
   Rect: {fileID: 1857974359676008288}
   Button: {fileID: 0}
@@ -119,6 +124,7 @@ GameObject:
   - component: {fileID: 8964515022251103003}
   - component: {fileID: 809092673598382302}
   - component: {fileID: 4538717187538403964}
+  - component: {fileID: 9114218161376060355}
   m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
@@ -250,6 +256,48 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &9114218161376060355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5869620693496939883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48c5eae63ea0ed942825cd98c26c0d51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnMouseDownEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3392162190839276400}
+        m_TargetAssemblyTypeName: Assets.Scripts.CraftingOption, Assembly-CSharp
+        m_MethodName: StartCrafting
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnMouseUpEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3392162190839276400}
+        m_TargetAssemblyTypeName: Assets.Scripts.CraftingOption, Assembly-CSharp
+        m_MethodName: StopCrafting
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

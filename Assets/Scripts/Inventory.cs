@@ -123,9 +123,9 @@ namespace Assets.Scripts
             for (int i = 0; i < _player.AvailableRecieps.Count; i++)
             {
                 CraftingOption newOption = Instantiate(CraftingOptionPrefab, CraftingOptionsParent.transform).GetComponent<CraftingOption>();
+                newOption.Inventory = this;
                 newOption.RequirementsParent.SetActive(false);
                 newOption.Init(_player.AvailableRecieps[i]);
-                newOption.Button.onClick.AddListener(delegate { CraftOptionClick(newOption); });
             }
         }
 
@@ -177,7 +177,7 @@ namespace Assets.Scripts
         public bool HasItems(Item item, int amount)
         {
             if (!HotbarItems.Any(x => !x.IsEmpty() && x.Item == item)) return false;
-            return HotbarItems.First(x => x.Item == item).Amount >= amount;
+            return HotbarItems.Where(x => x.Item == item).Sum(x => x.Amount) >= amount; 
         }
 
         public bool HasEmptySlot()
@@ -231,6 +231,8 @@ namespace Assets.Scripts
 
             for (int i = 0; i < HotbarItems.Length; i++)
             {
+                if (remainingAmount <= 0) break;
+
                 if (HotbarItems[i] != null && HotbarItems[i].Item == item)
                 {
                     if (HotbarItems[i].Amount >= remainingAmount)
@@ -241,7 +243,6 @@ namespace Assets.Scripts
                             HotbarItems[i] = null;
                         }
                         remainingAmount = 0;
-                        break;
                     }
                     else
                     {

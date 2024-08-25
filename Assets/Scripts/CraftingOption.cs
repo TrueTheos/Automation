@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Assets.Scripts
@@ -14,7 +15,16 @@ namespace Assets.Scripts
         public Image Icon;
         public GameObject RequirementPrefab;
 
+        private float _initialCraftInterval = .5f;
+        private float _minCraftInterval = 0.01f;
+        private float _acceleration = 0.075f;
+
+        private float _currentCraftInterval;
+        private float _timeSinceLastCraft;
+
         public CraftRecipe Recipe;
+
+        [SerializeField] public Inventory Inventory;
 
         private Color _normalColor;
 
@@ -25,6 +35,8 @@ namespace Assets.Scripts
         public bool IsSelected;
 
         private Vector3 _initialScale;
+
+        private bool _isCrafting;
 
         private void Awake()
         {
@@ -43,6 +55,14 @@ namespace Assets.Scripts
                 ItemAmountUI requirementItemUI = Instantiate(RequirementPrefab, RequirementsParent.transform).GetComponent<ItemAmountUI>();
 
                 requirementItemUI.Init(requirement);
+            }
+        }
+
+        private void Update()
+        {
+            if(_isCrafting)
+            {
+                Craft();
             }
         }
 
@@ -68,6 +88,32 @@ namespace Assets.Scripts
             IsSelected = true;
             transform.localScale = Vector3.one;
             RequirementsParent.SetActive(true);
+        }
+
+        public void StartCrafting()
+        {
+            _isCrafting = true;
+            _currentCraftInterval = _initialCraftInterval;
+            _timeSinceLastCraft = _currentCraftInterval;
+            Craft();
+        }
+
+        public void StopCrafting()
+        {
+            _isCrafting = false;
+            _timeSinceLastCraft = 0f;
+            _currentCraftInterval = _initialCraftInterval;
+        }
+
+        private void Craft()
+        {
+            _timeSinceLastCraft += Time.deltaTime;
+            if (_timeSinceLastCraft >= _currentCraftInterval)
+            {
+                Inventory.CraftOptionClick(this);
+                _timeSinceLastCraft = 0f;
+                _currentCraftInterval = Mathf.Max(_minCraftInterval, _currentCraftInterval - _acceleration);
+            }
         }
     }
 }
