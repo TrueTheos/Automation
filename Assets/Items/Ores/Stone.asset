@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7048b8e239c8b734e97540a363b31160, type: 3}
-  m_Name: Coal
+  m_Name: Stone
   m_EditorClassIdentifier: 
-  Name: Coal
-  Icon: {fileID: 846515663, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
-  MaxStack: 50
+  Name: Stone
+  Icon: {fileID: 1992262071, guid: a36600e3d64212b44bba2a9c0a3cc035, type: 3}
+  MaxStack: 100

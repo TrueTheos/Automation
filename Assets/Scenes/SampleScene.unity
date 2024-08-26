@@ -169,6 +169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PickupItemSound: {fileID: 8300000, guid: fb77b72c15620634c890e70909f45628, type: 3}
+  CraftSound: {fileID: 8300000, guid: 53f891ae89e9d7e498e6d683f9cbca45, type: 3}
 --- !u!82 &118969290
 AudioSource:
   m_ObjectHideFlags: 0
@@ -101222,7 +101223,7 @@ MonoBehaviour:
   CraftingView: {fileID: 997834711}
   CraftingOptionsParent: {fileID: 1660039649}
   SelectedCraftColor: {r: 1, g: 0.82583797, b: 0, a: 0.6313726}
-  CraftingMenuKey: 105
+  CraftingMenuKey: 9
   CraftingOptionPrefab: {fileID: 707462854899762040, guid: c458f8ffefa3dd647b96ec09e5cec9aa, type: 3}
   HotbarItems: []
   HotbarSlots: 9

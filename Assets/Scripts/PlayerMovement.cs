@@ -108,6 +108,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     if (_selectedItem != null && _selectedItem.Item is NormalItem normalItem)
                     {
+                        _inventory.RemoveItemFromSlot(1, _selectedItem);
                         conveyorBelt.SpawnItem(normalItem);
                     }
                 }

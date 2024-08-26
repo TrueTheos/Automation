@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7048b8e239c8b734e97540a363b31160, type: 3}
-  m_Name: Coal
+  m_Script: {fileID: 11500000, guid: 159b2f86cd494d349af108cd89750ccd, type: 3}
+  m_Name: Stone
   m_EditorClassIdentifier: 
   Name: Coal
-  Icon: {fileID: 846515663, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
-  MaxStack: 50
+  Icon: {fileID: 1642151531, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
+  MaxStack: 1
+  Prefab: {fileID: 129681216205148547, guid: 6f0a3cf3f43bc7d44bb96ea3ba0f8dec, type: 3}
+  MaxDurability: 30
