@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Assets.Scripts
@@ -60,11 +61,6 @@ namespace Assets.Scripts
         public void DeHighlight()
         {
             Background.color = _defaultColor;   
-        }
-
-        public bool IsEmpty()
-        {
-            return ItemAmount.Item == null;
         }
     }
 }

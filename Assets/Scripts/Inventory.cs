@@ -27,21 +27,21 @@ namespace Assets.Scripts
         private float _craftingOptionsTargetPos;
 
         [Header("HotBar")]
-        public ItemAmountUI[] HotbarItems;
+        public ItemSlot[] HotbarItems;
         public int HotbarSlots;
         public RectTransform HotbarView;
         public RectTransform HotbarSlotsParent;
-        public ItemAmountUI HotbarSlotPrefab;
+        public ItemSlot HotbarSlotPrefab;
 
         private Player _player;
 
         private void Awake()
         {
-            HotbarItems = new ItemAmountUI[HotbarSlots];
+            HotbarItems = new ItemSlot[HotbarSlots];
 
             for (int i = 0; i < HotbarSlots; i++)
             {
-                ItemAmountUI itemAmountUI = Instantiate(HotbarSlotPrefab, HotbarSlotsParent.transform);
+                ItemSlot itemAmountUI = Instantiate(HotbarSlotPrefab, HotbarSlotsParent.transform);
                 HotbarItems[i] = itemAmountUI;
             }
 
@@ -190,12 +190,12 @@ namespace Assets.Scripts
             return Array.IndexOf(HotbarItems, HotbarItems.First(x => x == null || x.IsEmpty()));
         }
 
-        public ItemAmountUI GetEmptySlot()
+        public ItemSlot GetEmptySlot()
         {
             return HotbarItems.First(x => x.IsEmpty());
         }
 
-        public ItemAmountUI GetNotFullSlot(Item item)
+        public ItemSlot GetNotFullSlot(Item item)
         {
             return HotbarItems.FirstOrDefault(x => x != null && x.Item == item && x.Amount < x.Item.MaxStack);
         }
@@ -213,7 +213,7 @@ namespace Assets.Scripts
             }
         }
 
-        public void RemoveItemFromSlot(int amount, ItemAmountUI ui)
+        public void RemoveItemFromSlot(int amount, ItemSlot ui)
         {
             ui.ItemAmount.Amount -= amount;
 
@@ -240,7 +240,7 @@ namespace Assets.Scripts
                         HotbarItems[i].ItemAmount.Amount -= remainingAmount;
                         if (HotbarItems[i].Amount == 0)
                         {
-                            HotbarItems[i] = null;
+                            HotbarItems[i].ItemAmount = new();
                         }
                         remainingAmount = 0;
                     }
@@ -275,7 +275,7 @@ namespace Assets.Scripts
 
         public void PickupItem(ItemObject itemObj, bool dropTheRest = false)
         {
-            int leftOver = AddItem(itemObj.ItemData, itemObj.Stack);
+            int leftOver = AddItem(itemObj.ItemData, itemObj.Amount);
 
             if(dropTheRest && leftOver > 0)
             {
@@ -308,7 +308,7 @@ namespace Assets.Scripts
 
             while (toAdd > 0)
             {
-                ItemAmountUI notFullSlot = GetNotFullSlot(item);
+                ItemSlot notFullSlot = GetNotFullSlot(item);
 
                 if (notFullSlot != null)
                 {
@@ -329,7 +329,7 @@ namespace Assets.Scripts
                 {
                     if (HasEmptySlot())
                     {
-                        ItemAmountUI emptySlot = GetEmptySlot();
+                        ItemSlot emptySlot = GetEmptySlot();
                         int amountToAdd = toAdd > item.MaxStack ? item.MaxStack : toAdd;
 
                         emptySlot.Init(new ItemAmount(item, amountToAdd));

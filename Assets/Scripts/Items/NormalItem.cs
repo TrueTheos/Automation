@@ -10,5 +10,6 @@ namespace Assets.Scripts.Items
     [CreateAssetMenu(fileName = "Item", menuName = "Item/Item")]
     public class NormalItem : Item
     {
+        public NormalItem SmeltedResult;
     }
 }

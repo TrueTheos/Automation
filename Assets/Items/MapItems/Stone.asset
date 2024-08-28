@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 159b2f86cd494d349af108cd89750ccd, type: 3}
   m_Name: Stone
   m_EditorClassIdentifier: 
-  Name: Coal
-  Icon: {fileID: 1642151531, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
+  Name: Stone
+  Icon: {fileID: -209338644, guid: a36600e3d64212b44bba2a9c0a3cc035, type: 3}
   MaxStack: 1
-  Prefab: {fileID: 129681216205148547, guid: 6f0a3cf3f43bc7d44bb96ea3ba0f8dec, type: 3}
-  MaxDurability: 30
+  Prefab: {fileID: 129681216205148547, guid: 93045248566b3574e927cb4c4c23a9fe, type: 3}
+  MaxDurability: 20

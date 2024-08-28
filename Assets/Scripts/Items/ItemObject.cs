@@ -12,7 +12,7 @@ namespace Assets.Scripts.Items
     public class ItemObject : MonoBehaviour
     {
         public Item ItemData;
-        public int Stack;
+        public int Amount;
 
         public void MoveToPosition(Vector3 newPosition)
         {
@@ -24,12 +24,12 @@ namespace Assets.Scripts.Items
             ItemData = item;
             if(count > item.MaxStack) 
             {
-                Stack = count;
-                MapManager.Instance.SpawnItem(item, transform.position.x, transform.position.y, count - Stack);
+                Amount = count;
+                MapManager.Instance.SpawnItem(item, transform.position.x, transform.position.y, count - Amount);
             }
             else
             {
-                Stack = count;
+                Amount = count;
             }
             GetComponent<SpriteRenderer>().sprite = item.Icon;
         }

@@ -21,8 +21,9 @@ public class PlayerMovement : MonoBehaviour
     public float MaxAttractionSpeed;
     public LayerMask PickupLayer;
 
+    [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _placeObjectPreview;
-    private ItemAmountUI _selectedItem;
+    private ItemSlot _selectedItem;
     private int _selectedObjectIndex;
 
     [SerializeField] private GameObject _hand;
@@ -39,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool _isClicking = false;
     private float _lastClickTime = 0f;
+    private float _currentMovementSpeed;
+    private bool _isRunning;
 
     private void Awake()
     {
@@ -63,13 +66,17 @@ public class PlayerMovement : MonoBehaviour
 
         _moveInput.Normalize();
 
-        if(Input.GetKey(SprintKey))
+        _currentMovementSpeed = Mathf.Clamp(_moveInput.magnitude, 0f, 1f);
+
+        if (Input.GetKey(SprintKey))
         {
             _rb.velocity = _moveInput * SprintSpeed;
+            _isRunning = true;
         }
         else
         {
             _rb.velocity = _moveInput * MoveSpeed;
+            _isRunning = false;
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -145,6 +152,23 @@ public class PlayerMovement : MonoBehaviour
 
         ScrollThruItems();
         UpdateHand();
+        Animate();
+    }
+
+    private void Animate()
+    {
+        Vector2 mousePosition = _cam.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 playerPosition = transform.position;
+        Vector2 directionToMouse = (mousePosition - playerPosition).normalized;
+        _animator.SetFloat("Horizontal", directionToMouse.x);
+        _animator.SetFloat("Vertical", directionToMouse.y);
+
+        if (_currentMovementSpeed > 0)
+        {
+            if (_isRunning) _animator.SetFloat("Speed", 2);
+            else _animator.SetFloat("Speed", 1);
+        }
+        else _animator.SetFloat("Speed", 0);
     }
 
     private void ScrollThruItems()

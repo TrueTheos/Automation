@@ -18,10 +18,13 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private float Scale;
 
     [SerializeField] private Tilemap Layer0Tilemap;
+    [SerializeField] private Tilemap Layer1Tilemap;
 
     [SerializeField] private Tile GreenTile;
     [SerializeField] private Tile DarkGreenTile;
     [SerializeField] private Tile StoneTile;
+    [SerializeField] private List<Tile> GrassTiles;
+    [SerializeField][Range(0f, 100f)] private float GrassSpawnChance;
 
     [SerializeField] private float StoneBiomeThreshold;
 
@@ -85,6 +88,14 @@ public class MapGenerator : MonoBehaviour
                     currentChunk.SetTile(x, y, TileType.STONE);
                     currentChunk.StoneTilesCount++;
                     Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), StoneTile);
+                }
+                else
+                {
+                    float r = Random.Range(0, 100f);
+                    if(r <= GrassSpawnChance)
+                    {
+                        Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), GrassTiles.GetRandom());
+                    }
                 }
             }
         }

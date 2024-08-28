@@ -10,6 +10,6 @@ namespace Assets.Scripts
     public interface IItemReceiver
     {
         public void ReceiveItem(ItemObject item);
-        public bool CanReceive();
+        public bool CanReceive(ItemObject item);
     }
 }
