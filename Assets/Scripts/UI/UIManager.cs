@@ -12,6 +12,7 @@ namespace Assets.Scripts.UI
         public static UIManager Instance;
 
         public FurnaceView FurnaceView;
+        public IronCrateView IronCrateView;
 
         private void Awake()
         {

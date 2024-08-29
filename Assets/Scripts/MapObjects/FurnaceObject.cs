@@ -35,7 +35,11 @@ namespace Assets.Scripts.MapObjects
 
         private void Update()
         {
-            if (_inputItem.Amount <= 0 || _inputItem.GetItem() == null || (_inputItem.GetItem() is NormalItem normalItem && normalItem.SmeltedResult == null) || IsFull())
+            if (_inputItem.Amount <= 0 || 
+                _inputItem.GetItem() == null ||
+                (_inputItem.GetItem() is NormalItem normalItem &&
+                normalItem.SmeltedResult == null) ||
+                IsFull())
             {
                 ParticleSystem.gameObject.SetActive(false);
                 _furnaceView.ProgressBar.fillAmount = 0;

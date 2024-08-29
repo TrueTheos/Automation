@@ -40,9 +40,14 @@ namespace Assets.Scripts.UI
         public void OpenFurnace(FurnaceObject furnace)
         {
             _currentFurnace = furnace;
+            ResetUI();
+            Open();
+        }
+
+        public override void ResetUI()
+        {
             InputSlot.ResetSlot();
             OutputSlot.ResetSlot();
-            Open();
         }
     }
 }

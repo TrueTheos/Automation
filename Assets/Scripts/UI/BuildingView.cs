@@ -33,5 +33,7 @@ namespace Assets.Scripts.UI
             _isOpen = true;
             gameObject.SetActive(true);
         }
+
+        public abstract void ResetUI();
     }
 }

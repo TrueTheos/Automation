@@ -131,10 +131,9 @@ namespace Assets.Scripts
 
         public void OnDrop(PointerEventData eventData)
         {
-            GameObject dropped = eventData.pointerDrag;
-            DraggableItem draggableItem = dropped.GetComponent<DraggableItem>();
+            DraggableItem draggedItem = eventData.pointerDrag.GetComponent<DraggableItem>();
 
-            ItemSlot draggedItemSlot = draggableItem.ParentAfterDrag.GetComponent<ItemSlot>();
+            ItemSlot draggedItemSlot = draggedItem.ParentAfterDrag.GetComponent<ItemSlot>();
             if (draggedItemSlot != null)
             {
                 draggedItemSlot.CurrentItem = null;
@@ -142,24 +141,36 @@ namespace Assets.Scripts
 
             if (transform.childCount != 0)
             {
-                GameObject current = transform.GetChild(0).gameObject;
-                DraggableItem currentDraggable = current.GetComponent<DraggableItem>();
+                DraggableItem currentItem = transform.GetChild(0).gameObject.GetComponent<DraggableItem>();
 
-                if(currentDraggable.ItemData.GetItem() == draggableItem.ItemData.GetItem()) 
+                if(currentItem.ItemData.GetItem() == draggedItem.ItemData.GetItem()) 
                 {
-                    currentDraggable.ItemData.Amount += draggableItem.ItemData.Amount;
-                    UpdateUI();
-                    OnItemChangeEvent?.Invoke();
-                    Destroy(draggableItem.gameObject);
-                    return;
+                    if (currentItem.ItemData.Amount + draggedItem.ItemData.Amount > currentItem.ItemData.Item.MaxStack)
+                    {
+                        int amountToAdd = currentItem.ItemData.Item.MaxStack - currentItem.ItemData.Amount;
+                        currentItem.ItemData.Amount += amountToAdd;
+                        draggedItem.ItemData.Amount -= amountToAdd;
+                        draggedItem.UpdateUI();
+                        UpdateUI();
+                        OnItemChangeEvent?.Invoke();
+                        return;
+                    }
+                    else
+                    {
+                        currentItem.ItemData.Amount += draggedItem.ItemData.Amount;
+                        UpdateUI();
+                        OnItemChangeEvent?.Invoke();
+                        Destroy(draggedItem.gameObject);
+                        return;
+                    }
                 }
 
-                currentDraggable.transform.SetParent(draggableItem.ParentAfterDrag);
-                ItemSlot slot = currentDraggable.transform.GetComponentInParent<ItemSlot>();
-                slot.CurrentItem = currentDraggable;
+                currentItem.transform.SetParent(draggedItem.ParentAfterDrag);
+                ItemSlot slot = currentItem.transform.GetComponentInParent<ItemSlot>();
+                slot.CurrentItem = currentItem;
             }
-            draggableItem.ParentAfterDrag = transform;
-            CurrentItem = draggableItem;
+            draggedItem.ParentAfterDrag = transform;
+            CurrentItem = draggedItem;
             OnItemChangeEvent?.Invoke();
             UpdateUI();
         }
