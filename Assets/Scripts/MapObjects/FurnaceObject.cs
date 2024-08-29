@@ -35,9 +35,10 @@ namespace Assets.Scripts.MapObjects
 
         private void Update()
         {
-            if (_inputItem.Amount <= 0 || _inputItem.Item == null || (_inputItem.Item is NormalItem normalItem && normalItem.SmeltedResult == null) || IsFull())
+            if (_inputItem.Amount <= 0 || _inputItem.GetItem() == null || (_inputItem.GetItem() is NormalItem normalItem && normalItem.SmeltedResult == null) || IsFull())
             {
                 ParticleSystem.gameObject.SetActive(false);
+                _furnaceView.ProgressBar.fillAmount = 0;
                 return;
             }
 
@@ -48,10 +49,10 @@ namespace Assets.Scripts.MapObjects
             if(_cooldown >= Speed)
             {
                 _cooldown = 0;
-                if(_outputItem.Item == null)
+                if(_outputItem.GetItem() == null)
                 {
-                    NormalItem item = _inputItem.Item as NormalItem;
-                    _outputItem.Item = item.SmeltedResult;
+                    NormalItem item = _inputItem.GetItem() as NormalItem;
+                    _outputItem.SetItem(item.SmeltedResult);
                     _outputItem.Amount = 1;
                     _inputItem.Amount--;
                     _furnaceView.UpdateSlots(_inputItem, _outputItem);
@@ -75,8 +76,8 @@ namespace Assets.Scripts.MapObjects
         {
             if (_inputItem.Amount >= InputCapacity) return false;
             if(item.ItemData is not NormalItem normalItem) return false;
-            if (normalItem.SmeltedResult == null) return false;
-            if (_outputItem.Item != null && _outputItem.Item != item) return false;
+            if (!normalItem.ItemFlags.HasFlag(ItemFlags.Smeltable)) return false;
+            if (_outputItem.GetItem() != null && _outputItem.GetItem() != item) return false;
             if (IsFull()) return false;
 
             return true;
@@ -90,21 +91,36 @@ namespace Assets.Scripts.MapObjects
 
         public void UpdateItems(ItemSlot input, ItemSlot output)
         {
-            _inputItem.Item = input.Item;
+            _inputItem.SetItem(input.Item);
             _inputItem.Amount = input.Amount;
-            _outputItem.Item = output.Item;
+            _outputItem.SetItem(output.Item);
             _outputItem.Amount = output.Amount;
         }
 
         public void ReceiveItem(ItemObject item)
         {
-            _inputItem = new ItemAmount(item.ItemData, item.Amount);
+            if (_inputItem.GetItem() == null) _inputItem.SetItem(item.ItemData);
+            _inputItem.Amount += item.Amount;
+            Destroy(item.gameObject);
         }
 
         public void OnClick(Player player)
         {
             _furnaceView.OpenFurnace(this);
             _furnaceView.UpdateSlots(_inputItem, _outputItem);
+        }
+
+        public Item GetOutputData()
+        {
+            return _outputItem.GetItem();
+        }
+
+        public Item TakeOutItem()
+        {
+            if(_outputItem.GetItem() == null) return null;
+            _outputItem.Amount--;
+            _furnaceView.UpdateSlots(_inputItem, _outputItem);
+            return _outputItem.GetItem();
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Assets.Scripts
         public void Init(CraftRecipe recipe)
         {
             Recipe = recipe;
-            Icon.sprite = recipe.Result.Item.Icon;
+            Icon.sprite = recipe.Result.GetItem().Icon;
 
             foreach (var requirement in recipe.Requirements)
             {

@@ -20,12 +20,13 @@ namespace Assets.Scripts.UI
         private void Start()
         {
             InputSlot.OnItemChangeEvent += UpdateFurnace;
+            OutputSlot.OnItemChangeEvent += UpdateFurnace;
         }
 
         public void UpdateSlots(ItemAmount input, ItemAmount output)
         {
-            if(input.Item != null) InputSlot.Init(input);
-            if (output.Item != null) OutputSlot.Init(output);
+            if(input.GetItem() != null) InputSlot.Init(input);
+            if (output.GetItem() != null) OutputSlot.Init(output);
         }
 
         private void UpdateFurnace()
@@ -39,6 +40,8 @@ namespace Assets.Scripts.UI
         public void OpenFurnace(FurnaceObject furnace)
         {
             _currentFurnace = furnace;
+            InputSlot.ResetSlot();
+            OutputSlot.ResetSlot();
             Open();
         }
     }

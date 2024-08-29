@@ -30,28 +30,7 @@ namespace Assets.Scripts
         }
 
         public void OnEndDrag(PointerEventData eventData)
-        {
-            PointerEventData d = new PointerEventData(EventSystem.current);
-            d.position = Input.mousePosition;
-            List<RaycastResult> results = new List<RaycastResult>();
-
-            EventSystem.current.RaycastAll(d, results);
-
-            if (results.Count > 0)
-            {
-                string objectsClicked = "";
-                foreach (RaycastResult result in results)
-                {
-                    objectsClicked += result.gameObject.name;
-
-                    //If not the last element, add a comma
-                    if (result.gameObject != results[^1].gameObject)
-                    {
-                        objectsClicked += ", ";
-                    }
-                }
-                Debug.Log("Clicked on: " + objectsClicked);
-            }
+        { 
             transform.SetParent(ParentAfterDrag);
             Icon.raycastTarget = true;
         }
@@ -66,7 +45,7 @@ namespace Assets.Scripts
 
         public void UpdateUI()
         {
-            Icon.sprite = ItemData.Item.Icon;
+            Icon.sprite = ItemData.GetItem().Icon;
             AmountText.text = ItemData.Amount.ToString();
         }
     }

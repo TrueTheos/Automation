@@ -21,7 +21,7 @@ namespace Assets.Scripts
         public ItemAmount ItemAmount;
 
         public int Amount => ItemAmount.Amount;
-        public Item Item => ItemAmount.Item;
+        public Item Item => ItemAmount.GetItem();
 
         private Color _defaultColor;
 

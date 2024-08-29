@@ -15,7 +15,19 @@ namespace Assets.Scripts
     {
         [SerializeField] private Image Background;
         [SerializeField] private Color HighlightColor;
-        [HideInInspector] public DraggableItem CurrentItem;
+        private DraggableItem _currentItem;
+        public DraggableItem CurrentItem
+        {
+            get
+            {
+                return _currentItem;
+            }
+            set
+            {
+                _currentItem = value;
+                //OnItemChangeEvent?.Invoke();
+            }
+        }
         public DraggableItem DraggableItemPrefab;
 
         public event Action OnItemChangeEvent;
@@ -40,7 +52,7 @@ namespace Assets.Scripts
             { 
                 if(CurrentItem != null)
                 {
-                    return CurrentItem.ItemData.Item;
+                    return CurrentItem.ItemData.GetItem();
                 }
                 else
                 {
@@ -59,7 +71,7 @@ namespace Assets.Scripts
 
         public void Init(ItemAmount itemAmount)
         {
-            if (CurrentItem != null && CurrentItem.ItemData.Item == itemAmount.Item)
+            if (CurrentItem != null && CurrentItem.ItemData.GetItem() == itemAmount.GetItem())
             {
                 UpdateItemData(itemAmount);
             }
@@ -75,7 +87,7 @@ namespace Assets.Scripts
         {
             if(CurrentItem != null)
             {
-                if (CurrentItem.ItemData.Item == null || CurrentItem.ItemData.Amount <= 0)
+                if (CurrentItem.ItemData.GetItem() == null || CurrentItem.ItemData.Amount <= 0)
                 {
                     Destroy(CurrentItem.gameObject);
                 }
@@ -83,6 +95,15 @@ namespace Assets.Scripts
                 {
                     CurrentItem.UpdateUI();
                 }
+            }
+        }
+
+        public void ResetSlot()
+        {
+            if(CurrentItem != null)
+            {
+                Destroy(CurrentItem.gameObject);
+                CurrentItem = null;
             }
         }
 
@@ -113,15 +134,22 @@ namespace Assets.Scripts
             GameObject dropped = eventData.pointerDrag;
             DraggableItem draggableItem = dropped.GetComponent<DraggableItem>();
 
+            ItemSlot draggedItemSlot = draggableItem.ParentAfterDrag.GetComponent<ItemSlot>();
+            if (draggedItemSlot != null)
+            {
+                draggedItemSlot.CurrentItem = null;
+            }
+
             if (transform.childCount != 0)
             {
                 GameObject current = transform.GetChild(0).gameObject;
                 DraggableItem currentDraggable = current.GetComponent<DraggableItem>();
 
-                if(currentDraggable.ItemData.Item == draggableItem.ItemData.Item) 
+                if(currentDraggable.ItemData.GetItem() == draggableItem.ItemData.GetItem()) 
                 {
                     currentDraggable.ItemData.Amount += draggableItem.ItemData.Amount;
                     UpdateUI();
+                    OnItemChangeEvent?.Invoke();
                     Destroy(draggableItem.gameObject);
                     return;
                 }
@@ -129,7 +157,6 @@ namespace Assets.Scripts
                 currentDraggable.transform.SetParent(draggableItem.ParentAfterDrag);
                 ItemSlot slot = currentDraggable.transform.GetComponentInParent<ItemSlot>();
                 slot.CurrentItem = currentDraggable;
-                slot.OnItemChangeEvent?.Invoke();
             }
             draggableItem.ParentAfterDrag = transform;
             CurrentItem = draggableItem;

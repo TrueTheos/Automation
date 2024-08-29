@@ -112,6 +112,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y);
                     _inventory.RemoveItemFromSlot(1, _selectedItem);
+                    UpdatePreviewSprite();
                 }
             }   
         }
@@ -208,12 +209,17 @@ public class PlayerMovement : MonoBehaviour
         _selectedItem = _inventory.HotbarItems[_selectedObjectIndex];
         _selectedItem.Highlight();
 
+        UpdatePreviewSprite();
+    }
+
+    public void UpdatePreviewSprite()
+    {
         if (_selectedItem != null && _selectedItem.Item != null)
         {
             if (_selectedItem.Item is MapItem buildingItem)
             {
                 _placeObjectPreview.gameObject.SetActive(true);
-                _placeObjectPreview.sprite = _selectedItem.Item.Icon;           
+                _placeObjectPreview.sprite = _selectedItem.Item.Icon;
             }
             else
             {

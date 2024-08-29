@@ -168,7 +168,7 @@ namespace Assets.Scripts
         {
             foreach (var req in requirements)
             {
-                if (!HasItems(req.Item, req.Amount)) return false;
+                if (!HasItems(req.GetItem(), req.Amount)) return false;
             }
 
             return true;
@@ -209,7 +209,7 @@ namespace Assets.Scripts
         {
             foreach (var item in items)
             {
-                RemoveItem(item.Item, item.Amount);
+                RemoveItem(item.GetItem(), item.Amount);
             }
         }
 
@@ -262,11 +262,11 @@ namespace Assets.Scripts
 
         public void AddItem(ItemAmount item, bool dropTheRest = false)
         {
-            int leftOver = AddItem(item.Item, item.Amount);
+            int leftOver = AddItem(item.GetItem(), item.Amount);
 
             if(dropTheRest && leftOver > 0)
             {
-                MapManager.Instance.SpawnItem(item.Item, 
+                MapManager.Instance.SpawnItem(item.GetItem(), 
                     transform.position.x, 
                     transform.position.y, 
                     leftOver);
@@ -372,6 +372,16 @@ namespace Assets.Scripts
         {
             Item = item;
             Amount = amount;
+        }
+
+        public void SetItem(Item item) 
+        {
+            Item = item;
+        }
+
+        public Item GetItem()
+        {
+            return Item;
         }
     }
 }

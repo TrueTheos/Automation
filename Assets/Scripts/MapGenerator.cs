@@ -94,7 +94,7 @@ public class MapGenerator : MonoBehaviour
                     float r = Random.Range(0, 100f);
                     if(r <= GrassSpawnChance)
                     {
-                        Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), GrassTiles.GetRandom());
+                        Layer1Tilemap.SetTile(new Vector3Int(x, y, 0), GrassTiles.GetRandom());
                     }
                 }
             }

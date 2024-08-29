@@ -6,14 +6,15 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.Experimental.GraphView.Port;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace Assets.Scripts.MapObjects
 {
     [RequireComponent(typeof(BoxCollider2D))]
-    public class ConveyorBeltObject : MapObject, IRightClick
+    public class ConveyorBeltObject : MapObject, IRightClick, IItemReceiver
     {
-        public ConveyorBeltObject Parent;
-        public ConveyorBeltObject Child;
+        public IItemReceiver Parent;
+        public IItemReceiver Child;
 
         public SpriteRenderer Sprite;
 
@@ -53,18 +54,29 @@ namespace Assets.Scripts.MapObjects
 
         public void MoveItems()
         {
+            if(Child == null || Parent == null)
+            {
+                UpdateNeighbors(ConnectionType.None);
+            }
+
+            if(Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
+            {
+                Item output = Parent.TakeOutItem();
+                if (output != null)
+                {
+                    IncomingItem = MapManager.Instance.SpawnItem(output, transform.position.x, transform.position.y, 1);
+                }
+            }
+
             if(IncomingItem != null)
             {
-                if(Item != null)
+                if (Item != null && Child != null && Child.CanReceive(IncomingItem))
                 {
-                    if (Child != null && Child.CanAcceptItem())
-                    {
-                        Child.AcceptItem(Item);
-                        Item = null;
-                    }
-                }               
+                    Child.ReceiveItem(Item);
+                    Item = null;
+                }
 
-                if(Item == null)
+                if (Item == null)
                 {
                     Item = IncomingItem;
                     IncomingItem = null;
@@ -73,30 +85,20 @@ namespace Assets.Scripts.MapObjects
             }     
             else
             {
-                if (Item != null && Child != null && Child.CanAcceptItem() && Item != null)
+                if (Item != null && Child != null && Child.CanReceive(Item))
                 {
-                    Child.AcceptItem(Item);
+                    Child.ReceiveItem(Item);
                     Item = null;
                 }
             }
         }
 
-        public bool CanAcceptItem()
-        {
-            return Item == null || (Child != null && Child.CanAcceptItem());
-        }
-
-        public void AcceptItem(ItemObject item)
-        {
-            IncomingItem = item;
-        }
-
         public void SpawnItem(NormalItem item)
         {
-            if (CanAcceptItem())
+            if (CanReceive(null))
             {
                 ItemObject newItemObject = MapManager.Instance.SpawnItem(item, transform.position.x, transform.position.y, 1);
-                AcceptItem(newItemObject);
+                ReceiveItem(newItemObject);
             }
         }
 
@@ -121,58 +123,97 @@ namespace Assets.Scripts.MapObjects
         private void UpdateNeighborConnection(Vector2 direction, ConnectionType neighborInput, ConnectionType neighborOutput)
         {
             Vector2 neighborPos = (Vector2)transform.position + direction;
-            ConveyorBeltObject neighbor = GetBeltAtPosition(neighborPos);
+            IItemReceiver neighbor = GetReceiverAtPosition(neighborPos);
             if (neighbor != null)
             {
-                if(Parent == null && neighbor.Child == null)
+                if(neighbor is ConveyorBeltObject belt)
                 {
-                    Parent = neighbor;
-                    neighbor.Child = this;
-                    neighbor.OutputConnection = neighborInput;
-
-                    if(neighbor.InputConnection == ConnectionType.None)
-                    {
-                        neighbor.InputConnection = _oppositeDirection[neighborInput];
-                    }
-                    InputConnection = neighborOutput;
-
-                    if(OutputConnection == ConnectionType.None) 
-                    {
-                        OutputConnection = _oppositeDirection[neighborOutput];
-                    }
+                    UpdateBeltConnection(belt, neighborInput, neighborOutput);
                 }
-                else if(Child == null && neighbor.Parent == null)
+                else
                 {
-                    Child = neighbor;
-                    neighbor.Parent = this;
-                    neighbor.InputConnection = neighborInput;
-
-                    if (neighbor.InputConnection == ConnectionType.None)
-                    {
-                        neighbor.InputConnection = _oppositeDirection[neighborInput];
-                    }
-
-                    OutputConnection = neighborOutput;
-
-                    if (OutputConnection == ConnectionType.None)
-                    {
-                        OutputConnection = _oppositeDirection[neighborOutput];
-                    }
+                    UpdateConnection(neighbor, neighborInput, neighborOutput);
                 }
-
-                neighbor.UpdateSprite(neighborOutput);
-                BeltDirection dir = GetBeltDirection();
-                Sprite.sprite = BeltSprites[dir];
             }
         }
 
-        private ConveyorBeltObject GetBeltAtPosition(Vector2 position)
+        private void UpdateConnection(IItemReceiver receiver, ConnectionType neighborInput, ConnectionType neighborOutput)
+        {
+            if (Parent == null)
+            {
+                Parent = receiver;
+                InputConnection = neighborOutput;
+
+                if (OutputConnection == ConnectionType.None)
+                {
+                    OutputConnection = _oppositeDirection[neighborOutput];
+                }
+            }
+            else if (Child == null && Parent != receiver)
+            {
+                Child = receiver;
+                OutputConnection = neighborOutput;
+
+                if (OutputConnection == ConnectionType.None)
+                {
+                    OutputConnection = _oppositeDirection[neighborOutput];
+                }
+            }
+
+            BeltDirection dir = GetBeltDirection();
+            Sprite.sprite = BeltSprites[dir];
+        }
+
+        private void UpdateBeltConnection(ConveyorBeltObject belt, ConnectionType neighborInput, ConnectionType neighborOutput)
+        {
+            if (Parent == null && belt.Child == null)
+            {
+                Parent = belt;
+                belt.Child = this;
+                belt.OutputConnection = neighborInput;
+
+                if (belt.InputConnection == ConnectionType.None)
+                {
+                    belt.InputConnection = _oppositeDirection[neighborInput];
+                }
+                InputConnection = neighborOutput;
+
+                if (OutputConnection == ConnectionType.None)
+                {
+                    OutputConnection = _oppositeDirection[neighborOutput];
+                }
+            }
+            else if (Child == null && belt.Parent == null)
+            {
+                Child = belt;
+                belt.Parent = this;
+                belt.InputConnection = neighborInput;
+
+                if (belt.InputConnection == ConnectionType.None)
+                {
+                    belt.InputConnection = _oppositeDirection[neighborInput];
+                }
+
+                OutputConnection = neighborOutput;
+
+                if (OutputConnection == ConnectionType.None)
+                {
+                    OutputConnection = _oppositeDirection[neighborOutput];
+                }
+            }
+
+            belt.UpdateSprite(neighborOutput);
+            BeltDirection dir = GetBeltDirection();
+            Sprite.sprite = BeltSprites[dir];
+        }
+
+        private IItemReceiver GetReceiverAtPosition(Vector2 position)
         {
             Collider2D[] colliders = Physics2D.OverlapPointAll(position);
             foreach (Collider2D collider in colliders)
             {
-                ConveyorBeltObject belt = collider.GetComponent<ConveyorBeltObject>();
-                if (belt != null) return belt;
+                IItemReceiver receiver = collider.GetComponent<IItemReceiver>();
+                if (receiver != null) return receiver;
             }
             return null;
         }
@@ -231,6 +272,27 @@ namespace Assets.Scripts.MapObjects
                 player.Inventory.RemoveItemFromSlot(1, playerMovement.SelectedItem);
                 SpawnItem(normalItem);
             }
+        }
+
+        public void ReceiveItem(ItemObject item)
+        {
+            IncomingItem = item;
+        }
+
+        public bool CanReceive(ItemObject item)
+        {
+            return Item == null || (Child != null && Child.CanReceive(Item));
+        }
+
+        public Item GetOutputData()
+        {
+            return Item.ItemData;
+        }
+
+        public Item TakeOutItem()
+        {           
+            Item = null;
+            return Item.ItemData;
         }
     }
 

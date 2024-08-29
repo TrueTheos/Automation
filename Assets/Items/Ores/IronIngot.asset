@@ -15,4 +15,5 @@ MonoBehaviour:
   Name: Iron Ingot
   Icon: {fileID: -731731925, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
   MaxStack: 30
+  ItemFlags: 1
   SmeltedResult: {fileID: 11400000, guid: 51e83da16b0cc1d49a8f074d45112307, type: 2}

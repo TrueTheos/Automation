@@ -12,5 +12,15 @@ namespace Assets.Scripts.Items
         public string Name;
         public Sprite Icon;
         public int MaxStack;
+        public ItemFlags ItemFlags;
+    }
+
+
+    [Flags]
+    public enum ItemFlags
+    {
+        None = 0,
+        Smeltable = 1,
+        SmeltingFuel = 2
     }
 }

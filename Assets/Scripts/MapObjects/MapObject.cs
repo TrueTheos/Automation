@@ -39,7 +39,9 @@ namespace Assets.Scripts.MapObjects
             OnPlace();
         }
 
-        protected virtual void OnPlace() { }
+        protected virtual void OnPlace() 
+        {
+        }
 
         public void Hit(int power)
         {
