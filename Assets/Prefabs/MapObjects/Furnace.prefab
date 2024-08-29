@@ -4978,4 +4978,4 @@ MonoBehaviour:
   InputCapacity: 30
   OutputCapacity: 30
   Speed: 2
-  ParticleSystem: {fileID: 0}
+  ParticleSystem: {fileID: 2401593113067665983}

@@ -215,11 +215,11 @@ namespace Assets.Scripts
 
         public void RemoveItemFromSlot(int amount, ItemSlot ui)
         {
-            ui.ItemAmount.Amount -= amount;
+            ui.CurrentItem.ItemData.Amount -= amount;
 
-            if(ui.ItemAmount.Amount <= 0)
+            if(ui.CurrentItem.ItemData.Amount <= 0)
             {
-                ui.ItemAmount = new();
+                ui.CurrentItem.ItemData = new(null, 0);
             }
 
             UpdateHotbarUI();
@@ -237,17 +237,17 @@ namespace Assets.Scripts
                 {
                     if (HotbarItems[i].Amount >= remainingAmount)
                     {
-                        HotbarItems[i].ItemAmount.Amount -= remainingAmount;
+                        HotbarItems[i].CurrentItem.ItemData.Amount -= remainingAmount;
                         if (HotbarItems[i].Amount == 0)
                         {
-                            HotbarItems[i].ItemAmount = new();
+                            HotbarItems[i].CurrentItem.ItemData = new(null, 0);
                         }
                         remainingAmount = 0;
                     }
                     else
                     {
                         remainingAmount -= HotbarItems[i].Amount;
-                        HotbarItems[i].ItemAmount = new();
+                        HotbarItems[i].CurrentItem.ItemData = new(null, 0);
                     }
                 }
             }
@@ -316,12 +316,12 @@ namespace Assets.Scripts
 
                     if (toAdd > freeAmount)
                     {
-                        notFullSlot.ItemAmount.Amount += freeAmount;
+                        notFullSlot.CurrentItem.ItemData.Amount += freeAmount;
                         toAdd -= freeAmount;
                     }
                     else
                     {
-                        notFullSlot.ItemAmount.Amount += toAdd;
+                        notFullSlot.CurrentItem.ItemData.Amount += toAdd;
                         toAdd -= toAdd;
                     }
                 }

@@ -10,8 +10,12 @@ public class Player : MonoBehaviour
     public SpriteRenderer Art;
 
     [SerializeField] public List<CraftRecipe> AvailableRecieps = new();
+    [HideInInspector] public PlayerMovement PlayeMovement { get; private set; }
+    [HideInInspector] public Inventory Inventory { get; private set; }
     private void Awake()
     {
         AvailableRecieps = Resources.LoadAll("Recipes", typeof(CraftRecipe)).Cast<CraftRecipe>().ToList();
+        PlayeMovement = GetComponent<PlayerMovement>();
+        Inventory = GetComponent<Inventory>();
     }
 }

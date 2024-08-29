@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapItem: {fileID: 11400000, guid: e0af175ea7d9ac743aa7403b39a55057, type: 2}
-  Drop: {fileID: 11400000, guid: a546707c34a43744e81c3cb64cd3ba50, type: 2}
+  Drop: {fileID: 11400000, guid: d4c4a6cd452f2f143ad6550c215baea3, type: 2}
   DropCountRange: {x: 5, y: 10}
   SpawnTileType: 2
 --- !u!61 &6629687668892915324

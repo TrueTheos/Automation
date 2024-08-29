@@ -10,7 +10,7 @@ using static UnityEditor.Experimental.GraphView.Port;
 namespace Assets.Scripts.MapObjects
 {
     [RequireComponent(typeof(BoxCollider2D))]
-    public class ConveyorBeltObject : MapObject
+    public class ConveyorBeltObject : MapObject, IRightClick
     {
         public ConveyorBeltObject Parent;
         public ConveyorBeltObject Child;
@@ -221,6 +221,16 @@ namespace Assets.Scripts.MapObjects
             }
 
             return BeltDirection.WE;
+        }
+
+        public void OnClick(Player player)
+        {
+            PlayerMovement playerMovement = player.PlayeMovement;
+            if (playerMovement.SelectedItem != null && playerMovement.SelectedItem.Item is NormalItem normalItem)
+            {
+                player.Inventory.RemoveItemFromSlot(1, playerMovement.SelectedItem);
+                SpawnItem(normalItem);
+            }
         }
     }
 

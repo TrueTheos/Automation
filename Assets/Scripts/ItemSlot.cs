@@ -15,17 +15,18 @@ namespace Assets.Scripts
     {
         [SerializeField] private Image Background;
         [SerializeField] private Color HighlightColor;
-        [SerializeField] private TextMeshProUGUI AmountText;
-        private DraggableItem _currentItem;
+        [HideInInspector] public DraggableItem CurrentItem;
         public DraggableItem DraggableItemPrefab;
+
+        public event Action OnItemChangeEvent;
 
         public int Amount
         {
             get
             {
-                if(_currentItem != null)
+                if(CurrentItem != null)
                 {
-                    return _currentItem.ItemData.Amount;
+                    return CurrentItem.ItemData.Amount;
                 }
                 else
                 {
@@ -37,9 +38,9 @@ namespace Assets.Scripts
         { 
             get 
             { 
-                if(_currentItem != null)
+                if(CurrentItem != null)
                 {
-                    return _currentItem.ItemData.Item;
+                    return CurrentItem.ItemData.Item;
                 }
                 else
                 {
@@ -58,25 +59,38 @@ namespace Assets.Scripts
 
         public void Init(ItemAmount itemAmount)
         {
-            _currentItem = Instantiate(DraggableItemPrefab, transform).GetComponent<DraggableItem>();
-            _currentItem.Init(this, itemAmount);
-            UpdateUI();
+            if (CurrentItem != null && CurrentItem.ItemData.Item == itemAmount.Item)
+            {
+                UpdateItemData(itemAmount);
+            }
+            else
+            {
+                CurrentItem = Instantiate(DraggableItemPrefab, transform).GetComponent<DraggableItem>();
+                CurrentItem.Init(this, itemAmount);
+                UpdateUI();
+            }
         }
 
         public void UpdateUI()
         {
-            if (Item == null)
+            if(CurrentItem != null)
             {
-                Icon.enabled = false;
-                AmountText.enabled = false;
+                if (CurrentItem.ItemData.Item == null || CurrentItem.ItemData.Amount <= 0)
+                {
+                    Destroy(CurrentItem.gameObject);
+                }
+                else
+                {
+                    CurrentItem.UpdateUI();
+                }
             }
-            else
-            {
-                Icon.enabled = true;
-                AmountText.enabled = true;
-                Icon.sprite = Item.Icon;
-                AmountText.text = Amount.ToString();
-            }
+        }
+
+        public void UpdateItemData(ItemAmount itemAmount)
+        {
+            if (CurrentItem == null) return;
+            CurrentItem.ItemData = itemAmount;
+            UpdateUI();
         }
 
         public void Highlight()
@@ -91,15 +105,36 @@ namespace Assets.Scripts
 
         public bool IsEmpty()
         {
-            return _currentItem == null;
+            return CurrentItem == null;
         }
 
         public void OnDrop(PointerEventData eventData)
         {
             GameObject dropped = eventData.pointerDrag;
             DraggableItem draggableItem = dropped.GetComponent<DraggableItem>();
+
+            if (transform.childCount != 0)
+            {
+                GameObject current = transform.GetChild(0).gameObject;
+                DraggableItem currentDraggable = current.GetComponent<DraggableItem>();
+
+                if(currentDraggable.ItemData.Item == draggableItem.ItemData.Item) 
+                {
+                    currentDraggable.ItemData.Amount += draggableItem.ItemData.Amount;
+                    UpdateUI();
+                    Destroy(draggableItem.gameObject);
+                    return;
+                }
+
+                currentDraggable.transform.SetParent(draggableItem.ParentAfterDrag);
+                ItemSlot slot = currentDraggable.transform.GetComponentInParent<ItemSlot>();
+                slot.CurrentItem = currentDraggable;
+                slot.OnItemChangeEvent?.Invoke();
+            }
             draggableItem.ParentAfterDrag = transform;
-            _currentItem = draggableItem;
+            CurrentItem = draggableItem;
+            OnItemChangeEvent?.Invoke();
+            UpdateUI();
         }
     }
 }

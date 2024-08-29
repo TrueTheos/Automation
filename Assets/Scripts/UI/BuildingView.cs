@@ -31,6 +31,7 @@ namespace Assets.Scripts.UI
         public virtual void Open()
         {
             _isOpen = true;
+            gameObject.SetActive(true);
         }
     }
 }

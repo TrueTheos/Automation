@@ -35,7 +35,7 @@ namespace Assets.Scripts.MapObjects
 
         private void Update()
         {
-            if (_inputItem.Amount > 0 || IsFull())
+            if (_inputItem.Amount <= 0 || _inputItem.Item == null || (_inputItem.Item is NormalItem normalItem && normalItem.SmeltedResult == null) || IsFull())
             {
                 ParticleSystem.gameObject.SetActive(false);
                 return;
@@ -50,16 +50,18 @@ namespace Assets.Scripts.MapObjects
                 _cooldown = 0;
                 if(_outputItem.Item == null)
                 {
-                    NormalItem normalItem = _outputItem.Item as NormalItem;
-                    _outputItem.Item = normalItem.SmeltedResult;
+                    NormalItem item = _inputItem.Item as NormalItem;
+                    _outputItem.Item = item.SmeltedResult;
                     _outputItem.Amount = 1;
+                    _inputItem.Amount--;
+                    _furnaceView.UpdateSlots(_inputItem, _outputItem);
                 }
                 else
                 {
-                    _outputItem.Amount++;
-                }
-
-                _furnaceView.UpdateSlots(_inputItem, _outputItem);
+                    _outputItem.Amount = _outputItem.Amount + 1;
+                    _inputItem.Amount--;
+                    _furnaceView.UpdateSlots(_inputItem, _outputItem);
+                }        
             }
 
             if(_furnaceView.IsOpen)
@@ -86,14 +88,22 @@ namespace Assets.Scripts.MapObjects
             return false;
         }
 
+        public void UpdateItems(ItemSlot input, ItemSlot output)
+        {
+            _inputItem.Item = input.Item;
+            _inputItem.Amount = input.Amount;
+            _outputItem.Item = output.Item;
+            _outputItem.Amount = output.Amount;
+        }
+
         public void ReceiveItem(ItemObject item)
         {
             _inputItem = new ItemAmount(item.ItemData, item.Amount);
         }
 
-        public void OnClick()
+        public void OnClick(Player player)
         {
-            _furnaceView.Open();
+            _furnaceView.OpenFurnace(this);
             _furnaceView.UpdateSlots(_inputItem, _outputItem);
         }
     }

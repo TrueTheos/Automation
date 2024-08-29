@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _placeObjectPreview;
     private ItemSlot _selectedItem;
+    public ItemSlot SelectedItem => _selectedItem;
     private int _selectedObjectIndex;
 
     [SerializeField] private GameObject _hand;
@@ -96,6 +97,13 @@ public class PlayerMovement : MonoBehaviour
 
         var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
+        if(Input.GetMouseButtonDown(1))
+        {
+            if (MapGenerator.Instance.GetObjectAtPos(gridMousePos.x, gridMousePos.y) is IRightClick rightClickable)
+            {
+                rightClickable.OnClick(_player);
+            }
+        }
         if (Input.GetMouseButton(1))
         {
             if (_mapManager.IsFree(gridMousePos.x, gridMousePos.y))
@@ -105,21 +113,7 @@ public class PlayerMovement : MonoBehaviour
                     _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y);
                     _inventory.RemoveItemFromSlot(1, _selectedItem);
                 }
-            }         
-        }
-        if(Input.GetMouseButtonDown(1))
-        {
-            if (!_mapManager.IsFree(gridMousePos.x, gridMousePos.y))
-            {
-                if (MapGenerator.Instance.GetObjectAtPos(gridMousePos.x, gridMousePos.y) is ConveyorBeltObject conveyorBelt)
-                {
-                    if (_selectedItem != null && _selectedItem.Item is NormalItem normalItem)
-                    {
-                        _inventory.RemoveItemFromSlot(1, _selectedItem);
-                        conveyorBelt.SpawnItem(normalItem);
-                    }
-                }
-            }
+            }   
         }
         if(_selectedItem != null && _selectedItem.Item is MapItem)
         {

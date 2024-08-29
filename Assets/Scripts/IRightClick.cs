@@ -8,6 +8,6 @@ namespace Assets.Scripts
 {
     public interface IRightClick
     {
-        public void OnClick();
+        public void OnClick(Player player);
     }
 }
