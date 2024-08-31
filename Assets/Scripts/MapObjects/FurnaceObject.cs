@@ -115,6 +115,7 @@ namespace Assets.Scripts.MapObjects
 
         public Item GetOutputData()
         {
+            if (_outputItem.Amount <= 0) return null;
             return _outputItem.GetItem();
         }
 
