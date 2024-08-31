@@ -80,7 +80,7 @@ namespace Assets.Scripts.MapObjects
             if (_inputItem.Amount >= InputCapacity) return false;
             if(item.ItemData is not NormalItem normalItem) return false;
             if (!normalItem.ItemFlags.HasFlag(ItemFlags.Smeltable)) return false;
-            if (_outputItem.GetItem() != null && _outputItem.GetItem() != item) return false;
+            if (_outputItem.GetItem() != null && _outputItem.GetItem() != normalItem.SmeltedResult) return false;
             if (IsFull()) return false;
 
             return true;

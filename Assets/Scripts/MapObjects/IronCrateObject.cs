@@ -68,13 +68,24 @@ namespace Assets.Scripts.MapObjects
                         _items[i].Item = incomingItem.ItemData;
                         _items[i].Amount = incomingItem.Amount;
                         if (_ironCrateView.IsOpen) _ironCrateView.UpdateSlot(i, _items[i]);
+                        Destroy(incomingItem.gameObject);
                         return;
                     }
                     else
                     {
-                        int added = incomingItem.ItemData.MaxStack - incomingItem.Amount;
-                        toAdd -= added;
-                        _items[i].Amount += added;
+                        int freeAmount = _items[i].Item.MaxStack - _items[i].Amount;
+                        
+                        if(toAdd > freeAmount)
+                        {
+                            _items[i].Amount += freeAmount;
+                            toAdd -= freeAmount;
+                        }
+                        else
+                        {
+                            _items[i].Amount += toAdd;
+                            toAdd -= toAdd; //xd
+                        }
+
                         if (_ironCrateView.IsOpen) _ironCrateView.UpdateSlot(i, _items[i]);
                     }
                 }
