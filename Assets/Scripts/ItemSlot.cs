@@ -137,6 +137,7 @@ namespace Assets.Scripts
             if (draggedItemSlot != null)
             {
                 draggedItemSlot.CurrentItem = null;
+                draggedItemSlot.OnItemChangeEvent?.Invoke();
             }
 
             if (transform.childCount != 0)

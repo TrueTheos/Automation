@@ -79,11 +79,23 @@ namespace Assets.Scripts.MapObjects
                     }
                 }
             }
+
+            Destroy(incomingItem.gameObject);
         }
 
-        public Item TakeOutItem()
+        public Items.Item TakeOutItem()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < SlotsCount; i++)
+            {
+                if (Items[i].Item != null && Items[i].Amount > 0)
+                {
+                    Items[i].Amount--;            
+                    _ironCrateView.UpdateSlot(i, Items[i]);
+                    return Items[i].Item;
+                }
+            }
+
+            return null;
         }
     }
 }

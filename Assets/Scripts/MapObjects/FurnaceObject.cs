@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEditor.Progress;
 using Item = Assets.Scripts.Items.Item;
 
 namespace Assets.Scripts.MapObjects

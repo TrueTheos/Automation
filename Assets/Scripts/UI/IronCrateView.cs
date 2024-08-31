@@ -15,15 +15,19 @@ namespace Assets.Scripts.UI
 
         private void Awake()
         {
-            for (int i = 0; i < Slots.Count; i++)
+            for (int i = 0; i < Slots.Count - 1; i++)
             {
-                Slots[i].OnItemChangeEvent += () => UpdateIronCrate(i);
+                Slots[i].OnItemChangeEvent += UpdateIronCrate;
             }
         }
 
-        private void UpdateIronCrate(int slotID)
+        private void UpdateIronCrate()
         {
-            _ironCrate.UpdateSlot(Slots[slotID], slotID);
+            for (int i = 0; i < Slots.Count - 1; i++)
+            {
+                _ironCrate.UpdateSlot(Slots[i], i);
+            }
+            
         }
 
         public override void ResetUI()
