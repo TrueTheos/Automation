@@ -15,7 +15,8 @@ public class MapGenerator : MonoBehaviour
     public static MapGenerator Instance;
 
     public int Seed;
-    [SerializeField] private float Scale;
+    [SerializeField] private float NoiseScale;
+    [SerializeField] private float WaterNoiseScale;
 
     [SerializeField] private Tilemap Layer0Tilemap;
     [SerializeField] private Tilemap Layer1Tilemap;
@@ -23,10 +24,12 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private Tile GreenTile;
     [SerializeField] private Tile DarkGreenTile;
     [SerializeField] private Tile StoneTile;
+    [SerializeField] private Tile WaterTile;
     [SerializeField] private List<Tile> GrassTiles;
     [SerializeField][Range(0f, 100f)] private float GrassSpawnChance;
 
     [SerializeField] private float StoneBiomeThreshold;
+    [SerializeField] private float WaterThreshold;
 
     [Header("Chunk Settings")]
     public int CHUNK_SIZE = 32;
@@ -48,6 +51,9 @@ public class MapGenerator : MonoBehaviour
     {
         Random.InitState(Seed);
 
+        Layer0Tilemap.ClearAllTiles();
+        Layer1Tilemap.ClearAllTiles();
+
         for (int xChunk = 0; xChunk < Chunks.GetLength(0); xChunk++)
         {
             for (int yChunk = 0; yChunk < Chunks.GetLength(1); yChunk++)
@@ -57,7 +63,7 @@ public class MapGenerator : MonoBehaviour
                 {
                     for (int y = 0; y < CHUNK_SIZE; y++)
                     {
-                        Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), GreenTile);
+                        Layer0Tilemap.SetTile(new Vector3Int(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, 0), GreenTile);
                         chunkTiles[x,y] = TileType.GRASS;
                     }
                 }
@@ -67,6 +73,7 @@ public class MapGenerator : MonoBehaviour
         }    
 
         GenerateStoneBiome();
+        GenerateWater();
         StartCoroutine(GenerateOres());
     }
 
@@ -79,8 +86,8 @@ public class MapGenerator : MonoBehaviour
         {
             for (int y = 0; y < _mapManager.Height; y++)
             {
-                float xCoord = randomX + x / (float)_mapManager.Width * Scale;
-                float yCoord = randomY + y / (float)_mapManager.Height * Scale;
+                float xCoord = randomX + x / (float)_mapManager.Width * NoiseScale;
+                float yCoord = randomY + y / (float)_mapManager.Height * NoiseScale;
                 float perlin = Mathf.PerlinNoise(xCoord, yCoord);
                 if (perlin < StoneBiomeThreshold)
                 {
@@ -96,6 +103,33 @@ public class MapGenerator : MonoBehaviour
                     {
                         Layer1Tilemap.SetTile(new Vector3Int(x, y, 0), GrassTiles.GetRandom());
                     }
+                }
+            }
+        }
+    }
+
+    private void GenerateWater()
+    {
+        float randomX = Random.Range(-10000f, 10000f);
+        float randomY = Random.Range(-10000f, 10000f);
+
+        for (int x = 0; x < _mapManager.Width; x++)
+        {
+            for (int y = 0; y < _mapManager.Height; y++)
+            {
+                float xCoord = randomX + x / (float)_mapManager.Width * WaterNoiseScale;
+                float yCoord = randomY + y / (float)_mapManager.Height * WaterNoiseScale;
+                float perlin = Mathf.PerlinNoise(xCoord, yCoord);
+                if (perlin < WaterThreshold)
+                {
+                    Chunk currentChunk = GetChunk(x, y);
+                    if(currentChunk.GetType(x,y) == TileType.GRASS)
+                    {
+                        currentChunk.SetTile(x, y, TileType.WATER);
+                        Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), WaterTile);
+                        Layer1Tilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    }
+                    
                 }
             }
         }
@@ -177,6 +211,11 @@ public class Chunk
         _tiles[x - WorldX, y - WorldY] = type;
     }
 
+    public TileType GetType(int x, int y)
+    {
+        return _tiles[x - WorldX, y - WorldY];
+    }
+
     public void SpawnObject(MapObject obj)
     {
         if (obj is OreObject) OresCount++;
@@ -226,5 +265,6 @@ public enum TileType
 {
     NONE,
     GRASS,
-    STONE
+    STONE,
+    WATER
 }
