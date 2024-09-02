@@ -4,6 +4,9 @@ using Assets.Scripts.MapObjects;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+using MapObjects.ElectricGrids;
+
 using UnityEngine;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using UnityEngine.XR;
@@ -48,6 +51,9 @@ public class PlayerMovement : MonoBehaviour
     private float _lastClickTime = 0f;
     private float _currentMovementSpeed;
     private bool _isRunning;
+    
+    public bool IsConnecting { get; set; }
+    public IPowerGridUser CurrentObjectBeingConnected { get; set; }
 
     private void Awake()
     {
@@ -68,6 +74,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            IsConnecting = false;
+            CurrentObjectBeingConnected = null;
+        }
+
+        if (IsConnecting)
+        {
+            return;
+        }
+        
         _moveInput.x = Input.GetAxisRaw("Horizontal");
         _moveInput.y = Input.GetAxisRaw("Vertical");
 
@@ -100,9 +117,9 @@ public class PlayerMovement : MonoBehaviour
             HandleHittingObject();
         }
 
-
         var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
+        
         if(Input.GetMouseButtonDown(1))
         {
             if (MapGenerator.Instance.GetObjectAtPos(gridMousePos.x, gridMousePos.y) is IRightClick rightClickable)
@@ -110,6 +127,7 @@ public class PlayerMovement : MonoBehaviour
                 rightClickable.OnClick(_player);
             }
         }
+        
         if (Input.GetMouseButton(1))
         {
             if (_mapManager.IsFree(gridMousePos.x, gridMousePos.y))
