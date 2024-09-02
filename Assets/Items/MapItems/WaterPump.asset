@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 159b2f86cd494d349af108cd89750ccd, type: 3}
+  m_Name: WaterPump
+  m_EditorClassIdentifier: 
+  Name: Water Pump
+  Icon: {fileID: 337180491, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}
+  MaxStack: 1
+  ItemFlags: 0
+  Prefab: {fileID: 4210697785589834073, guid: 6b989c1a8fd14d4458b46fac059bd026, type: 3}
+  MaxDurability: 10
+  CanBeRotated: 0
+  DefaultDirection: 1
+  DirectionSprites:
+    dictionary:
+    - Key: 1
+      Value: {fileID: 337180491, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}

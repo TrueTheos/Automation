@@ -15,5 +15,18 @@ MonoBehaviour:
   Name: Conveyor Belt
   Icon: {fileID: -129201297, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
   MaxStack: 100
+  ItemFlags: 0
   Prefab: {fileID: 4210697785589834073, guid: 6b989c1a8fd14d4458b46fac059bd026, type: 3}
   MaxDurability: 10
+  CanBeRotated: 1
+  DefaultDirection: 2
+  DirectionSprites:
+    dictionary:
+    - Key: 0
+      Value: {fileID: -651349940, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 1
+      Value: {fileID: -129201297, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 2
+      Value: {fileID: -174329239, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
+    - Key: 3
+      Value: {fileID: -1271546529, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}

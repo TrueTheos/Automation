@@ -13,5 +13,9 @@ namespace Assets.Scripts.Items
     {
         public MapObject Prefab;
         public int MaxDurability;
+        public bool CanBeRotated;
+        public Direction DefaultDirection = Direction.Down;
+        public SerializableDictionary<Direction, Sprite> DirectionSprites;
+
     }
 }

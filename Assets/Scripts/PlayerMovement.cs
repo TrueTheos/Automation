@@ -10,6 +10,7 @@ using MapObjects.ElectricGrids;
 using UnityEngine;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using UnityEngine.XR;
+using System;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -18,17 +19,20 @@ public class PlayerMovement : MonoBehaviour
     public int DestroyPower = 10;
     public float DestroyInterval;
     private float _destroyTimer;
-    public KeyCode SprintKey;
     public float PickupRange;
     public float AttractionRange;
     public float MaxAttractionSpeed;
     public LayerMask PickupLayer;
 
+    [Header("Keybinds")]
+    [SerializeField] private KeyCode _sprintKey;
+    [SerializeField] private KeyCode _rotateKey;
+
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _placeObjectPreview;
     private ItemSlot _selectedItem;
     public ItemSlot SelectedItem => _selectedItem;
-
+    private Direction _selectedItemDirection = Direction.Down;
     private int _selectedObjectIndex;
 
     [SerializeField] private GameObject _hand;
@@ -64,6 +68,7 @@ public class PlayerMovement : MonoBehaviour
     {
         _mapManager = MapManager.Instance;
         _selectedItem = _inventory.HotbarItems[0];
+        if (_selectedItem.Item is MapItem mapItem) _selectedItemDirection = mapItem.DefaultDirection;
         _destroyTimer = DestroyInterval;
     }
 
@@ -87,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
 
         _currentMovementSpeed = Mathf.Clamp(_moveInput.magnitude, 0f, 1f);
 
-        if (Input.GetKey(SprintKey))
+        if (Input.GetKey(_sprintKey))
         {
             _rb.velocity = _moveInput * SprintSpeed;
             _isRunning = true;
@@ -129,17 +134,32 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (_selectedItem != null && !_selectedItem.IsEmpty() && _selectedItem.Item is MapItem buildingItem)
                 {
-                    _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y);
+                    _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y, _selectedItemDirection);
                     _inventory.RemoveItemFromSlot(1, _selectedItem);
                     UpdatePreviewSprite();
                 }
             }   
         }
-        
-        if(_selectedItem != null && _selectedItem.Item is MapItem)
+        if(_selectedItem != null && _selectedItem.Item is MapItem mapItem)
         {
             Vector3 _placeholderPos = new Vector3(.5f + gridMousePos.x, .5f + gridMousePos.y, 0);
             _placeObjectPreview.gameObject.transform.position = _placeholderPos;
+
+            if(Input.GetKeyDown(_rotateKey) && mapItem.CanBeRotated)
+            {
+                for (int i = 1; i <= 4; i++)
+                {
+                    Direction nextDirection = (Direction)(((int)_selectedItemDirection + i) % 4);
+
+                    // Check if the next direction exists in the dictionary
+                    if (mapItem.DirectionSprites.ContainsKey(nextDirection))
+                    {
+                        _selectedItemDirection = nextDirection;
+                        break;
+                    }
+                }
+                UpdatePreviewSprite();
+            }
         }
 
         List<ItemObject> items = Physics2D.OverlapCircleAll(transform.position, AttractionRange, PickupLayer).Select(x => x.GetComponent<ItemObject>()).ToList();
@@ -227,6 +247,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_selectedItem != null) _selectedItem.DeHighlight();
         _selectedItem = _inventory.HotbarItems[_selectedObjectIndex];
+        if (_selectedItem.Item is MapItem mapItem) _selectedItemDirection = mapItem.DefaultDirection;
         _selectedItem.Highlight();
 
         UpdatePreviewSprite();
@@ -239,7 +260,7 @@ public class PlayerMovement : MonoBehaviour
             if (_selectedItem.Item is MapItem buildingItem)
             {
                 _placeObjectPreview.gameObject.SetActive(true);
-                _placeObjectPreview.sprite = _selectedItem.Item.Icon;
+                _placeObjectPreview.sprite = buildingItem.DirectionSprites[_selectedItemDirection];
             }
             else
             {

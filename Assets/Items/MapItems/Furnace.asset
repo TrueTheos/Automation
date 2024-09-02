@@ -15,5 +15,12 @@ MonoBehaviour:
   Name: Furnace
   Icon: {fileID: 21300000, guid: a1a2097f441a9bd4c985cdb498969020, type: 3}
   MaxStack: 1
+  ItemFlags: 0
   Prefab: {fileID: 7721624960510594945, guid: 8dc664ab2aab1a545a4ff737e6c87fce, type: 3}
   MaxDurability: 40
+  CanBeRotated: 0
+  DefaultDirection: 2
+  DirectionSprites:
+    dictionary:
+    - Key: 2
+      Value: {fileID: 21300000, guid: a1a2097f441a9bd4c985cdb498969020, type: 3}

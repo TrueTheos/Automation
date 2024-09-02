@@ -23,11 +23,11 @@ public class MapManager : MonoBehaviour
         _generator = GetComponent<MapGenerator>();
     }
 
-    public void SpawnObject(MapObject obj, int x, int y)
+    public void SpawnObject(MapObject obj, int x, int y, Direction direction)
     {
         MapObject spawnedOre = Instantiate(obj, new Vector3(x + .5f, y + .5f, 0), Quaternion.identity);
         Chunk chunk = _generator.GetChunk(x, y);
-        spawnedOre.Place(chunk, x, y);
+        spawnedOre.Place(chunk, x, y, direction);
     }
 
     public bool IsFree(int x, int y)

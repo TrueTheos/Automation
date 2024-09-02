@@ -18,3 +18,9 @@ MonoBehaviour:
   ItemFlags: 0
   Prefab: {fileID: 5636715138489654252, guid: ae8792dd5b9595c48ad13ae00cbc4dc7, type: 3}
   MaxDurability: 30
+  CanBeRotated: 0
+  DefaultDirection: 2
+  DirectionSprites:
+    dictionary:
+    - Key: 2
+      Value: {fileID: 1412756841, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
