@@ -50,10 +50,10 @@ namespace MapObjects.ElectricGrids
             return ConnectedGridUsers.Any();
         }
 
-        protected override void OnPlace()
+        protected override void OnPlace(Direction direction)
         {
-            base.OnPlace();
-
+            base.OnPlace(direction);
+        
             ConnectedGridUsers = new List<IPowerGridUser>();
         }
 
