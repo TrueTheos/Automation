@@ -8,6 +8,8 @@ namespace Assets.Scripts
     [Serializable]
     public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
+        //test
+
         [System.Serializable]
         public class OBJ
         {

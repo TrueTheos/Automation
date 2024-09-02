@@ -113,12 +113,12 @@ TextureImporter:
       name: waterpump_side_1
       rect:
         serializedVersion: 2
-        x: 18
-        y: 26
+        x: 32
+        y: 32
         width: 32
         height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 9
+      pivot: {x: 0.75, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -126,6 +126,69 @@ TextureImporter:
       bones: []
       spriteID: f1373e98f6fdab941a344ab32c9dc5c3
       internalID: 337180491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: waterpump_side_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.25}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 945079909314674409d289ce290bf8ab
+      internalID: -799912130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: waterpump_side_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f69631592aa9dff4486462cca903a25c
+      internalID: -1368460817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: waterpump_side_3
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.5, y: 0.25}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ddfb015ebf4d464a86f1cd7984b0c94
+      internalID: -222805220
       vertices: []
       indices: 
       edges: []
@@ -143,6 +206,8 @@ TextureImporter:
     nameFileIdTable:
       waterpump_side_0: -799912130
       waterpump_side_1: 337180491
+      waterpump_side_2: -1368460817
+      waterpump_side_3: -222805220
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
