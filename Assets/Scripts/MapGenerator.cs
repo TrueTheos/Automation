@@ -170,7 +170,7 @@ public class MapGenerator : MonoBehaviour
 
                         if (spawnSpace != Vector2Int.zero)
                         {
-                            _mapManager.SpawnObject(ore, spawnSpace.x, spawnSpace.y);
+                            _mapManager.SpawnObject(ore, spawnSpace.x, spawnSpace.y, Direction.None);
                         }
                     }
                 }

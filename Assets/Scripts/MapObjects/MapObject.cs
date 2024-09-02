@@ -11,6 +11,9 @@ namespace Assets.Scripts.MapObjects
 {
     public abstract class MapObject : MonoBehaviour
     {
+        public Direction Direction;
+        [SerializeField] private bool _canBeRotated;
+
         public Chunk Chunk;
         public MapItem MapItem;
 
@@ -23,7 +26,7 @@ namespace Assets.Scripts.MapObjects
 
         private GameManager _gameManager;
 
-        public void Place(Chunk chunk, int x, int y)
+        public void Place(Chunk chunk, int x, int y, Direction direction)
         {
             Chunk = chunk;
             
@@ -36,12 +39,10 @@ namespace Assets.Scripts.MapObjects
 
             _gameManager = GameManager.Instance;
 
-            OnPlace();
+            OnPlace(direction);
         }
 
-        protected virtual void OnPlace() 
-        {
-        }
+        protected virtual void OnPlace(Direction direction) { }
 
         public void Hit(int power)
         {

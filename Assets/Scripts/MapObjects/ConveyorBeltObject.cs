@@ -1,12 +1,6 @@
 using Assets.Scripts.Items;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.Port;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace Assets.Scripts.MapObjects
 {
@@ -24,39 +18,76 @@ namespace Assets.Scripts.MapObjects
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
 
-        private static Dictionary<ConnectionType, ConnectionType> _oppositeDirection = new()
+        private static Dictionary<Direction, Direction> _oppositeDirection = new()
         {
-            {ConnectionType.Left, ConnectionType.Right },
-            {ConnectionType.Right, ConnectionType.Left },
-            {ConnectionType.Up, ConnectionType.Down },
-            {ConnectionType.Down, ConnectionType.Up },
+            {Direction.Left, Direction.Right },
+            {Direction.Right, Direction.Left },
+            {Direction.Up, Direction.Down },
+            {Direction.Down, Direction.Up },
         };
 
-        public enum ConnectionType
+        private BeltDirection _dir;
+        private BeltDirection _direction
         {
-            None,
-            Left,
-            Right,
-            Up,
-            Down
+            get { return _dir; } set 
+            {
+                _dir = value;
+            }
+        }
+        private BeltDirection _defaultDirection;
+
+        private Direction _inputDirection = Direction.None;
+        public Direction InputConnection
+        {
+            get
+            {
+                return _inputDirection;
+            }
+            set
+            {
+                _inputDirection = value;
+            }
+        }
+        private Direction _outputDirection = Direction.None;
+        public Direction OutputConnection
+        {
+            get
+            {
+                return _outputDirection;
+            }
+            set
+            {
+                _outputDirection = value;
+            }
         }
 
-        private BeltDirection _direction;
-
-        public ConnectionType InputConnection = ConnectionType.None;
-        public ConnectionType OutputConnection = ConnectionType.None;
-
-        protected override void OnPlace()
+        protected override void OnPlace(Direction direction)
         {
-            UpdateSprite(ConnectionType.None);
+            _defaultDirection = DirectionToBeltDirection(direction);
+            InputConnection = _oppositeDirection[direction];
+            OutputConnection = direction;
+            UpdateSprite(Direction.None);
             GameManager.Instance.AddBelt(this);
+        }
+
+        private BeltDirection DirectionToBeltDirection(Direction dir)
+        {
+            if (dir == Direction.Left) return BeltDirection.EW;
+            if (dir == Direction.Right) return BeltDirection.WE;
+            if (dir == Direction.Up) return BeltDirection.SN;
+            if (dir == Direction.Down) return BeltDirection.NS;
+            return BeltDirection.EW;
         }
 
         public void MoveItems()
         {
-            if(Child == null || Parent == null)
+            if(Child == null)
             {
-                UpdateNeighbors(ConnectionType.None);
+                UpdateNeighbor(OutputConnection);
+            }
+            if(Parent == null)
+            {
+                UpdateNeighbor(InputConnection);
             }
 
             if(Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
@@ -102,9 +133,10 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        public void UpdateSprite(ConnectionType comingFrom)
+        public void UpdateSprite(Direction comingFrom)
         {
-            if(comingFrom == ConnectionType.None || _direction != GetBeltDirection())
+            if (comingFrom == Direction.None || InputConnection == Direction.None ||
+                OutputConnection == Direction.None || _direction != GetBeltDirection())
             {
                 _direction = GetBeltDirection();
                 Sprite.sprite = BeltSprites[_direction];
@@ -112,15 +144,23 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        private void UpdateNeighbors(ConnectionType comingFrom)
+        private void UpdateNeighbors(Direction comingFrom)
         {
-            if (comingFrom == ConnectionType.None || comingFrom != ConnectionType.Down) UpdateNeighborConnection(Vector2.up, ConnectionType.Down, ConnectionType.Up);
-            if (comingFrom == ConnectionType.None || comingFrom != ConnectionType.Up) UpdateNeighborConnection(Vector2.down, ConnectionType.Up, ConnectionType.Down);
-            if (comingFrom == ConnectionType.None || comingFrom != ConnectionType.Right) UpdateNeighborConnection(Vector2.left, ConnectionType.Right, ConnectionType.Left);
-            if (comingFrom == ConnectionType.None || comingFrom != ConnectionType.Left) UpdateNeighborConnection(Vector2.right, ConnectionType.Left, ConnectionType.Right);
+            if (comingFrom == Direction.None || comingFrom != Direction.Down) UpdateNeighborConnection(Vector2.up, Direction.Down, Direction.Up);
+            if (comingFrom == Direction.None || comingFrom != Direction.Up) UpdateNeighborConnection(Vector2.down, Direction.Up, Direction.Down);
+            if (comingFrom == Direction.None || comingFrom != Direction.Right) UpdateNeighborConnection(Vector2.left, Direction.Right, Direction.Left);
+            if (comingFrom == Direction.None || comingFrom != Direction.Left) UpdateNeighborConnection(Vector2.right, Direction.Left, Direction.Right);
         }
 
-        private void UpdateNeighborConnection(Vector2 direction, ConnectionType neighborInput, ConnectionType neighborOutput)
+        private void UpdateNeighbor(Direction dir)
+        {
+            if (dir == Direction.Down) UpdateNeighborConnection(Vector2.down, Direction.Up, Direction.Down);
+            if (dir == Direction.Up) UpdateNeighborConnection(Vector2.up, Direction.Down, Direction.Up);
+            if (dir == Direction.Right) UpdateNeighborConnection(Vector2.right, Direction.Left, Direction.Right);
+            if (dir == Direction.Left) UpdateNeighborConnection(Vector2.left, Direction.Right, Direction.Left);
+        }
+
+        private void UpdateNeighborConnection(Vector2 direction, Direction neighborInput, Direction neighborOutput)
         {
             Vector2 neighborPos = (Vector2)transform.position + direction;
             IItemReceiver neighbor = GetReceiverAtPosition(neighborPos);
@@ -137,14 +177,14 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        private void UpdateConnection(IItemReceiver receiver, ConnectionType neighborInput, ConnectionType neighborOutput)
+        private void UpdateConnection(IItemReceiver receiver, Direction neighborInput, Direction neighborOutput)
         {
             if (Parent == null)
             {
                 Parent = receiver;
                 InputConnection = neighborOutput;
 
-                if (OutputConnection == ConnectionType.None)
+                if (OutputConnection == Direction.None)
                 {
                     OutputConnection = _oppositeDirection[neighborOutput];
                 }
@@ -154,17 +194,18 @@ namespace Assets.Scripts.MapObjects
                 Child = receiver;
                 OutputConnection = neighborOutput;
 
-                if (OutputConnection == ConnectionType.None)
+                if (OutputConnection == Direction.None)
                 {
                     OutputConnection = _oppositeDirection[neighborOutput];
                 }
             }
 
             BeltDirection dir = GetBeltDirection();
+            _direction = dir;
             Sprite.sprite = BeltSprites[dir];
         }
 
-        private void UpdateBeltConnection(ConveyorBeltObject belt, ConnectionType neighborInput, ConnectionType neighborOutput)
+        private void UpdateBeltConnection(ConveyorBeltObject belt, Direction neighborInput, Direction neighborOutput)
         {
             if (Parent == null && belt.Child == null)
             {
@@ -172,16 +213,21 @@ namespace Assets.Scripts.MapObjects
                 belt.Child = this;
                 belt.OutputConnection = neighborInput;
 
-                if (belt.InputConnection == ConnectionType.None)
+                if (belt.InputConnection == Direction.None || belt.Parent == null)
                 {
-                    belt.InputConnection = _oppositeDirection[neighborInput];
+                    belt.InputConnection = neighborOutput;
                 }
                 InputConnection = neighborOutput;
 
-                if (OutputConnection == ConnectionType.None)
+                if (OutputConnection == Direction.None)
                 {
-                    OutputConnection = _oppositeDirection[neighborOutput];
+                    OutputConnection = neighborInput;
                 }
+
+                belt.UpdateSprite(neighborInput);
+                BeltDirection dir = GetBeltDirection();
+                _direction = dir;
+                Sprite.sprite = BeltSprites[dir];
             }
             else if (Child == null && belt.Parent == null)
             {
@@ -189,22 +235,23 @@ namespace Assets.Scripts.MapObjects
                 belt.Parent = this;
                 belt.InputConnection = neighborInput;
 
-                if (belt.InputConnection == ConnectionType.None)
+                if (belt.OutputConnection == Direction.None || belt.Child == null)
                 {
-                    belt.InputConnection = _oppositeDirection[neighborInput];
+                    belt.OutputConnection = neighborOutput;
                 }
 
                 OutputConnection = neighborOutput;
 
-                if (OutputConnection == ConnectionType.None)
+                if (InputConnection == Direction.None)
                 {
-                    OutputConnection = _oppositeDirection[neighborOutput];
+                    InputConnection = neighborInput;
                 }
-            }
 
-            belt.UpdateSprite(neighborOutput);
-            BeltDirection dir = GetBeltDirection();
-            Sprite.sprite = BeltSprites[dir];
+                belt.UpdateSprite(neighborInput);
+                BeltDirection dir = GetBeltDirection();
+                _direction = dir;
+                Sprite.sprite = BeltSprites[dir];
+            }     
         }
 
         private IItemReceiver GetReceiverAtPosition(Vector2 position)
@@ -220,48 +267,45 @@ namespace Assets.Scripts.MapObjects
 
         private BeltDirection GetBeltDirection()
         {
-            if (Child == null && InputConnection != ConnectionType.None)
+            //if (Child == null && InputConnection != Direction.None)
+            //{
+            //    return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
+            //}
+
+            //if (Parent == null && OutputConnection != Direction.None)
+            //{
+            //    return DirectionToBeltDirection(OutputConnection);
+            //}
+
+            if(InputConnection == Direction.Left)
             {
-                if (InputConnection == ConnectionType.Left) return BeltDirection.WE;
-                if (InputConnection == ConnectionType.Up) return BeltDirection.NS;
-                if (InputConnection == ConnectionType.Right) return BeltDirection.EW;
-                if (InputConnection == ConnectionType.Down) return BeltDirection.SN;
+                if(OutputConnection == Direction.Right) return BeltDirection.WE;
+                if(OutputConnection == Direction.Up) return BeltDirection.WN;
+                if(OutputConnection == Direction.Down) return BeltDirection.WS;
+            }
+            if(InputConnection == Direction.Right)
+            {
+                if (OutputConnection == Direction.Left) return BeltDirection.EW;
+                if (OutputConnection == Direction.Up) return BeltDirection.EN;
+                if (OutputConnection == Direction.Down) return BeltDirection.ES;
+                if (OutputConnection == Direction.None) return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
+            }
+            if(InputConnection == Direction.Down)
+            {
+                if (OutputConnection == Direction.Right) return BeltDirection.SE;
+                if (OutputConnection == Direction.Up) return BeltDirection.SN;
+                if (OutputConnection == Direction.Left) return BeltDirection.SW;
+                if (OutputConnection == Direction.None) return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
+            }
+            if (InputConnection == Direction.Up)
+            {
+                if (OutputConnection == Direction.Right) return BeltDirection.NE;
+                if (OutputConnection == Direction.Down) return BeltDirection.NS;
+                if (OutputConnection == Direction.Left) return BeltDirection.NW;
+                if (OutputConnection == Direction.None) return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
             }
 
-            if (Parent == null && OutputConnection != ConnectionType.None)
-            {
-                if (OutputConnection == ConnectionType.Left) return BeltDirection.EW;
-                if (OutputConnection == ConnectionType.Up) return BeltDirection.SN;
-                if (OutputConnection == ConnectionType.Right) return BeltDirection.WE;
-                if (OutputConnection == ConnectionType.Down) return BeltDirection.NS;
-            }
-
-            if(InputConnection == ConnectionType.Left)
-            {
-                if(OutputConnection == ConnectionType.Right) return BeltDirection.WE;
-                if(OutputConnection == ConnectionType.Up) return BeltDirection.WN;
-                if(OutputConnection == ConnectionType.Down) return BeltDirection.WS;
-            }
-            if(InputConnection == ConnectionType.Right)
-            {
-                if (OutputConnection == ConnectionType.Left) return BeltDirection.EW;
-                if (OutputConnection == ConnectionType.Up) return BeltDirection.EN;
-                if (OutputConnection == ConnectionType.Down) return BeltDirection.ES;
-            }
-            if(InputConnection == ConnectionType.Down)
-            {
-                if (OutputConnection == ConnectionType.Right) return BeltDirection.SE;
-                if (OutputConnection == ConnectionType.Up) return BeltDirection.SN;
-                if (OutputConnection == ConnectionType.Left) return BeltDirection.SW;
-            }
-            if (InputConnection == ConnectionType.Up)
-            {
-                if (OutputConnection == ConnectionType.Right) return BeltDirection.NE;
-                if (OutputConnection == ConnectionType.Down) return BeltDirection.NS;
-                if (OutputConnection == ConnectionType.Left) return BeltDirection.NW;
-            }
-
-            return BeltDirection.WE;
+            return _defaultDirection;
         }
 
         public void OnClick(Player player)
@@ -296,118 +340,12 @@ namespace Assets.Scripts.MapObjects
         }
     }
 
-    [System.Serializable]
-    public class SerializableDictionary<TKey, TValue> : IDictionary<TKey,TValue>
+    public enum Direction
     {
-        [System.Serializable]
-        public class OBJ
-        {
-            public TKey Key;
-            public TValue Value;
-        }
-
-        public List<OBJ> dictionary = new List<OBJ>();
-
-        public ICollection<TKey> Keys => dictionary.Select(x => x.Key).ToList();
-        public ICollection<TValue> Values => dictionary.Select(x => x.Value).ToList();
-        public int Count => dictionary.Count;
-        public bool IsReadOnly => false;
-
-        public TValue this[TKey key]
-        {
-            get
-            {
-                OBJ item = dictionary.Find(x => EqualityComparer<TKey>.Default.Equals(x.Key, key));
-                if (item == null)
-                    throw new KeyNotFoundException();
-                return item.Value;
-            }
-            set
-            {
-                OBJ item = dictionary.Find(x => EqualityComparer<TKey>.Default.Equals(x.Key, key));
-                if (item == null)
-                    dictionary.Add(new OBJ { Key = key, Value = value });
-                else
-                    item.Value = value;
-            }
-        }
-
-        public void Add(TKey key, TValue value)
-        {
-            if (ContainsKey(key))
-                throw new ArgumentException("An element with the same key already exists in the dictionary.");
-            dictionary.Add(new OBJ { Key = key, Value = value });
-        }
-
-        public bool ContainsKey(TKey key)
-        {
-            return dictionary.Exists(x => EqualityComparer<TKey>.Default.Equals(x.Key, key));
-        }
-
-        public bool Remove(TKey key)
-        {
-            return dictionary.RemoveAll(x => EqualityComparer<TKey>.Default.Equals(x.Key, key)) > 0;
-        }
-
-        public bool TryGetValue(TKey key, out TValue value)
-        {
-            OBJ item = dictionary.Find(x => EqualityComparer<TKey>.Default.Equals(x.Key, key));
-            if (item != null)
-            {
-                value = item.Value;
-                return true;
-            }
-            value = default;
-            return false;
-        }
-
-        public void Add(KeyValuePair<TKey, TValue> item)
-        {
-            Add(item.Key, item.Value);
-        }
-
-        public void Clear()
-        {
-            dictionary.Clear();
-        }
-
-        public bool Contains(KeyValuePair<TKey, TValue> item)
-        {
-            return dictionary.Exists(x =>
-                EqualityComparer<TKey>.Default.Equals(x.Key, item.Key) &&
-                EqualityComparer<TValue>.Default.Equals(x.Value, item.Value));
-        }
-
-        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
-            if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-            if (array.Length - arrayIndex < Count)
-                throw new ArgumentException("The number of elements in the source dictionary is greater than the available space from arrayIndex to the end of the destination array.");
-
-            foreach (var item in dictionary)
-            {
-                array[arrayIndex++] = new KeyValuePair<TKey, TValue>(item.Key, item.Value);
-            }
-        }
-
-        public bool Remove(KeyValuePair<TKey, TValue> item)
-        {
-            return dictionary.RemoveAll(x =>
-                EqualityComparer<TKey>.Default.Equals(x.Key, item.Key) &&
-                EqualityComparer<TValue>.Default.Equals(x.Value, item.Value)) > 0;
-        }
-
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return dictionary.Select(x => new KeyValuePair<TKey, TValue>(x.Key, x.Value)).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        None = -1,
+        Up = 0,
+        Right = 1,
+        Down = 2,
+        Left = 3
     }
 }
