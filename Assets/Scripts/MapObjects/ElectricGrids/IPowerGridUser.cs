@@ -61,30 +61,29 @@ namespace MapObjects.ElectricGrids
         public void OnPowerGridUserClick(Player player)
         {
             //TODO add building type to item? If it's just place or connect or drag, dunno
-                if (player.PlayeMovement.CurrentObjectBeingConnected == null)
-                {
-                    player.PlayeMovement.CurrentObjectBeingConnected = this;
-                    
-                    //TODO Spawn Wire between this and mouse
-                }
-                else
-                {
-                    //TODO Spawn Wire between connected users
-                    
-                    var wireStartObject = player.PlayeMovement.CurrentObjectBeingConnected;
-                    
-                    if (wireStartObject != null)
-                    {
-                        wireStartObject.ConnectUsers(wireStartObject);
+            if (player.PlayeMovement.CurrentObjectBeingConnected == null)
+            {
+                player.PlayeMovement.CurrentObjectBeingConnected = this;
 
-                        List<IPowerGridUser> checkList = new ();
-                        wireStartObject.DebugHasPower = DebugHasPower = HasPower(this, checkList);
-                    }
+                //TODO Spawn Wire between this and mouse
+            }
+            else
+            {
+                //TODO Spawn Wire between connected users
 
-                    player.PlayeMovement.CurrentObjectBeingConnected = null;
-                    //player.PlayeMovement.CurrentObjectBeingConnected = this;
+                var wireStartObject = player.PlayeMovement.CurrentObjectBeingConnected;
+
+                if (wireStartObject != null)
+                {
+                    wireStartObject.ConnectUsers(wireStartObject);
+
+                    List<IPowerGridUser> checkList = new();
+                    wireStartObject.DebugHasPower = DebugHasPower = HasPower(this, checkList);
                 }
-            
+
+                player.PlayeMovement.CurrentObjectBeingConnected = null;
+                //player.PlayeMovement.CurrentObjectBeingConnected = this;
+            }
         }
     }
 

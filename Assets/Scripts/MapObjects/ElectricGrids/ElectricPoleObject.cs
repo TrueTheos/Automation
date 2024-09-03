@@ -52,6 +52,8 @@ namespace MapObjects.ElectricGrids
 
         protected override void OnPlace(Direction direction)
         {
+            base.OnPlace(direction);
+        
             ConnectedGridUsers = new List<IPowerGridUser>();
         }
 
