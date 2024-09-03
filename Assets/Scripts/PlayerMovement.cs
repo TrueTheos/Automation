@@ -11,6 +11,7 @@ using UnityEngine;
 using static UnityEditor.Experimental.GraphView.GraphView;
 using UnityEngine.XR;
 using System;
+using UnityEditor;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -260,7 +261,15 @@ public class PlayerMovement : MonoBehaviour
             if (_selectedItem.Item is MapItem buildingItem)
             {
                 _placeObjectPreview.gameObject.SetActive(true);
-                _placeObjectPreview.sprite = buildingItem.DirectionSprites[_selectedItemDirection];
+                if (buildingItem.DirectionSprites == null || !buildingItem.DirectionSprites.ContainsKey(_selectedItemDirection))
+                {
+                    _placeObjectPreview.sprite = buildingItem.Icon;
+                }
+                else
+                {
+                    _placeObjectPreview.sprite = buildingItem.DirectionSprites[_selectedItemDirection];
+                }
+                
             }
             else
             {

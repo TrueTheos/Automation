@@ -143,5 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d2139f6910e4653ae9b1e0494f545d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Direction: 0
+  SpriteRend: {fileID: 8682204378943370106}
   MapItem: {fileID: 11400000, guid: 384fa763838050146ae813a7224bd182, type: 2}
-  debugGowno: 0
+  hasPowerDebug: 0

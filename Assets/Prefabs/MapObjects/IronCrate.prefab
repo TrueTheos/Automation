@@ -143,5 +143,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67d83b19a763d2545bdbbfe65901dcde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Direction: 0
+  SpriteRend: {fileID: 4063170707660098691}
+  _canBeRotated: 0
   MapItem: {fileID: 11400000, guid: bbcb0bfd08f52bf4f83a9dbf69bdfe18, type: 2}
   SlotsCount: 8

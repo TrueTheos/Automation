@@ -143,6 +143,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4518c79a9fb92ab4184ed2651b3a810f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Direction: 0
+  SpriteRend: {fileID: 7631471799708160134}
   MapItem: {fileID: 11400000, guid: fe1bd418bb37eda4b89001a1080cda1b, type: 2}
   Drop: {fileID: 11400000, guid: 9d0edea45af0ba74ba6dd03f2af77b70, type: 2}
   DropCountRange: {x: 5, y: 15}

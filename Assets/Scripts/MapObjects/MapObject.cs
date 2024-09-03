@@ -12,7 +12,7 @@ namespace Assets.Scripts.MapObjects
     public abstract class MapObject : MonoBehaviour
     {
         public Direction Direction;
-        [SerializeField] private bool _canBeRotated;
+        public SpriteRenderer SpriteRend;
 
         public Chunk Chunk;
         public MapItem MapItem;
@@ -42,7 +42,18 @@ namespace Assets.Scripts.MapObjects
             OnPlace(direction);
         }
 
-        protected virtual void OnPlace(Direction direction) { }
+        protected virtual void OnPlace(Direction direction)
+        {
+            Direction = direction;
+            if (MapItem.DirectionSprites == null || !MapItem.DirectionSprites.ContainsKey(Direction))
+            {
+                SpriteRend.sprite = MapItem.Icon;
+            }
+            else
+            {
+                SpriteRend.sprite = MapItem.DirectionSprites[Direction];
+            }
+        }
 
         public void Hit(int power)
         {

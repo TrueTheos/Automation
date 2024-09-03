@@ -91,7 +91,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f6931f738461c74d8254b27b79b05bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Direction: 0
+  SpriteRend: {fileID: 3418666128084005850}
   MapItem: {fileID: 11400000, guid: 5b48356f0f66a0747b7c03803f9d9689, type: 2}
+  PumpRate: 25
 --- !u!1 &8371356531963614012
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,7 +121,7 @@ Transform:
   m_GameObject: {fileID: 8371356531963614012}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -165,7 +168,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: 337180491, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}
+  m_Sprite: {fileID: -799912130, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

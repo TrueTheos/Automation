@@ -4974,6 +4974,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed4a1a0ced9716d48b7c337dbe7704f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Direction: 0
+  SpriteRend: {fileID: 8682204378943370106}
+  _canBeRotated: 0
   MapItem: {fileID: 11400000, guid: 7aa771a5a4f0efe4f8d4af04d76c55b0, type: 2}
   InputCapacity: 30
   OutputCapacity: 30

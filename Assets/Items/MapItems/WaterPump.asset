@@ -16,11 +16,17 @@ MonoBehaviour:
   Icon: {fileID: 337180491, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}
   MaxStack: 1
   ItemFlags: 0
-  Prefab: {fileID: 4210697785589834073, guid: 6b989c1a8fd14d4458b46fac059bd026, type: 3}
-  MaxDurability: 10
-  CanBeRotated: 0
-  DefaultDirection: 1
+  Prefab: {fileID: 8374449270673110001, guid: 41ba694267c279549adf3a919e3d4863, type: 3}
+  MaxDurability: 20
+  CanBeRotated: 1
+  DefaultDirection: 2
   DirectionSprites:
     dictionary:
     - Key: 1
+      Value: {fileID: -799912130, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}
+    - Key: 2
+      Value: {fileID: -222805220, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}
+    - Key: 3
       Value: {fileID: 337180491, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}
+    - Key: 0
+      Value: {fileID: -1368460817, guid: 7f5dc2c1cd2d22543a6c4468fa133af4, type: 3}

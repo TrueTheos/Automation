@@ -1,4 +1,5 @@
 using Assets.Scripts.Items;
+using Assets.Scripts.Managers;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +10,6 @@ namespace Assets.Scripts.MapObjects
     {
         public IItemReceiver Parent;
         public IItemReceiver Child;
-
-        public SpriteRenderer Sprite;
 
         public ItemObject IncomingItem;
         public ItemObject Item;
@@ -26,14 +25,7 @@ namespace Assets.Scripts.MapObjects
             {Direction.Down, Direction.Up },
         };
 
-        private BeltDirection _dir;
-        private BeltDirection _direction
-        {
-            get { return _dir; } set 
-            {
-                _dir = value;
-            }
-        }
+        private BeltDirection _direction;
         private BeltDirection _defaultDirection;
 
         private Direction _inputDirection = Direction.None;
@@ -67,7 +59,7 @@ namespace Assets.Scripts.MapObjects
             InputConnection = _oppositeDirection[direction];
             OutputConnection = direction;
             UpdateSprite(Direction.None);
-            GameManager.Instance.AddBelt(this);
+            ConveyorBeltManager.Instance.AddBelt(this);
         }
 
         private BeltDirection DirectionToBeltDirection(Direction dir)
@@ -139,7 +131,7 @@ namespace Assets.Scripts.MapObjects
                 OutputConnection == Direction.None || _direction != GetBeltDirection())
             {
                 _direction = GetBeltDirection();
-                Sprite.sprite = BeltSprites[_direction];
+                SpriteRend.sprite = BeltSprites[_direction];
                 UpdateNeighbors(comingFrom);
             }
         }
@@ -202,7 +194,7 @@ namespace Assets.Scripts.MapObjects
 
             BeltDirection dir = GetBeltDirection();
             _direction = dir;
-            Sprite.sprite = BeltSprites[dir];
+            SpriteRend.sprite = BeltSprites[dir];
         }
 
         private void UpdateBeltConnection(ConveyorBeltObject belt, Direction neighborInput, Direction neighborOutput)
@@ -227,7 +219,7 @@ namespace Assets.Scripts.MapObjects
                 belt.UpdateSprite(neighborInput);
                 BeltDirection dir = GetBeltDirection();
                 _direction = dir;
-                Sprite.sprite = BeltSprites[dir];
+                SpriteRend.sprite = BeltSprites[dir];
             }
             else if (Child == null && belt.Parent == null)
             {
@@ -250,7 +242,7 @@ namespace Assets.Scripts.MapObjects
                 belt.UpdateSprite(neighborInput);
                 BeltDirection dir = GetBeltDirection();
                 _direction = dir;
-                Sprite.sprite = BeltSprites[dir];
+                SpriteRend.sprite = BeltSprites[dir];
             }     
         }
 

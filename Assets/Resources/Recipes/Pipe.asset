@@ -12,9 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3722d1300d8e7c848b79673459db7aa0, type: 3}
   m_Name: Pipe
   m_EditorClassIdentifier: 
-  Requirements:
-  - Item: {fileID: 11400000, guid: 0c5ed698edc947042b873267df9471db, type: 2}
-    Amount: 2
+  Requirements: []
   Result:
     Item: {fileID: 11400000, guid: bfcebb5f7a53c1d4fae3e0a86ded1c64, type: 2}
     Amount: 1
