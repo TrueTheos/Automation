@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using Assets.Scripts.Managers;
 
 namespace Assets.Scripts
 {

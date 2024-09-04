@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using Assets.Scripts.Managers;
 using Assets.Scripts.MapObjects;
 using System;
 using System.Collections;
@@ -34,7 +35,10 @@ public class MapGenerator : MonoBehaviour
     [Header("Chunk Settings")]
     public int CHUNK_SIZE = 32;
     [SerializeField] private float OreGenerateTickInterval;
+    [SerializeField] private float TreeGenerateTickInterval;
     [SerializeField] private int MaximumOres;
+    [SerializeField] private int MaximumTrees;
+    [SerializeField] private TreeObject TreeObject;
     [SerializeField] private AnimationCurve SpawnProbability; // by number of ores
     public List<OreObject> Ores;
     private Chunk[,] Chunks;
@@ -58,23 +62,22 @@ public class MapGenerator : MonoBehaviour
         {
             for (int yChunk = 0; yChunk < Chunks.GetLength(1); yChunk++)
             {
-                TileType[,] chunkTiles = new TileType[CHUNK_SIZE, CHUNK_SIZE];
+                Chunks[xChunk, yChunk] = new Chunk(xChunk, yChunk, CHUNK_SIZE);
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
                     for (int y = 0; y < CHUNK_SIZE; y++)
                     {
                         Layer0Tilemap.SetTile(new Vector3Int(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, 0), GreenTile);
-                        chunkTiles[x,y] = TileType.GRASS;
+                        Chunks[xChunk, yChunk].SetTile(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, TileType.GRASS);
                     }
-                }
-
-                Chunks[xChunk, yChunk] = new Chunk(xChunk, yChunk, CHUNK_SIZE, chunkTiles);
+                }           
             }
         }    
 
         GenerateStoneBiome();
         GenerateWater();
         StartCoroutine(GenerateOres());
+        StartCoroutine(GenerateTrees());
     }
 
     private void GenerateStoneBiome()
@@ -93,7 +96,6 @@ public class MapGenerator : MonoBehaviour
                 {
                     Chunk currentChunk = GetChunk(x, y);
                     currentChunk.SetTile(x, y, TileType.STONE);
-                    currentChunk.StoneTilesCount++;
                     Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), StoneTile);
                 }
                 else
@@ -158,7 +160,7 @@ public class MapGenerator : MonoBehaviour
                 for (int y = 0; y < Chunks.GetLength(1); y++)
                 {
                     Chunk chunk = Chunks[x, y];
-                    if (chunk.OresCount >= MaximumOres || chunk.OresCount >= chunk.StoneTilesCount) continue;
+                    if (chunk.OresCount >= MaximumOres || chunk.OresCount >= chunk.TilesCount[TileType.STONE]) continue;
                     float spawnChance = Random.Range(0f, 1f);
                     if(spawnChance <= SpawnProbability.Evaluate(chunk.OresCount / MaximumOres))
                     {
@@ -177,6 +179,34 @@ public class MapGenerator : MonoBehaviour
             }
         }
     }
+
+    public IEnumerator GenerateTrees()
+    {
+        if (TreeObject == null) yield break;
+        while(true)
+        {
+            yield return new WaitForSeconds(TreeGenerateTickInterval);
+
+            for (int x = 0; x < Chunks.GetLength(0); x++)
+            {
+                for (int y = 0; y < Chunks.GetLength(1); y++)
+                {
+                    Chunk chunk = Chunks[x, y];
+                    if (chunk.TreesCount >= MaximumTrees || chunk.TreesCount >= chunk.TilesCount[TileType.GRASS]) continue;
+                    float spawnChance = Random.Range(0f, 1f);
+                    if (spawnChance <= SpawnProbability.Evaluate(chunk.TreesCount / MaximumTrees))
+                    {
+                        Vector2Int spawnSpace = chunk.GetFreeSpace(TileType.GRASS);
+
+                        if (spawnSpace != Vector2Int.zero)
+                        {
+                            _mapManager.SpawnObject(TreeObject, spawnSpace.x, spawnSpace.y, Direction.None);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 public class Chunk
@@ -186,11 +216,12 @@ public class Chunk
     private int _chunkSize;
 
     public MapObject[,] Objects;
-    public int OresCount;
+    public int OresCount; // dziwne to ale chuj niech bedzie na razie
+    public int TreesCount;
     private TileType[,] _tiles;
-    public int StoneTilesCount;
+    public Dictionary<TileType, int> TilesCount = new();
 
-    public Chunk(int x, int y, int chunkSize, TileType[,] tiles)
+    public Chunk(int x, int y, int chunkSize)
     {
         X = x;
         Y = y;
@@ -198,7 +229,12 @@ public class Chunk
         WorldY = Y * chunkSize;
         _chunkSize = chunkSize;
         Objects = new MapObject[chunkSize, chunkSize];
-        _tiles = tiles;
+        _tiles = new TileType[chunkSize, chunkSize];
+
+        foreach (var val in Enum.GetValues(typeof(TileType)).Cast<TileType>())
+        {
+            TilesCount[val] = 0;
+        }
     }
 
     public bool IsFreeWorldPos(int x, int y)
@@ -208,7 +244,17 @@ public class Chunk
 
     public void SetTile(int x, int y, TileType type)
     {
+        TileType previousType = _tiles[x - WorldX, y - WorldY];
+        if (previousType != TileType.NONE && previousType != type && TilesCount[type] > 0)
+        {
+            if (TilesCount.ContainsKey(previousType)) TilesCount[previousType]--;
+        }
         _tiles[x - WorldX, y - WorldY] = type;
+        if (TilesCount.ContainsKey(type))
+        {
+            TilesCount[type]++;
+        }
+        else TilesCount[type] = 1;
     }
 
     public TileType GetType(int x, int y)
@@ -219,6 +265,7 @@ public class Chunk
     public void SpawnObject(MapObject obj)
     {
         if (obj is OreObject) OresCount++;
+        else if (obj is TreeObject) TreesCount++;
         Objects[obj.X - WorldX, obj.Y - WorldY] = obj;
     }
 
@@ -230,6 +277,7 @@ public class Chunk
     public void DestroyObject(MapObject obj)
     {
         if(obj is OreObject) OresCount--;
+        else if (obj is TreeObject) TreesCount--;
         Objects[obj.X - WorldX, obj.Y - WorldY] = null;
     }
 

@@ -46,6 +46,8 @@ namespace Assets.Scripts.Managers
             }
         }
 
+        //TODO add breaking fluid objects
+
         private List<FluidNetwork> fluidNetworks = new List<FluidNetwork>();
         public void RegisterContainer(IFluidReceiver container)
         {

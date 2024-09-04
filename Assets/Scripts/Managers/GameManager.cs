@@ -3,27 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+namespace Assets.Scripts.Managers
 {
-    private MapManager _mapManager;
-    private MapGenerator _mapGenerator;
-
-    public static GameManager Instance;
-    private void Awake()
+    public class GameManager : MonoBehaviour
     {
-        Instance = this;
-    }
+        private MapManager _mapManager;
+        private MapGenerator _mapGenerator;
 
-    void Start()
-    {
-        _mapManager = MapManager.Instance;
-        _mapGenerator = MapGenerator.Instance;
+        public Transform ObjectHighlight;
 
-        Init();
-    }
+        public static GameManager Instance;
+        private void Awake()
+        {
+            Instance = this;
+        }
 
-    private void Init()
-    {
-        _mapGenerator.Generate();
+        void Start()
+        {
+            _mapManager = MapManager.Instance;
+            _mapGenerator = MapGenerator.Instance;
+
+            Init();
+        }
+
+        private void Init()
+        {
+            _mapGenerator.Generate();
+        }
     }
 }

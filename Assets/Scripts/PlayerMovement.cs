@@ -12,6 +12,7 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 using UnityEngine.XR;
 using System;
 using UnityEditor;
+using Assets.Scripts.Managers;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -141,7 +142,9 @@ public class PlayerMovement : MonoBehaviour
                 }
             }   
         }
-        if(_selectedItem != null && _selectedItem.Item is MapItem mapItem)
+
+        #region Rotating Objects
+        if (_selectedItem != null && _selectedItem.Item is MapItem mapItem)
         {
             Vector3 _placeholderPos = new Vector3(.5f + gridMousePos.x, .5f + gridMousePos.y, 0);
             _placeObjectPreview.gameObject.transform.position = _placeholderPos;
@@ -162,9 +165,18 @@ public class PlayerMovement : MonoBehaviour
                 UpdatePreviewSprite();
             }
         }
+        #endregion
 
+
+        PickupItems();
+        ScrollThruItems();
+        UpdateHand();
+        Animate();
+    }
+
+    private void PickupItems()
+    {
         List<ItemObject> items = Physics2D.OverlapCircleAll(transform.position, AttractionRange, PickupLayer).Select(x => x.GetComponent<ItemObject>()).ToList();
-
         foreach (var item in items)
         {
             float distanceToPlayer = Vector2.Distance(item.transform.position, transform.position);
@@ -183,12 +195,7 @@ public class PlayerMovement : MonoBehaviour
                     AudioManager.Instance.PickupItem();
                 }
             }
-            
         }
-
-        ScrollThruItems();
-        UpdateHand();
-        Animate();
     }
 
     private void Animate()

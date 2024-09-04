@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Items;
+using Assets.Scripts.Managers;
 using DG.Tweening;
 using System;
 using System.Collections.Generic;
@@ -6,12 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Assets.Scripts.MapObjects
 {
-    public abstract class MapObject : MonoBehaviour
+    public abstract class MapObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        public Direction Direction;
+        [HideInInspector] public Direction Direction;
         public SpriteRenderer SpriteRend;
 
         public Chunk Chunk;
@@ -72,6 +74,17 @@ namespace Assets.Scripts.MapObjects
         {
             Chunk.DestroyObject(this);
             Destroy(gameObject);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            GameManager.Instance.ObjectHighlight.gameObject.SetActive(true);
+            GameManager.Instance.ObjectHighlight.transform.position = transform.position;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            GameManager.Instance.ObjectHighlight.gameObject.SetActive(false);
         }
     }
 }

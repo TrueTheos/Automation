@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.MapObjects;
+﻿using Assets.Scripts.Managers;
+using Assets.Scripts.MapObjects;
 using DG.Tweening;
 using System;
 using System.Collections.Generic;
