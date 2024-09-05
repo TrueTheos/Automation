@@ -8,17 +8,12 @@ using Assets.Scripts.Managers;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class SteamEngineObject : MapObject, IFluidReceiver
+    public class SteamEngineObject : FluidUserObject
     {
-        public List<IFluidReceiver> Connections { get; private set; } = new List<IFluidReceiver>();
-        public PipeConnection CurrentConnections { get; set; } = PipeConnection.None;
-        public Vector3 Position => transform.position;
-
-        public float Capacity { get; set; }
-
-        public float CurrentFluid { get; set; }
-
         private FluidManager waterManager;
+        public override Connection InputDirection { get; set; } = Connection.Left;
+
+        public override FluidType InputFluidType { get; set; } = FluidType.Steam;
 
         private void Start()
         {
@@ -45,68 +40,77 @@ namespace Assets.Scripts.MapObjects
 
         private void ConnectToAdjacentPipes()
         {
-            CheckAndConnectPipe(Vector2.up);
-            CheckAndConnectPipe(Vector2.right);
-            CheckAndConnectPipe(Vector2.down);
-            CheckAndConnectPipe(Vector2.left);
+            foreach (var con in InputDirection.GetFlags().Cast<Connection>())
+            {
+                if (con == Connection.None) continue;
+                CheckAndConnectPipe(ConnectionToVector(con), con);
+            }
+            foreach (var con in OutputDirection.GetFlags().Cast<Connection>())
+            {
+                if (con == Connection.None) continue;
+                CheckAndConnectPipe(ConnectionToVector(con), con);
+            }
         }
 
-        private void CheckAndConnectPipe(Vector2 adjacentPosition)
+        private void CheckAndConnectPipe(Vector2 adjacentPosition, Connection con)
         {
             Vector2 pos = (Vector2)transform.position + adjacentPosition;
             Collider2D[] colliders = Physics2D.OverlapPointAll(pos);
             foreach (Collider2D collider in colliders)
             {
-                IFluidReceiver receiver = collider.GetComponent<IFluidReceiver>();
+                FluidUserObject receiver = collider.GetComponent<FluidUserObject>();
                 if (receiver != null)
                 {
-                    Connect(receiver);
+                    Connect(receiver, con);
                 }
             }
         }
 
 
-        public void Connect(IFluidReceiver other)
+        public override void Connect(FluidUserObject other, Connection con)
         {
-            if (!Connections.Contains(other))
+            if (!ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)))
             {
-                Connections.Add(other);
-                other.Connect(this);
+                ConnectedObjects[con] = other;
+                other.Connect(this, GetOppositeConnection(con));
 
                 UpdateConnections(FluidType.Steam);
                 other.UpdateConnections(FluidType.Steam);
             }
         }
 
-        public void UpdateConnections(FluidType fluidType)
+        public override void UpdateConnections(FluidType fluidType)
         {
-            CurrentConnections = PipeConnection.None;
+            CurrentConnections = Connection.None;
 
-            foreach (var node in Connections)
+            foreach (var node in ConnectedObjects.Values)
             {
-                Vector2 direction = node.Position - Position;
-                if (direction.y > 0.5f) CurrentConnections |= PipeConnection.Up;
-                else if (direction.y < -0.5f) CurrentConnections |= PipeConnection.Down;
-                else if (direction.x > 0.5f) CurrentConnections |= PipeConnection.Right;
-                else if (direction.x < -0.5f) CurrentConnections |= PipeConnection.Left;
+                Vector2 direction = node.transform.position - transform.position;
+                if (direction.y > 0.5f) CurrentConnections |= Connection.Up;
+                else if (direction.y < -0.5f) CurrentConnections |= Connection.Down;
+                else if (direction.x > 0.5f) CurrentConnections |= Connection.Right;
+                else if (direction.x < -0.5f) CurrentConnections |= Connection.Left;
             }
-
-            UpdateSprite();
-        }
-
-        public void UpdateSprite()
-        {
-            // The sprite is updated in CheckWaterAvailability
         }
 
         private void CheckWaterAvailability()
         {
-            //
+            //todo
         }
 
-        public bool IsConnectedTo(IFluidReceiver other)
+        public override bool IsConnectedTo(FluidUserObject other)
         {
-            throw new NotImplementedException();
+            return ConnectedObjects.ContainsValue(other);
         }
+
+        public override bool CanConnect(FluidUserObject other, Connection comingFrom)
+        {
+            if (other is not PipeObject pipe) return false;
+            if (comingFrom != InputDirection) return false;
+            if (ConnectedObjects.ContainsKey(comingFrom) && ConnectedObjects[comingFrom] != null) return false;
+            if (pipe.FluidType == FluidType.None|| pipe.FluidType == InputFluidType) return true;
+            return false;
+        }
+
     }
 }

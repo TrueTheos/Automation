@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     public float MoveSpeed;
     public float SprintSpeed;
     public int DestroyPower = 10;
+    public float BreakRange;
     public float DestroyInterval;
     private float _destroyTimer;
     public float PickupRange;

@@ -9,31 +9,33 @@ using Assets.Scripts.Managers;
 namespace Assets.Scripts.MapObjects
 {
     [RequireComponent(typeof(BoxCollider2D))]
-    public class WaterPumpObject : MapObject, IFluidReceiver
+    public class WaterPumpObject : FluidUserObject
     {
-        public float Capacity { get; set; }
-        public float CurrentFluid { get; set; }
         public float PumpRate;
 
-        [HideInInspector] public List<IFluidReceiver> Connections { get; private set; } = new List<IFluidReceiver>();
-        [HideInInspector] public PipeConnection CurrentConnections { get; set; } = PipeConnection.None;
-        [HideInInspector] public Vector3 Position => transform.position;
+        public override Connection OutputDirection { get; set; } = Connection.Up;
+
+        public override FluidType OutputFluidType { get; set; } = FluidType.Water;
+
+        private MapGenerator _mapGenerator;
 
         protected override void OnPlace(Direction direction)
         {
+            _mapGenerator = MapGenerator.Instance;
             base.OnPlace(direction);
             Place();
-            FluidManager.Instance.RegisterContainer(this);
+            FluidManager.Instance.RegisterContainer(this);     
         }
 
         private void Update()
         {
+            if (_mapGenerator.GetTileTypeAtPos(X, Y) != TileType.WATER) return;
             FluidManager.Instance.SimulatePumpFlow(this, Time.deltaTime);
         }
 
-        public bool IsConnectedTo(IFluidReceiver other)
+        public override bool IsConnectedTo(FluidUserObject other)
         {
-            return Connections.Contains(other);
+            return ConnectedObjects.ContainsValue(other);
         }
 
         public bool Place()
@@ -45,33 +47,39 @@ namespace Assets.Scripts.MapObjects
 
         private void ConnectToAdjacentPipes()
         {
-            CheckAndConnectPipe(Vector2.up);
-            CheckAndConnectPipe(Vector2.right);
-            CheckAndConnectPipe(Vector2.down);
-            CheckAndConnectPipe(Vector2.left);
+            foreach (var con in InputDirection.GetFlags().Cast<Connection>())
+            {
+                if (con == Connection.None) continue;
+                CheckAndConnectPipe(ConnectionToVector(con), con);
+            }
+            foreach (var con in OutputDirection.GetFlags().Cast<Connection>())
+            {
+                if (con == Connection.None) continue;
+                CheckAndConnectPipe(ConnectionToVector(con), con);
+            }
         }
 
-        private void CheckAndConnectPipe(Vector2 adjacentPosition)
+        private void CheckAndConnectPipe(Vector2 adjacentPosition, Connection con)
         {
             Vector2 pos = (Vector2)transform.position + adjacentPosition;
             Collider2D[] colliders = Physics2D.OverlapPointAll(pos);
             foreach (Collider2D collider in colliders)
             {
-                IFluidReceiver receiver = collider.GetComponent<IFluidReceiver>();
+                PipeObject receiver = collider.GetComponent<PipeObject>();
                 if (receiver != null)
                 {
-                    Connect(receiver);
+                    Connect(receiver, con);
                 }
             }
         }
 
 
-        public void Connect(IFluidReceiver other)
+        public override void Connect(FluidUserObject other, Connection con)
         {
-            if (!Connections.Contains(other))
+            if (!ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)))
             {
-                Connections.Add(other);
-                other.Connect(this);
+                ConnectedObjects[con] = other;
+                other.Connect(this, GetOppositeConnection(con));
 
                 UpdateConnections(FluidType.Water);
                 other.UpdateConnections(FluidType.Water);
@@ -79,20 +87,26 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        public void UpdateConnections(FluidType fluidType)
+        public override void UpdateConnections(FluidType fluidType)
         {
-            CurrentConnections = PipeConnection.None;
+            CurrentConnections = Connection.None;
 
-            foreach (var node in Connections)
+            foreach (var node in ConnectedObjects.Values)
             {
-                Vector2 direction = node.Position - Position;
-                if (direction.y > 0.5f) CurrentConnections |= PipeConnection.Up;
-                else if (direction.y < -0.5f) CurrentConnections |= PipeConnection.Down;
-                else if (direction.x > 0.5f) CurrentConnections |= PipeConnection.Right;
-                else if (direction.x < -0.5f) CurrentConnections |= PipeConnection.Left;
+                Vector2 direction = node.transform.position - transform.position;
+                if (direction.y > 0.5f) CurrentConnections |= Connection.Up;
+                else if (direction.y < -0.5f) CurrentConnections |= Connection.Down;
+                else if (direction.x > 0.5f) CurrentConnections |= Connection.Right;
+                else if (direction.x < -0.5f) CurrentConnections |= Connection.Left;
             }
+        }
 
-            UpdateSprite();
+        public override bool CanConnect(FluidUserObject other, Connection comingFrom)
+        {
+            if (other is not PipeObject pipe) return false;
+            if (comingFrom != OutputDirection) return false;
+            if (ConnectedObjects.ContainsKey(comingFrom) && ConnectedObjects[comingFrom] != null) return false;
+            return true;
         }
 
         public void UpdateSprite()

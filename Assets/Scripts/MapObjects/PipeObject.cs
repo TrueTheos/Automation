@@ -9,18 +9,18 @@ using Assets.Scripts.Managers;
 namespace Assets.Scripts.MapObjects
 {
     [RequireComponent(typeof(BoxCollider2D))]
-    public class PipeObject : MapObject, IFluidReceiver
+    public class PipeObject : FluidUserObject
     {
         [SerializeField] private SerializableDictionary<FluidType, Color> _fluidColors;
 
         [SerializeField] private float _capacity;
-        public float Capacity
+        public override float Capacity
         {
             get => _capacity;
             set { _capacity = value; }
         }
         [SerializeField] private float _currentFluid;
-        public float CurrentFluid
+        public override float CurrentFill
         {
             get => _currentFluid;
             set 
@@ -31,22 +31,9 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        private FluidType _fluidType = FluidType.None;
-
-        public List<IFluidReceiver> Connections { get; private set; } = new List<IFluidReceiver>();
-        public PipeConnection CurrentConnections { get; set; } = PipeConnection.None;
-
-        private Dictionary<PipeConnection, PipeConnection> _oppositeConnections = new Dictionary<PipeConnection, PipeConnection>()
-        {
-            {PipeConnection.Left, PipeConnection.Right},
-            {PipeConnection.Right, PipeConnection.Left},
-            {PipeConnection.Up, PipeConnection.Down},
-            {PipeConnection.Down, PipeConnection.Up }
-        };
-        public Vector3 Position => transform.position;
+        public FluidType FluidType = FluidType.None;
 
         [SerializeField] private SpriteRenderer _bgSprite, _fluidSprite;
-
 
         [Serializable]
         public class PipeSprite
@@ -54,7 +41,7 @@ namespace Assets.Scripts.MapObjects
             public Sprite Pipe, BG;
         }
 
-        public SerializableDictionary<PipeConnection, PipeSprite> PipeSprites;
+        public SerializableDictionary<Connection, PipeSprite> PipeSprites;
         protected override void OnPlace(Direction direction)
         {
             base.OnPlace(direction);
@@ -64,63 +51,63 @@ namespace Assets.Scripts.MapObjects
 
         public bool Place()
         {
-            ConnectToAdjacentPipes();
+            ConnectToAdjacentFluidUsers();
 
             return true;
         }
 
-        private void ConnectToAdjacentPipes()
+        private void ConnectToAdjacentFluidUsers()
         {
-            CheckAndConnectPipe(Vector2.up);
-            CheckAndConnectPipe(Vector2.right);
-            CheckAndConnectPipe(Vector2.down);
-            CheckAndConnectPipe(Vector2.left);
+            CheckAndConnectFluidUser(Vector2.up, Connection.Up);
+            CheckAndConnectFluidUser(Vector2.right, Connection.Right);
+            CheckAndConnectFluidUser(Vector2.down, Connection.Down);
+            CheckAndConnectFluidUser(Vector2.left, Connection.Left);
         }
 
-        private void CheckAndConnectPipe(Vector2 adjacentPosition)
+        private void CheckAndConnectFluidUser(Vector2 adjacentPosition, Connection con)
         {
             Vector2 pos = (Vector2)transform.position + adjacentPosition;
             Collider2D[] colliders = Physics2D.OverlapPointAll(pos);
             foreach (Collider2D collider in colliders)
             {
-                IFluidReceiver receiver = collider.GetComponent<IFluidReceiver>();
+                FluidUserObject receiver = collider.GetComponent<FluidUserObject>();
                 if (receiver != null)
                 {
-                    Connect(receiver);
+                    Connect(receiver, con);
                 }
             }
         }
 
-        public void Connect(IFluidReceiver other)
+        public override void Connect(FluidUserObject other, Connection con)
         {
-            if (!Connections.Contains(other))
+            if (!ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)))
             {
-                Connections.Add(other);
-                other.Connect(this);
+                ConnectedObjects[con] = other;
+                other.Connect(this, GetOppositeConnection(con));
 
                 if (other is WaterPumpObject pump)
                 {
                     UpdateFluidType(FluidType.Water);
                 }
-                else if (other is PipeObject pipe && pipe._fluidType != FluidType.None)
+                else if (other is PipeObject pipe && pipe.FluidType != FluidType.None)
                 {
-                    UpdateFluidType(pipe._fluidType);
+                    UpdateFluidType(pipe.FluidType);
                 }
 
-                UpdateConnections(_fluidType);
-                other.UpdateConnections(_fluidType);
+                UpdateConnections(FluidType);
+                other.UpdateConnections(FluidType);
                 FluidManager.Instance.UpdateNetworks();
             }
         }
         public void UpdateFluidType(FluidType newFluidType)
         {
-            if (_fluidType != newFluidType)
+            if (FluidType != newFluidType)
             {
-                _fluidType = newFluidType;
+                FluidType = newFluidType;
                 UpdateSprite();
 
                 // Propagate the fluid type to connected pipes
-                foreach (var connection in Connections)
+                foreach (var connection in ConnectedObjects.Values)
                 {
                     if (connection is PipeObject pipe)
                     {
@@ -131,18 +118,18 @@ namespace Assets.Scripts.MapObjects
         }
 
 
-        public void UpdateConnections(FluidType fluidType)
+        public override void UpdateConnections(FluidType fluidType)
         {
             UpdateFluidType(fluidType);
-            CurrentConnections = PipeConnection.None;
+            CurrentConnections = Connection.None;
 
-            foreach (var node in Connections)
+            foreach (var node in ConnectedObjects.Values)
             {
-                Vector2 direction = node.Position - Position;
-                if (direction.y > 0.5f) CurrentConnections |= PipeConnection.Up;
-                else if (direction.y < -0.5f) CurrentConnections |= PipeConnection.Down;
-                else if (direction.x > 0.5f) CurrentConnections |= PipeConnection.Right;
-                else if (direction.x < -0.5f) CurrentConnections |= PipeConnection.Left;
+                Vector2 direction = node.transform.position - transform.position;
+                if (direction.y > 0.5f) CurrentConnections |= Connection.Up;
+                else if (direction.y < -0.5f) CurrentConnections |= Connection.Down;
+                else if (direction.x > 0.5f) CurrentConnections |= Connection.Right;
+                else if (direction.x < -0.5f) CurrentConnections |= Connection.Left;
             }
 
             UpdateSprite();
@@ -151,9 +138,9 @@ namespace Assets.Scripts.MapObjects
         public void UpdateSprite()
         {
             PipeSprite spr;
-            if (CurrentConnections != PipeConnection.None && (CurrentConnections & (CurrentConnections - 1)) == 0)
+            if (CurrentConnections != Connection.None && (CurrentConnections & (CurrentConnections - 1)) == 0)
             {
-                spr = PipeSprites[CurrentConnections | _oppositeConnections[CurrentConnections]];
+                spr = PipeSprites[CurrentConnections | GetOppositeConnection(CurrentConnections)];
             }
             else
             {
@@ -172,12 +159,22 @@ namespace Assets.Scripts.MapObjects
             SpriteRend.sprite = spr.Pipe;
             _bgSprite.sprite = spr.BG;
             _fluidSprite.sprite = spr.BG;
-            _fluidSprite.color = _fluidColors[_fluidType];
+            _fluidSprite.color = _fluidColors[FluidType];
         }
 
-        public bool IsConnectedTo(IFluidReceiver other)
+        public override bool IsConnectedTo(FluidUserObject other)
         {
-            return Connections.Contains(other);
+            return ConnectedObjects.ContainsValue(other);
+        }
+
+        public override bool CanConnect(FluidUserObject other, Connection comingFrom)
+        {
+            if(other is PipeObject pipe)
+            {
+                if (FluidType == FluidType.None || pipe.FluidType == FluidType.None || pipe.FluidType == FluidType) return true;
+                return false;
+            }
+            return true;
         }
     }
 }

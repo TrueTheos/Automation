@@ -14,6 +14,11 @@ namespace Assets.Scripts.Managers
     {
         public static FluidManager Instance;
 
+        [SerializeField] private float _baseFlow;
+        [SerializeField] private float _minFlow;
+        [SerializeField] private float _scaleFactor;
+        [SerializeField] private float _exponent;
+
         private void Awake()
         {
             Instance = this;
@@ -21,9 +26,9 @@ namespace Assets.Scripts.Managers
 
         public class FluidNetwork
         {
-            public List<IFluidReceiver> Containers = new List<IFluidReceiver>();
+            public List<FluidUserObject> Containers = new List<FluidUserObject>();
             public float TotalCapacity => Containers.Sum(c => c.Capacity);
-            public float TotalFluid => Containers.Sum(c => c.CurrentFluid);
+            public float TotalFluid => Containers.Sum(c => c.CurrentFill);
             public float FluidLevel => TotalFluid / TotalCapacity;
 
             public void UpdateFluidLevels()
@@ -31,7 +36,7 @@ namespace Assets.Scripts.Managers
                 float level = FluidLevel;
                 foreach (var container in Containers)
                 {
-                    container.CurrentFluid = container.Capacity * level;
+                    container.CurrentFill = container.Capacity * level;
                 }
             }
 
@@ -41,7 +46,7 @@ namespace Assets.Scripts.Managers
                 float newLevel = newTotalFluid / TotalCapacity;
                 foreach (var container in Containers)
                 {
-                    container.CurrentFluid = container.Capacity * newLevel;
+                    container.CurrentFill = container.Capacity * newLevel;
                 }
             }
         }
@@ -49,7 +54,7 @@ namespace Assets.Scripts.Managers
         //TODO add breaking fluid objects
 
         private List<FluidNetwork> fluidNetworks = new List<FluidNetwork>();
-        public void RegisterContainer(IFluidReceiver container)
+        public void RegisterContainer(FluidUserObject container)
         {
             var network = fluidNetworks.FirstOrDefault(n => n.Containers.Any(c => c.IsConnectedTo(container)));
             if (network == null)
@@ -72,6 +77,8 @@ namespace Assets.Scripts.Managers
         public float CalculateFlow(int pipeCount)
         {
             if (pipeCount < 1) return 0;
+            return _baseFlow / (1 + Mathf.Pow(pipeCount / _scaleFactor, _exponent)) + _minFlow;
+            /*if (pipeCount < 1) return 0;
             if (pipeCount < 197)
             {
                 return 10000f / (3 * pipeCount - 1) + 1000;
@@ -79,7 +86,7 @@ namespace Assets.Scripts.Managers
             else
             {
                 return 240000f / (pipeCount + 39);
-            }
+            }*/
         }
 
         public void SimulatePumpFlow(WaterPumpObject pump, float deltaTime)

@@ -147,6 +147,11 @@ public class MapGenerator : MonoBehaviour
         return GetChunk(x, y).GetObjectAtPos(x,y);
     }
 
+    public TileType GetTileTypeAtPos(int x, int y)
+    {
+        return GetChunk(x, y).GetType(x, y);
+    }
+
     public IEnumerator GenerateOres()
     {
         if (Ores == null || Ores.Count == 0) yield break;
