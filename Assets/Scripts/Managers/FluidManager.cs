@@ -56,14 +56,39 @@ namespace Assets.Scripts.Managers
         private List<FluidNetwork> fluidNetworks = new List<FluidNetwork>();
         public void RegisterContainer(FluidUserObject container)
         {
-            var network = fluidNetworks.FirstOrDefault(n => n.Containers.Any(c => c.IsConnectedTo(container)));
-            if (network == null)
+            List<FluidNetwork> connectedNetworks = new List<FluidNetwork>();
+
+            foreach (var network in fluidNetworks)
             {
-                network = new FluidNetwork();
-                fluidNetworks.Add(network);
+                if (network.Containers.Any(c => c.IsConnectedTo(container)))
+                {
+                    connectedNetworks.Add(network);
+                }
             }
-            network.Containers.Add(container);
-            network.UpdateFluidLevels();
+
+            if (connectedNetworks.Count == 0)
+            {
+                FluidNetwork newNetwork = new FluidNetwork();
+                newNetwork.Containers.Add(container);
+                fluidNetworks.Add(newNetwork);
+            }
+            else if (connectedNetworks.Count == 1)
+            {
+                connectedNetworks[0].Containers.Add(container);
+            }
+            else
+            {
+                FluidNetwork mergedNetwork = new FluidNetwork();
+                foreach (var network in connectedNetworks)
+                {
+                    mergedNetwork.Containers.AddRange(network.Containers);
+                    fluidNetworks.Remove(network);
+                }
+                mergedNetwork.Containers.Add(container);
+                fluidNetworks.Add(mergedNetwork);
+            }
+
+            UpdateNetworks();
         }
 
         public void UpdateNetworks()
@@ -76,9 +101,9 @@ namespace Assets.Scripts.Managers
 
         public float CalculateFlow(int pipeCount)
         {
+            //if (pipeCount < 1) return 0;
+            //return _baseFlow / (1 + Mathf.Pow(pipeCount / _scaleFactor, _exponent)) + _minFlow;
             if (pipeCount < 1) return 0;
-            return _baseFlow / (1 + Mathf.Pow(pipeCount / _scaleFactor, _exponent)) + _minFlow;
-            /*if (pipeCount < 1) return 0;
             if (pipeCount < 197)
             {
                 return 10000f / (3 * pipeCount - 1) + 1000;
@@ -86,15 +111,18 @@ namespace Assets.Scripts.Managers
             else
             {
                 return 240000f / (pipeCount + 39);
-            }*/
+            }
         }
 
         public void SimulatePumpFlow(WaterPumpObject pump, float deltaTime)
         {
             var network = fluidNetworks.First(n => n.Containers.Contains(pump));
-            int pipeCount = network.Containers.Count(c => c is PipeObject);
-            float flow = CalculateFlow(pipeCount) * deltaTime;
-            network.AddFluid(flow);
+            if (network != null)
+            {
+                int pipeCount = network.Containers.Count(c => c is PipeObject);
+                float flow = CalculateFlow(pipeCount) * deltaTime;
+                network.AddFluid(flow);
+            }
         }
         /*(public bool HasFluid(IFluidReceiver startNode)
         {
