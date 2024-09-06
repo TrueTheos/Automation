@@ -101,6 +101,7 @@ namespace Assets.Scripts.MapObjects
         }
         public void UpdateFluidType(FluidType newFluidType)
         {
+            if (FluidType != FluidType.None) return;
             if (FluidType != newFluidType)
             {
                 FluidType = newFluidType;

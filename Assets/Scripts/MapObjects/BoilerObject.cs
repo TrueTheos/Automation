@@ -11,35 +11,93 @@ namespace Assets.Scripts.MapObjects
     [RequireComponent(typeof(BoxCollider2D))]
     public class BoilerObject : FluidUserObject
     {
-        private FluidManager waterManager;
-
         public override Connection OutputDirection { get; set; } = Connection.Right;
         public override Connection InputDirection { get; set; } = Connection.Left;
 
         public override FluidType InputFluidType { get; set; } = FluidType.Water;
         public override FluidType OutputFluidType { get; set; } = FluidType.Steam;
 
-        private void Start()
+        public override float Capacity
         {
-            waterManager = FluidManager.Instance;
+            get => _waterCapacity + _steamCapacity;
+            set { /* Capacity is fixed for boiler */ }
         }
 
-        private void Update()
+        public override float CurrentFill
         {
-            CheckWaterAvailability();
+            get => _currentWater + _currentSteam;
+            set
+            {
+                float totalFluid = value;
+                _currentWater = Mathf.Min(totalFluid, _waterCapacity);
+                _currentSteam = Mathf.Max(0, totalFluid - _currentWater);
+            }
         }
+
+        [SerializeField] private float _waterCapacity = 100f;
+        [SerializeField] private float _steamCapacity = 100f;
+        [SerializeField] private float _conversionRate = 1f;
+        [SerializeField] private float _waterPullRate = 10f;
+
+        private float _currentWater = 0f;
+        private float _currentSteam = 0f;
 
         protected override void OnPlace(Direction direction)
         {
             base.OnPlace(direction);
             Place();
+            FluidManager.Instance.RegisterContainer(this);
         }
 
         public bool Place()
         {
             ConnectToAdjacentPipes();
-
             return true;
+        }
+
+        private void Update()
+        {
+            PullWaterFromInput();
+            ProcessWaterToSteam();
+            PushSteamToOutput();
+        }
+
+        private void PullWaterFromInput()
+        {
+            if (ConnectedObjects.TryGetValue(InputDirection, out FluidUserObject inputObject))
+            {
+                float waterToPull = Mathf.Min(_waterPullRate * Time.deltaTime, _waterCapacity - _currentWater, inputObject.CurrentFill);
+                if (waterToPull > 0)
+                {
+                    _currentWater += waterToPull;
+                    inputObject.CurrentFill -= waterToPull;
+                    FluidManager.Instance.UpdateNetworks();
+                }
+            }
+        }
+
+        private void ProcessWaterToSteam()
+        {
+            if (_currentWater > 0)
+            {
+                float amountToConvert = Mathf.Min(_currentWater, (_steamCapacity - _currentSteam) / _conversionRate);
+                _currentWater -= amountToConvert;
+                _currentSteam += amountToConvert * _conversionRate;
+            }
+        }
+
+        private void PushSteamToOutput()
+        {
+            if (_currentSteam > 0 && ConnectedObjects.TryGetValue(OutputDirection, out FluidUserObject outputObject))
+            {
+                float steamToPush = Mathf.Min(_currentSteam, outputObject.Capacity - outputObject.CurrentFill);
+                if (steamToPush > 0)
+                {
+                    _currentSteam -= steamToPush;
+                    outputObject.CurrentFill += steamToPush;
+                    FluidManager.Instance.UpdateNetworks();
+                }
+            }
         }
 
         private void ConnectToAdjacentPipes()
@@ -87,19 +145,10 @@ namespace Assets.Scripts.MapObjects
         {
             CurrentConnections = Connection.None;
 
-            foreach (var node in ConnectedObjects.Values)
+            foreach (var kvp in ConnectedObjects)
             {
-                Vector2 direction = node.transform.position - transform.position;
-                if (direction.y > 0.5f) CurrentConnections |= Connection.Up;
-                else if (direction.y < -0.5f) CurrentConnections |= Connection.Down;
-                else if (direction.x > 0.5f) CurrentConnections |= Connection.Right;
-                else if (direction.x < -0.5f) CurrentConnections |= Connection.Left;
+                CurrentConnections |= kvp.Key;
             }
-        }
-
-        private void CheckWaterAvailability()
-        {
-            //todo
         }
 
         public override bool IsConnectedTo(FluidUserObject other)
@@ -113,12 +162,12 @@ namespace Assets.Scripts.MapObjects
             if (ConnectedObjects.ContainsKey(comingFrom) && ConnectedObjects[comingFrom] != null) return false;
             if (comingFrom == InputDirection)
             {
-                if (pipe.FluidType == FluidType.None || pipe.FluidType == InputFluidType) return true;
+                return pipe.FluidType == FluidType.None || pipe.FluidType == InputFluidType;
             }
             if (comingFrom == OutputDirection)
             {
-                
-                if (pipe.FluidType == FluidType.None || pipe.FluidType == OutputFluidType) return true;
+
+                return pipe.FluidType == FluidType.None || pipe.FluidType == OutputFluidType;
             }
 
             return false;

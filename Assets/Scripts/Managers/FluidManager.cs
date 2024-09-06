@@ -101,12 +101,10 @@ namespace Assets.Scripts.Managers
 
         public float CalculateFlow(int pipeCount)
         {
-            //if (pipeCount < 1) return 0;
-            //return _baseFlow / (1 + Mathf.Pow(pipeCount / _scaleFactor, _exponent)) + _minFlow;
             if (pipeCount < 1) return 0;
             if (pipeCount < 197)
             {
-                return 10000f / (3 * pipeCount - 1) + 1000;
+                return 1000f / (3 * pipeCount - 1) + 10;
             }
             else
             {
