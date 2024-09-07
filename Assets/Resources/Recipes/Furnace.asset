@@ -12,9 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3722d1300d8e7c848b79673459db7aa0, type: 3}
   m_Name: Furnace
   m_EditorClassIdentifier: 
-  Requirements:
-  - Item: {fileID: 11400000, guid: 4f02e52d94dec6a429b3e3214705e85d, type: 2}
-    Amount: 50
+  Requirements: []
   Result:
     Item: {fileID: 11400000, guid: 7aa771a5a4f0efe4f8d4af04d76c55b0, type: 2}
     Amount: 1

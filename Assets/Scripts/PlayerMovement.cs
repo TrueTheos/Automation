@@ -137,9 +137,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (_selectedItem != null && !_selectedItem.IsEmpty() && _selectedItem.Item is MapItem buildingItem)
                 {
-                    _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y, _selectedItemDirection);
-                    _inventory.RemoveItemFromSlot(1, _selectedItem);
-                    UpdatePreviewSprite();
+                    if (_mapManager.CanPlaceObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y))
+                    {
+                        _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y, _selectedItemDirection);
+                        _inventory.RemoveItemFromSlot(1, _selectedItem);
+                        UpdatePreviewSprite();
+                    }
                 }
             }   
         }

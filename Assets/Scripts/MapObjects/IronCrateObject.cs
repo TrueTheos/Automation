@@ -108,5 +108,10 @@ namespace Assets.Scripts.MapObjects
 
             return null;
         }
+
+        public GameObject GetGameObject()
+        {
+            return gameObject;
+        }
     }
 }

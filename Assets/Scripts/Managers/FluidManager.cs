@@ -46,7 +46,8 @@ namespace Assets.Scripts.Managers
                 float newLevel = newTotalFluid / TotalCapacity;
                 foreach (var container in Containers)
                 {
-                    container.CurrentFill = container.Capacity * newLevel;
+                    if (container == null) continue;
+                    container.CurrentFill = Mathf.Min(container.CurrentFill + newLevel, container.Capacity);
                 }
             }
         }

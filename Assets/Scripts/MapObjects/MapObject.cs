@@ -8,15 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
 namespace Assets.Scripts.MapObjects
 {
     public abstract class MapObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [HideInInspector] public Direction Direction;
+        public ObjectSize Size;
         public SpriteRenderer SpriteRend;
 
-        public Chunk Chunk;
         public MapItem MapItem;
 
         private int _currentDurability;
@@ -28,16 +27,45 @@ namespace Assets.Scripts.MapObjects
 
         private GameManager _gameManager;
 
-        public void Place(Chunk chunk, int x, int y, Direction direction)
+        public Vector2Int[] GetOccupiedPositions(int x, int y)
         {
-            Chunk = chunk;
-            
+            switch (Size)
+            {
+                case ObjectSize._1x1:
+                    return new Vector2Int[] { new(x, y) };
+                case ObjectSize._2x2:
+                    return new Vector2Int[] {
+                    new(x, y),
+                    new(x + 1, y),
+                    new(x, y + 1),
+                    new(x + 1, y + 1)
+                };
+                case ObjectSize._2x1:
+                    return new Vector2Int[] {
+                    new(x, y),
+                    new(x + 1, y)
+                };
+                case ObjectSize._1x2:
+                    return new Vector2Int[] {
+                    new(x, y),
+                    new(x, y + 1)
+                };
+                default:
+                    return new Vector2Int[] { new(x, y) };
+            }
+        }
+
+        public void Place(int x, int y, Direction direction)
+        {            
             _x = x; 
             _y = y;
-
             _currentDurability = MapItem.MaxDurability;
 
-            Chunk.SpawnObject(this);
+            foreach (Vector2Int pos in GetOccupiedPositions(X, Y))
+            {
+                Chunk chunk = MapGenerator.Instance.GetChunk(pos.x, pos.y);
+                chunk.SpawnObject(this);
+            }
 
             _gameManager = GameManager.Instance;
 
@@ -61,19 +89,27 @@ namespace Assets.Scripts.MapObjects
         {
             _currentDurability -= power;
 
-            transform.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), 0.5f, 10, 1);
+            
             //transform.DOShakePosition(0.5f, 0.2f, 10, 90, false, true);
 
             if (_currentDurability <= 0)
             {
-                Break();
+                transform.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), 0.5f, 10, 1).OnComplete(Break);
+            }
+            else
+            {
+                transform.DOPunchScale(new Vector3(0.1f, 0.1f, 0.1f), 0.5f, 10, 1);
             }
         }
 
         public virtual void Break()
         {
-            Chunk.DestroyObject(this);
-            Destroy(gameObject);
+            foreach (Vector2Int pos in GetOccupiedPositions(X, Y))
+            {
+                Chunk chunk = MapGenerator.Instance.GetChunk(pos.x, pos.y);
+                chunk.DestroyObject(this);
+            }
+            DestroyImmediate(gameObject);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -86,5 +122,14 @@ namespace Assets.Scripts.MapObjects
         {
             GameManager.Instance.ObjectHighlight.gameObject.SetActive(false);
         }
+    }
+
+    // Width x Height
+    public enum ObjectSize
+    {
+        _1x1,
+        _2x2,
+        _2x1,
+        _1x2
     }
 }

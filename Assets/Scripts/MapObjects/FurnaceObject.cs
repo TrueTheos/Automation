@@ -126,5 +126,10 @@ namespace Assets.Scripts.MapObjects
             _furnaceView.UpdateSlots(_inputItem, _outputItem);
             return _outputItem.GetItem();
         }
+
+        public GameObject GetGameObject()
+        {
+            return gameObject;
+        }
     }
 }
