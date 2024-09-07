@@ -32,6 +32,8 @@ namespace MapObjects.ElectricGrids
 
             if (newPowerState.HasFlag(PowerState.HasPower))
             {
+                DebugHasPower = true;
+                
                 foreach (var connectedPowerCable in ConnectedPowerCables)
                 {
                     connectedPowerCable.startColor = Color.green;
@@ -40,6 +42,8 @@ namespace MapObjects.ElectricGrids
             }
             else
             {
+                DebugHasPower = false;
+                
                 foreach (var connectedPowerCable in ConnectedPowerCables)
                 {
                     connectedPowerCable.startColor = Color.grey;
@@ -91,11 +95,9 @@ namespace MapObjects.ElectricGrids
             }
         }
 
-        public void DisconnectUsers(IPowerGridUser powerGridUser)
+        public void DisconnectUsers(IPowerGridUser disconnectedUser)
         {
-            ConnectedGridUsers.Remove(powerGridUser);
-
-            powerGridUser.ConnectedGridUsers.Remove(this);
+            ConnectedGridUsers.Remove(disconnectedUser);
         }
     }
 

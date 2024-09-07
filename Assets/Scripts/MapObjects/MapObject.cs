@@ -72,8 +72,15 @@ namespace Assets.Scripts.MapObjects
 
         public virtual void Break()
         {
+            OnBreak();
+            
             Chunk.DestroyObject(this);
             Destroy(gameObject);
+        }
+
+        public virtual void OnBreak()
+        {
+            
         }
 
         public void OnPointerEnter(PointerEventData eventData)

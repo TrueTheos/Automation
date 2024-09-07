@@ -62,5 +62,24 @@ namespace MapObjects.ElectricGrids
             ConnectedGridUsers = new List<IPowerGridUser>();
             ConnectedPowerCables = new List<LineRenderer>();
         }
+
+        public override void OnBreak()
+        {
+            base.OnBreak();
+            
+            foreach (var connectedUser in ConnectedGridUsers)
+            {
+                connectedUser.DisconnectUsers(this);
+            }
+
+            ConnectedGridUsers.Clear();
+
+            foreach (var powerCable in ConnectedPowerCables)
+            {
+                Destroy(powerCable.gameObject);
+            }
+
+            ConnectedPowerCables.Clear();
+        }
     }
 }
