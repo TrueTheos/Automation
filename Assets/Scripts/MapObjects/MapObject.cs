@@ -104,6 +104,7 @@ namespace Assets.Scripts.MapObjects
 
         public virtual void Break()
         {
+            OnBreak();
             foreach (Vector2Int pos in GetOccupiedPositions(X, Y))
             {
                 Chunk chunk = MapGenerator.Instance.GetChunk(pos.x, pos.y);
@@ -111,6 +112,8 @@ namespace Assets.Scripts.MapObjects
             }
             DestroyImmediate(gameObject);
         }
+
+        public virtual void OnBreak() { }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
