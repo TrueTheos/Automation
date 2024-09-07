@@ -13,6 +13,14 @@ namespace Assets.Scripts.Items
         public Sprite Icon;
         public int MaxStack;
         public ItemFlags ItemFlags;
+        public ItemType ItemType;
+    }
+
+    public enum ItemType
+    {
+        None = 0,
+        WorldObject = 1,
+        Wire = 2
     }
 
 

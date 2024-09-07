@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Assets.Scripts.Items;
 using Assets.Scripts.MapObjects;
+
+using Unity.VisualScripting;
 
 using UnityEngine;
 
@@ -12,6 +15,13 @@ namespace MapObjects.ElectricGrids
     public class ElectricPoleObject : MapObject, IPowerGridUser
     {
         public List<IPowerGridUser> ConnectedGridUsers { get; set; }
+        
+        [SerializeField]
+        [Inspectable]
+        public List<LineRenderer> ConnectedPowerCables { get; set; }
+        public Vector3 ConnectionPoint => transform.position;
+
+        PowerState IPowerGridUser.PowerState { get; set; }
 
         public bool hasPowerDebug;
         public bool DebugHasPower
@@ -27,13 +37,23 @@ namespace MapObjects.ElectricGrids
             _iPowerGridUser = this;
         }
 
+        public void OnClick(Player player)
+        {
+            var selectedItemItem = player.PlayeMovement.SelectedItem.Item;
+
+            if (selectedItemItem != null && selectedItemItem.ItemType == ItemType.Wire)
+            {
+                _iPowerGridUser.OnPowerGridUserClick(player);
+            }
+        }
+
         public bool CanConnect(IPowerGridUser requestingUser)
         {
             //Check distance
             return true;
         }
 
-        public bool HasPower(IPowerGridUser requestingUser, List<IPowerGridUser> checkedUsers)
+        public bool HasPower(IPowerGridUser questingUser, List<IPowerGridUser> checkedUsers)
         {
             if (checkedUsers.Contains(this))
             {
@@ -42,7 +62,8 @@ namespace MapObjects.ElectricGrids
             
             checkedUsers.Add(this);
             
-            return ConnectedGridUsers.Any(x => x != null && x != requestingUser && x.HasPower(requestingUser, checkedUsers));
+            return ConnectedGridUsers.Any(x => x != null && x != questingUser 
+                                                         && x.HasPower(questingUser, checkedUsers));
         }
 
         public bool IsConnected()
@@ -55,11 +76,7 @@ namespace MapObjects.ElectricGrids
             base.OnPlace(direction);
         
             ConnectedGridUsers = new List<IPowerGridUser>();
-        }
-
-        public void OnClick(Player player)
-        {
-            _iPowerGridUser.OnPowerGridUserClick(player);
+            ConnectedPowerCables = new List<LineRenderer>();
         }
     }
 }

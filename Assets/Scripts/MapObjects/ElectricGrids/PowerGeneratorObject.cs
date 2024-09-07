@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Assets.Scripts.Items;
 using Assets.Scripts.MapObjects;
+
+using Unity.VisualScripting;
 
 using UnityEngine;
 
@@ -12,6 +15,13 @@ namespace MapObjects.ElectricGrids
     {
         public List<IPowerGridUser> ConnectedGridUsers { get; set; }
         
+        [SerializeField]
+        [Inspectable]
+        public List<LineRenderer> ConnectedPowerCables { get; set; }
+        public Vector3 ConnectionPoint => transform.position;
+
+        PowerState IPowerGridUser.PowerState { get; set; }
+
         public bool debugGowno;
         public bool DebugHasPower
         {
@@ -20,7 +30,7 @@ namespace MapObjects.ElectricGrids
         }
 
         private IPowerGridUser _iPowerGridUser;
-        
+
         private void Start()
         {
             _iPowerGridUser = this;
@@ -30,7 +40,7 @@ namespace MapObjects.ElectricGrids
         {
             var selectedItemItem = player.PlayeMovement.SelectedItem.Item;
 
-            if (selectedItemItem != null && selectedItemItem.Name == "Copper Wire")
+            if (selectedItemItem != null && selectedItemItem.ItemType == ItemType.Wire)
             {
                 _iPowerGridUser.OnPowerGridUserClick(player);
             }
@@ -43,7 +53,7 @@ namespace MapObjects.ElectricGrids
             return true;
         }
 
-        public bool HasPower(IPowerGridUser requestingUser, List<IPowerGridUser> checkedUsers)
+        public bool HasPower(IPowerGridUser questingUser, List<IPowerGridUser> checkedUsers)
         {
             return true;
         }
@@ -58,6 +68,7 @@ namespace MapObjects.ElectricGrids
             base.OnPlace(direction);
 
             ConnectedGridUsers = new List<IPowerGridUser>();
+            ConnectedPowerCables = new List<LineRenderer>();
         }
     }
 }

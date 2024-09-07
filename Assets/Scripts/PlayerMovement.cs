@@ -14,6 +14,8 @@ using System;
 using UnityEditor;
 using Assets.Scripts.Managers;
 
+using Managers;
+
 public class PlayerMovement : MonoBehaviour
 {
     public float MoveSpeed;
@@ -55,8 +57,8 @@ public class PlayerMovement : MonoBehaviour
     private float _currentMovementSpeed;
     private bool _isRunning;
     
-    public bool IsConnecting { get; set; }
-    public IPowerGridUser CurrentObjectBeingConnected { get; set; }
+    private CableManager _cableManager;
+
 
     private void Awake()
     {
@@ -65,6 +67,8 @@ public class PlayerMovement : MonoBehaviour
         _cam = Camera.main;
         _player = GetComponent<Player>();
         _handArt = _hand.GetComponentInChildren<SpriteRenderer>();
+
+        _cableManager = _player.CableManager;
     }
 
     private void Start()
@@ -79,11 +83,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            IsConnecting = false;
-            CurrentObjectBeingConnected = null;
+            _cableManager.IsConnecting = false;
+
+            _cableManager.CancelCurrentAction();
         }
 
-        if (IsConnecting)
+        if (_cableManager.IsConnecting)
         {
             return;
         }
