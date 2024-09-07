@@ -4,91 +4,105 @@ using System.Linq;
 
 using Assets.Scripts;
 
+using UnityEngine;
+
 namespace MapObjects.ElectricGrids
 {
     public interface IPowerGridUser : IRightClick
     {
-        public List<IPowerGridUser> ConnectedGridUsers { get; set; }
-
-        public bool DebugHasPower { get; set; }
+        List<IPowerGridUser> ConnectedGridUsers { get; set; }
+        List<LineRenderer> ConnectedPowerCables { get; set; }
+        Vector3 ConnectionPoint { get; }
+        PowerState PowerState { get; set; }
         
-        public void ConnectUsers(IPowerGridUser powerGridUser)
-        {
-            if (powerGridUser == this)
-            {
-                return;
-            }
-            
-            if (!ConnectedGridUsers.Contains(powerGridUser))
-            {
-                ConnectedGridUsers.Add(powerGridUser);
-            }
-            
-            if (!powerGridUser.ConnectedGridUsers.Contains(powerGridUser))
-            {
-                powerGridUser.ConnectedGridUsers.Add(this);
-            }
-        }
+        bool DebugHasPower { get; set; }
+        
+        abstract bool CanConnect(IPowerGridUser requestingUser);
+        bool IsConnected() => ConnectedGridUsers != null && ConnectedGridUsers.Any();
 
-        public void DisconnectUsers(IPowerGridUser powerGridUser)
+        bool HasPower()
         {
-            ConnectedGridUsers.Remove(powerGridUser);
-
-            powerGridUser.ConnectedGridUsers.Remove(this);
+            return PowerState.HasFlag(PowerState.HasPower);
         }
         
-        public abstract bool CanConnect(IPowerGridUser requestingUser);
-        public abstract bool HasPower(IPowerGridUser requestingUser, List<IPowerGridUser> checkedUsers);
-        public abstract bool IsConnected();
-
-        public PowerGridUserState GetPowerState()
+        public void SetPowerState(PowerState newPowerState)
         {
-            var state = PowerGridUserState.OffGrid;
+            PowerState = newPowerState;
+            DebugHasPower = newPowerState.HasFlag(PowerState.HasPower);
 
-            // if (HasPower(this))
-            // {
-            //     state |= PowerGridUserState.HasPower;
-            // }
-
-            if (IsConnected())
+            if (newPowerState.HasFlag(PowerState.HasPower))
             {
-                state |= PowerGridUserState.IsConnected;
+                DebugHasPower = true;
+                
+                foreach (var connectedPowerCable in ConnectedPowerCables)
+                {
+                    connectedPowerCable.startColor = Color.green;
+                    connectedPowerCable.endColor = Color.green;
+                }
+            }
+            else
+            {
+                DebugHasPower = false;
+                
+                foreach (var connectedPowerCable in ConnectedPowerCables)
+                {
+                    connectedPowerCable.startColor = Color.grey;
+                    connectedPowerCable.endColor = Color.grey;
+                }
             }
 
-            return state;
+            foreach (var connectedGridUser in ConnectedGridUsers)
+            {
+                if (connectedGridUser.PowerState != newPowerState)
+                {
+                    connectedGridUser.SetPowerState(newPowerState);
+                }
+            }
         }
 
         public void OnPowerGridUserClick(Player player)
         {
-            //TODO add building type to item? If it's just place or connect or drag, dunno
-            if (player.PlayeMovement.CurrentObjectBeingConnected == null)
+            player.CableManager.HandleConnectingGridUsers(this);
+        }
+        
+        public void ConnectUsers(IPowerGridUser connectingUser, LineRenderer lineRenderer)
+        {
+            if (connectingUser == this)
             {
-                player.PlayeMovement.CurrentObjectBeingConnected = this;
-
-                //TODO Spawn Wire between this and mouse
+                return;
             }
-            else
+            
+            if (!ConnectedGridUsers.Contains(connectingUser))
             {
-                //TODO Spawn Wire between connected users
-
-                var wireStartObject = player.PlayeMovement.CurrentObjectBeingConnected;
-
-                if (wireStartObject != null)
-                {
-                    wireStartObject.ConnectUsers(wireStartObject);
-
-                    List<IPowerGridUser> checkList = new();
-                    wireStartObject.DebugHasPower = DebugHasPower = HasPower(this, checkList);
-                }
-
-                player.PlayeMovement.CurrentObjectBeingConnected = null;
-                //player.PlayeMovement.CurrentObjectBeingConnected = this;
+                ConnectedGridUsers.Add(connectingUser);
             }
+            
+            if (!connectingUser.ConnectedGridUsers.Contains(connectingUser))
+            {
+                connectingUser.ConnectedGridUsers.Add(this);
+            }
+            
+            ConnectedPowerCables.Add(lineRenderer);
+            connectingUser.ConnectedPowerCables.Add(lineRenderer);
+
+            if (HasPower())
+            {
+                connectingUser.SetPowerState(PowerState);
+            }
+            else if (connectingUser.HasPower())
+            {
+                SetPowerState(connectingUser.PowerState);
+            }
+        }
+
+        public void DisconnectUsers(IPowerGridUser disconnectedUser)
+        {
+            ConnectedGridUsers.Remove(disconnectedUser);
         }
     }
 
     [Flags]
-    public enum PowerGridUserState
+    public enum PowerState
     {
         OffGrid = 0,
         HasPower = 1,

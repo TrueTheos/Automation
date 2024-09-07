@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Assets.Scripts.Items;
 using Assets.Scripts.MapObjects;
+
+using Unity.VisualScripting;
 
 using UnityEngine;
 
@@ -12,6 +15,12 @@ namespace MapObjects.ElectricGrids
     {
         public List<IPowerGridUser> ConnectedGridUsers { get; set; }
         
+        [SerializeField]
+        [Inspectable]
+        public List<LineRenderer> ConnectedPowerCables { get; set; }
+        public Vector3 ConnectionPoint => transform.position;
+        public PowerState PowerState { get; set; }
+
         public bool debugGowno;
         public bool DebugHasPower
         {
@@ -20,17 +29,19 @@ namespace MapObjects.ElectricGrids
         }
 
         private IPowerGridUser _iPowerGridUser;
-        
+
         private void Start()
         {
             _iPowerGridUser = this;
+
+            PowerState |= PowerState.HasPower;
         }
 
         public void OnClick(Player player)
         {
             var selectedItemItem = player.PlayeMovement.SelectedItem.Item;
 
-            if (selectedItemItem != null && selectedItemItem.Name == "Copper Wire")
+            if (selectedItemItem != null && selectedItemItem.ItemType == ItemType.Wire)
             {
                 _iPowerGridUser.OnPowerGridUserClick(player);
             }
@@ -43,12 +54,7 @@ namespace MapObjects.ElectricGrids
             return true;
         }
 
-        public bool HasPower(IPowerGridUser requestingUser, List<IPowerGridUser> checkedUsers)
-        {
-            return true;
-        }
-
-        public bool IsConnected()
+        public bool HasPower()
         {
             return true;
         }
@@ -58,6 +64,26 @@ namespace MapObjects.ElectricGrids
             base.OnPlace(direction);
 
             ConnectedGridUsers = new List<IPowerGridUser>();
+            ConnectedPowerCables = new List<LineRenderer>();
+        }
+        
+        public override void OnBreak()
+        {
+            base.OnBreak();
+            
+            foreach (var connectedUser in ConnectedGridUsers)
+            {
+                connectedUser.DisconnectUsers(this);
+            }
+
+            ConnectedGridUsers.Clear();
+
+            foreach (var powerCable in ConnectedPowerCables)
+            {
+                Destroy(powerCable.gameObject);
+            }
+
+            ConnectedPowerCables.Clear();
         }
     }
 }

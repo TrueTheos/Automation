@@ -16,4 +16,5 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: b2f05e37ec44dca4f9e86ca134fcb603, type: 3}
   MaxStack: 100
   ItemFlags: 0
+  ItemType: 2
   SmeltedResult: {fileID: 0}
