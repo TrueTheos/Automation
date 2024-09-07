@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Assets.Scripts;
 
@@ -9,37 +10,48 @@ namespace MapObjects.ElectricGrids
 {
     public interface IPowerGridUser : IRightClick
     {
-        public List<IPowerGridUser> ConnectedGridUsers { get; set; }
-        public List<LineRenderer> ConnectedPowerCables { get; set; }
-        public Vector3 ConnectionPoint { get; }
-        public PowerState PowerState { get; protected set; }
-
-        public bool DebugHasPower { get; set; }
+        List<IPowerGridUser> ConnectedGridUsers { get; set; }
+        List<LineRenderer> ConnectedPowerCables { get; set; }
+        Vector3 ConnectionPoint { get; }
+        PowerState PowerState { get; set; }
         
-        public abstract bool CanConnect(IPowerGridUser requestingUser);
-        public abstract bool HasPower(IPowerGridUser questingUser, List<IPowerGridUser> checkedUsers);
-        public abstract bool IsConnected();
+        bool DebugHasPower { get; set; }
+        
+        abstract bool CanConnect(IPowerGridUser requestingUser);
+        bool IsConnected() => ConnectedGridUsers != null && ConnectedGridUsers.Any();
 
-        public void RefreshPowerState()
+        bool HasPower()
         {
-            PowerState = PowerState.OffGrid;
+            return PowerState.HasFlag(PowerState.HasPower);
+        }
+        
+        public void SetPowerState(PowerState newPowerState)
+        {
+            PowerState = newPowerState;
+            DebugHasPower = newPowerState.HasFlag(PowerState.HasPower);
 
-            if (HasPower(this, new List<IPowerGridUser>()))
-            {
-                PowerState |= PowerState.HasPower;
-            }
-
-            if (IsConnected())
-            {
-                PowerState |= PowerState.IsConnected;
-            }
-
-            if (PowerState.HasFlag(PowerState.HasPower))
+            if (newPowerState.HasFlag(PowerState.HasPower))
             {
                 foreach (var connectedPowerCable in ConnectedPowerCables)
                 {
                     connectedPowerCable.startColor = Color.green;
                     connectedPowerCable.endColor = Color.green;
+                }
+            }
+            else
+            {
+                foreach (var connectedPowerCable in ConnectedPowerCables)
+                {
+                    connectedPowerCable.startColor = Color.grey;
+                    connectedPowerCable.endColor = Color.grey;
+                }
+            }
+
+            foreach (var connectedGridUser in ConnectedGridUsers)
+            {
+                if (connectedGridUser.PowerState != newPowerState)
+                {
+                    connectedGridUser.SetPowerState(newPowerState);
                 }
             }
         }
@@ -68,9 +80,15 @@ namespace MapObjects.ElectricGrids
             
             ConnectedPowerCables.Add(lineRenderer);
             connectingUser.ConnectedPowerCables.Add(lineRenderer);
-            
-            RefreshPowerState();
-            connectingUser.RefreshPowerState();
+
+            if (HasPower())
+            {
+                connectingUser.SetPowerState(PowerState);
+            }
+            else if (connectingUser.HasPower())
+            {
+                SetPowerState(connectingUser.PowerState);
+            }
         }
 
         public void DisconnectUsers(IPowerGridUser powerGridUser)

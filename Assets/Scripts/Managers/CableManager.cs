@@ -78,9 +78,6 @@ namespace Managers
                         previous.ConnectionPoint);
                     
                     previous.ConnectUsers(newCurrentGridUser, connectionCable);
-
-                    List<IPowerGridUser> checkList = new();
-                    previous.DebugHasPower = newCurrentGridUser.DebugHasPower = newCurrentGridUser.HasPower(newCurrentGridUser, checkList);
                 }
 
                 CurrentObjectBeingConnected = newCurrentGridUser;

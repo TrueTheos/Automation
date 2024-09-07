@@ -20,8 +20,8 @@ namespace MapObjects.ElectricGrids
         [Inspectable]
         public List<LineRenderer> ConnectedPowerCables { get; set; }
         public Vector3 ConnectionPoint => transform.position;
+        public PowerState PowerState { get; set; }
 
-        PowerState IPowerGridUser.PowerState { get; set; }
 
         public bool hasPowerDebug;
         public bool DebugHasPower
@@ -35,6 +35,8 @@ namespace MapObjects.ElectricGrids
         private void Start()
         {
             _iPowerGridUser = this;
+
+            PowerState |= PowerState.OffGrid;
         }
 
         public void OnClick(Player player)
@@ -51,24 +53,6 @@ namespace MapObjects.ElectricGrids
         {
             //Check distance
             return true;
-        }
-
-        public bool HasPower(IPowerGridUser questingUser, List<IPowerGridUser> checkedUsers)
-        {
-            if (checkedUsers.Contains(this))
-            {
-                return false;
-            }
-            
-            checkedUsers.Add(this);
-            
-            return ConnectedGridUsers.Any(x => x != null && x != questingUser 
-                                                         && x.HasPower(questingUser, checkedUsers));
-        }
-
-        public bool IsConnected()
-        {
-            return ConnectedGridUsers.Any();
         }
 
         protected override void OnPlace(Direction direction)
