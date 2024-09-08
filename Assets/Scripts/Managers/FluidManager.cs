@@ -36,6 +36,7 @@ namespace Assets.Scripts.Managers
                 float level = FluidLevel;
                 foreach (var container in Containers)
                 {
+                    if (container == null) continue;
                     container.CurrentFill = container.Capacity * level;
                 }
             }

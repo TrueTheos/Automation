@@ -140,7 +140,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -230,8 +230,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Direction: 0
+  Size: 0
   SpriteRend: {fileID: 4015227206421614388}
   MapItem: {fileID: 11400000, guid: bfcebb5f7a53c1d4fae3e0a86ded1c64, type: 2}
+  CurrentConnections: 0
   _fluidColors:
     dictionary:
     - Key: 0
@@ -242,6 +244,7 @@ MonoBehaviour:
       Value: {r: 1, g: 1, b: 1, a: 0.8352941}
   _capacity: 100
   _currentFluid: 0
+  FluidType: 0
   _bgSprite: {fileID: 5425611049818951545}
   _fluidSprite: {fileID: 5229376320635681867}
   PipeSprites:
