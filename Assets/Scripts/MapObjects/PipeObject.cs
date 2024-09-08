@@ -26,8 +26,11 @@ namespace Assets.Scripts.MapObjects
             set 
             { 
                 _currentFluid = value;
-                var color = _fluidSprite.color;
-                _fluidSprite.color = new Color(color.r, color.g, color.b, value / Capacity);
+                if (_fluidColors != null)
+                {
+                    var color = _fluidSprite.color;
+                    _fluidSprite.color = new Color(color.r, color.g, color.b, value / Capacity);
+                }
             }
         }
 

@@ -26,10 +26,19 @@ namespace Assets.Scripts.Managers
         }
 
         public void SpawnObject(MapObject obj, int x, int y, Direction direction)
-        {
+        {        
             MapObject spawnedOre = Instantiate(obj, new Vector3(x + .5f, y + .5f, 0), Quaternion.identity);
-            Chunk chunk = _generator.GetChunk(x, y);
-            spawnedOre.Place(chunk, x, y, direction);
+            spawnedOre.Place(x, y, direction);
+        }
+
+        public bool CanPlaceObject(MapObject obj, int x, int y)
+        {
+            foreach (Vector2Int pos in obj.GetOccupiedPositions(x, y))
+            {
+                if (!IsFree(pos.x, pos.y)) return false;
+            }
+
+            return true;
         }
 
         public bool IsFree(int x, int y)

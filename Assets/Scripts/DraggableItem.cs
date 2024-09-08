@@ -39,6 +39,7 @@ namespace Assets.Scripts
         {
             transform.SetParent(parent.transform);
             Icon.raycastTarget = true;
+            Icon.preserveAspect = true;
             ItemData = item;
             UpdateUI();
         }

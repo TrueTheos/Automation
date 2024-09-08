@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -13,5 +14,6 @@ namespace Assets.Scripts
         public bool CanReceive(ItemObject item);
         public Item GetOutputData();
         public Item TakeOutItem();
+        public GameObject GetGameObject();
     }
 }

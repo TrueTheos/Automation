@@ -55,10 +55,6 @@ MonoBehaviour:
   RequirementsParent: {fileID: 8613364389352270516}
   Icon: {fileID: 912220755911595352}
   RequirementPrefab: {fileID: 2205682249249908787, guid: 7e0ccb219093b234f942b07a6baa16c6, type: 3}
-  InitialCraftInterval: 1
-  MinCraftInterval: 0.1
-  acceleration: 0.05
-  ItemsToCraftPerInterval: 1
   Recipe: {fileID: 0}
   Inventory: {fileID: 0}
   Background: {fileID: 8964515022251103003}
@@ -370,7 +366,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 1769346254, guid: ffeb7a5fdd4828c4b926aa06a3721833, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

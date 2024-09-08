@@ -125,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
             HandleHittingObject();
         }
 
-        var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        var mousePos = _cam.ScreenToWorldPoint(Input.mousePosition);
         Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
         
         if(Input.GetMouseButtonDown(1))
@@ -142,9 +142,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (_selectedItem != null && !_selectedItem.IsEmpty() && _selectedItem.Item is MapItem buildingItem)
                 {
-                    _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y, _selectedItemDirection);
-                    _inventory.RemoveItemFromSlot(1, _selectedItem);
-                    UpdatePreviewSprite();
+                    if (_mapManager.CanPlaceObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y))
+                    {
+                        _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y, _selectedItemDirection);
+                        _inventory.RemoveItemFromSlot(1, _selectedItem);
+                        UpdatePreviewSprite();
+                    }
                 }
             }   
         }
@@ -345,7 +348,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void HitObject()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
 
         if (hit.collider != null && hit.collider.gameObject.TryGetComponent(out MapObject mapObj))

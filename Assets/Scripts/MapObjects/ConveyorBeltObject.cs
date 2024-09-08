@@ -8,10 +8,12 @@ namespace Assets.Scripts.MapObjects
     [RequireComponent(typeof(BoxCollider2D))]
     public class ConveyorBeltObject : MapObject, IRightClick, IItemReceiver
     {
+        [SerializeField] private float _speed;
+
         public IItemReceiver Parent;
         public IItemReceiver Child;
 
-        public ItemObject IncomingItem;
+        //public ItemObject IncomingItem;
         public ItemObject Item;
 
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
@@ -27,6 +29,11 @@ namespace Assets.Scripts.MapObjects
 
         private BeltDirection _direction;
         private BeltDirection _defaultDirection;
+
+        private Vector3 _itemStartPosition;
+        private Vector3 _itemTargetPosition;
+        private float _itemProgress;
+
 
         private Direction _inputDirection = Direction.None;
         public Direction InputConnection
@@ -59,7 +66,51 @@ namespace Assets.Scripts.MapObjects
             InputConnection = _oppositeDirection[direction];
             OutputConnection = direction;
             UpdateSprite(Direction.None);
-            ConveyorBeltManager.Instance.AddBelt(this);
+        }
+
+        private void Update()
+        {
+            if (Item != null)
+            {
+                _itemProgress += Time.deltaTime * _speed;
+                if (_itemProgress >= 1f)
+                {
+                    if (Child != null && Child.CanReceive(Item))
+                    {
+                        Child.ReceiveItem(Item);
+                        Item = null;
+                        _itemProgress = 0f;
+                    }
+                    else
+                    {
+                        _itemProgress = 1f;
+                    }
+                }
+                else
+                {
+                    Item.transform.position = Vector3.Lerp(_itemStartPosition, _itemTargetPosition, _itemProgress);
+                }
+            }
+            else if (Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
+            {
+                Item output = Parent.TakeOutItem();
+                if (output != null)
+                {
+                    ReceiveItem(MapManager.Instance.SpawnItem(output, transform.position.x, transform.position.y, 1));
+                }
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if(Child == null)
+            {
+                UpdateNeighbor(OutputConnection);
+            }
+            if(Parent == null)
+            {
+                UpdateNeighbor(InputConnection);
+            }
         }
 
         private BeltDirection DirectionToBeltDirection(Direction dir)
@@ -71,50 +122,50 @@ namespace Assets.Scripts.MapObjects
             return BeltDirection.EW;
         }
 
-        public void MoveItems()
-        {
-            if(Child == null)
-            {
-                UpdateNeighbor(OutputConnection);
-            }
-            if(Parent == null)
-            {
-                UpdateNeighbor(InputConnection);
-            }
+        //public void MoveItems()
+        //{
+        //    if(Child == null)
+        //    {
+        //        UpdateNeighbor(OutputConnection);
+        //    }
+        //    if(Parent == null)
+        //    {
+        //        UpdateNeighbor(InputConnection);
+        //    }
 
-            if(Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
-            {
-                Item output = Parent.TakeOutItem();
-                if (output != null)
-                {
-                    IncomingItem = MapManager.Instance.SpawnItem(output, transform.position.x, transform.position.y, 1);
-                }
-            }
+        //    if(Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
+        //    {
+        //        Item output = Parent.TakeOutItem();
+        //        if (output != null)
+        //        {
+        //            IncomingItem = MapManager.Instance.SpawnItem(output, transform.position.x, transform.position.y, 1);
+        //        }
+        //    }
 
-            if(IncomingItem != null)
-            {
-                if (Item != null && Child != null && Child.CanReceive(IncomingItem))
-                {
-                    Child.ReceiveItem(Item);
-                    Item = null;
-                }
+        //    if(IncomingItem != null)
+        //    {
+        //        if (Item != null && Child != null && Child.CanReceive(IncomingItem))
+        //        {
+        //            Child.ReceiveItem(Item);
+        //            Item = null;
+        //        }
 
-                if (Item == null)
-                {
-                    Item = IncomingItem;
-                    IncomingItem = null;
-                    Item.MoveToPosition(transform.position);
-                }
-            }     
-            else
-            {
-                if (Item != null && Child != null && Child.CanReceive(Item))
-                {
-                    Child.ReceiveItem(Item);
-                    Item = null;
-                }
-            }
-        }
+        //        if (Item == null)
+        //        {
+        //            Item = IncomingItem;
+        //            IncomingItem = null;
+        //            Item.MoveToPosition(transform.position);
+        //        }
+        //    }     
+        //    else
+        //    {
+        //        if (Item != null && Child != null && Child.CanReceive(Item))
+        //        {
+        //            Child.ReceiveItem(Item);
+        //            Item = null;
+        //        }
+        //    }
+        //}
 
         public void SpawnItem(NormalItem item)
         {
@@ -312,12 +363,15 @@ namespace Assets.Scripts.MapObjects
 
         public void ReceiveItem(ItemObject item)
         {
-            IncomingItem = item;
+            Item = item;
+            _itemStartPosition = Parent != null ? Parent.GetGameObject().transform.position : transform.position;
+            _itemTargetPosition = transform.position;
+            _itemProgress = 0f;
         }
 
         public bool CanReceive(ItemObject item)
         {
-            return Item == null || (Child != null && Child.CanReceive(Item));
+            return Item == null;
         }
 
         public Item GetOutputData()
@@ -326,9 +380,20 @@ namespace Assets.Scripts.MapObjects
         }
 
         public Item TakeOutItem()
-        {           
-            Item = null;
-            return Item.ItemData;
+        {
+            if (Item != null)
+            {
+                Item itemToReturn = Item.ItemData;
+                Destroy(Item.gameObject);
+                Item = null;
+                return itemToReturn;
+            }
+            return null;
+        }
+
+        public GameObject GetGameObject()
+        {
+            return gameObject;
         }
     }
 

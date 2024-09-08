@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Furnace
   m_EditorClassIdentifier: 
   Name: Furnace
-  Icon: {fileID: 21300000, guid: a1a2097f441a9bd4c985cdb498969020, type: 3}
+  Icon: {fileID: -1391931000, guid: 102c8263366675f43b7ccc8986cc361f, type: 3}
   MaxStack: 1
   ItemFlags: 0
   Prefab: {fileID: 7721624960510594945, guid: 8dc664ab2aab1a545a4ff737e6c87fce, type: 3}
@@ -23,4 +23,4 @@ MonoBehaviour:
   DirectionSprites:
     dictionary:
     - Key: 2
-      Value: {fileID: 21300000, guid: a1a2097f441a9bd4c985cdb498969020, type: 3}
+      Value: {fileID: -1391931000, guid: 102c8263366675f43b7ccc8986cc361f, type: 3}
