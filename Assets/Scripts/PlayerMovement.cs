@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
     private float _currentMovementSpeed;
     private bool _isRunning;
     
-    private CableManager _cableManager;
+    private CableBuilder _cableBuilder;
 
 
     private void Awake()
@@ -68,7 +68,7 @@ public class PlayerMovement : MonoBehaviour
         _player = GetComponent<Player>();
         _handArt = _hand.GetComponentInChildren<SpriteRenderer>();
 
-        _cableManager = _player.CableManager;
+        _cableBuilder = _player.CableBuilder;
     }
 
     private void Start()
@@ -83,12 +83,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            _cableManager.IsConnecting = false;
+            _cableBuilder.IsConnecting = false;
 
-            _cableManager.CancelCurrentAction();
+            _cableBuilder.CancelCurrentAction();
         }
 
-        if (_cableManager.IsConnecting)
+        if (_cableBuilder.IsConnecting)
         {
             return;
         }

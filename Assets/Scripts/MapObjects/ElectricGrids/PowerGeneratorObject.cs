@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Assets.Scripts.Items;
+﻿using Assets.Scripts.Items;
 using Assets.Scripts.MapObjects;
 
-using Unity.VisualScripting;
+using Managers;
 
 using UnityEngine;
 
@@ -13,28 +10,18 @@ namespace MapObjects.ElectricGrids
     [RequireComponent(typeof(BoxCollider2D))]
     public class PowerGeneratorObject : MapObject, IPowerGridUser
     {
-        public List<IPowerGridUser> ConnectedGridUsers { get; set; }
-        
-        [SerializeField]
-        [Inspectable]
-        public List<LineRenderer> ConnectedPowerCables { get; set; }
+        public PowerGrid PowerGrid { get; set; }
         public Vector3 ConnectionPoint => transform.position;
-        public PowerState PowerState { get; set; }
 
-        public bool debugGowno;
-        public bool DebugHasPower
-        {
-            get => debugGowno;
-            set => debugGowno = value;
-        }
+        [SerializeField]
+        private int powerSupplied = 100;
+        public int PowerAmount => powerSupplied;
 
         private IPowerGridUser _iPowerGridUser;
 
         private void Start()
         {
             _iPowerGridUser = this;
-
-            PowerState |= PowerState.HasPower;
         }
 
         public void OnClick(Player player)
@@ -47,43 +34,6 @@ namespace MapObjects.ElectricGrids
             }
 
             //Tu Logika na ewentualne dorzucanie do pieca? drewno żeby była para? coś takiego
-        }
-        
-        public bool CanConnect(IPowerGridUser requestingUser)
-        {
-            return true;
-        }
-
-        public bool HasPower()
-        {
-            return true;
-        }
-
-        protected override void OnPlace(Direction direction)
-        {
-            base.OnPlace(direction);
-
-            ConnectedGridUsers = new List<IPowerGridUser>();
-            ConnectedPowerCables = new List<LineRenderer>();
-        }
-        
-        public override void OnBreak()
-        {
-            base.OnBreak();
-            
-            foreach (var connectedUser in ConnectedGridUsers)
-            {
-                connectedUser.DisconnectUsers(this);
-            }
-
-            ConnectedGridUsers.Clear();
-
-            foreach (var powerCable in ConnectedPowerCables)
-            {
-                Destroy(powerCable.gameObject);
-            }
-
-            ConnectedPowerCables.Clear();
         }
     }
 }
