@@ -54,7 +54,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -144,6 +144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Direction: 0
+  Size: 0
   SpriteRend: {fileID: 7631471799708160134}
   MapItem: {fileID: 11400000, guid: fe1bd418bb37eda4b89001a1080cda1b, type: 2}
   Drop: {fileID: 11400000, guid: 9d0edea45af0ba74ba6dd03f2af77b70, type: 2}
