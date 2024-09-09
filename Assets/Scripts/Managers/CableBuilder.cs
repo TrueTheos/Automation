@@ -25,8 +25,7 @@ namespace Managers
         
         public bool IsConnecting { get; set; }
 
-        private DraggableCable _draggableCable;
-        
+        private DraggableCable _draggableCable;      
         
         private IPowerGridUser _currentActiveGridUser;
         private IPowerGridUser CurrentActiveGridUser

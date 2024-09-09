@@ -40,6 +40,11 @@ namespace Assets.Scripts.MapObjects
             if (con == Connection.Right) return Vector2.right;
             return Vector2.zero;
         }
+
+        public void OnDestroy()
+        {
+            FluidManager.Instance.UnregisterContainer(this);
+        }
     }
 
     [System.Flags]

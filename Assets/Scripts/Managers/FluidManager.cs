@@ -93,6 +93,55 @@ namespace Assets.Scripts.Managers
             UpdateNetworks();
         }
 
+        public void UnregisterContainer(FluidUserObject container)
+        {
+            FluidNetwork network = fluidNetworks.FirstOrDefault(n => n.Containers.Contains(container));
+            if (network != null)
+            {
+                network.Containers.Remove(container);
+                ReevaluateNetworkIntegrity(network);
+            }
+        }
+
+        private void ReevaluateNetworkIntegrity(FluidNetwork network)
+        {
+            if (network.Containers.Count == 0)
+            {
+                fluidNetworks.Remove(network);
+                return;
+            }
+
+            List<FluidUserObject> visited = new List<FluidUserObject>();
+            Queue<FluidUserObject> queue = new Queue<FluidUserObject>();
+            queue.Enqueue(network.Containers[0]);
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                visited.Add(current);
+
+                foreach (var neighbor in network.Containers.Where(c => c.IsConnectedTo(current) && !visited.Contains(c)))
+                {
+                    queue.Enqueue(neighbor);
+                }
+            }
+
+            if (visited.Count < network.Containers.Count)
+            {
+                // Network needs to be split
+                FluidNetwork newNetwork = new FluidNetwork();
+                newNetwork.Containers.AddRange(network.Containers.Except(visited));
+                foreach (var container in newNetwork.Containers)
+                {
+                    network.Containers.Remove(container);
+                }
+                fluidNetworks.Add(newNetwork);
+
+                network.UpdateFluidLevels();
+                newNetwork.UpdateFluidLevels();
+            }
+        }
+
         public void UpdateNetworks()
         {
             foreach (var network in fluidNetworks)
