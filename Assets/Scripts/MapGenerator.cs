@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static Assets.Scripts.Utilities;
 using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
