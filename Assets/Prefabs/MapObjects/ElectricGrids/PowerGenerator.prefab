@@ -147,4 +147,5 @@ MonoBehaviour:
   Size: 0
   SpriteRend: {fileID: 8682204378943370106}
   MapItem: {fileID: 11400000, guid: 8e9664e31d63cf747ad89c7e7c906924, type: 2}
-  debugGowno: 0
+  _connectionPoint: {fileID: 1650501280103854782}
+  powerSupplied: 100

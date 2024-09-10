@@ -52,29 +52,33 @@ namespace Assets.Scripts.MapObjects
             foreach (var con in InputDirection.GetFlags().Cast<Connection>())
             {
                 if (con == Connection.None) continue;
-                CheckAndConnectPipe(ConnectionToVector(con), con);
+                CheckAndConnectPipe(con);
             }
             foreach (var con in OutputDirection.GetFlags().Cast<Connection>())
             {
                 if (con == Connection.None) continue;
-                CheckAndConnectPipe(ConnectionToVector(con), con);
+                CheckAndConnectPipe(con);
             }
         }
 
-        private void CheckAndConnectPipe(Vector2 adjacentPosition, Connection con)
+        private void CheckAndConnectPipe(Connection con)
         {
-            Vector2 pos = (Vector2)transform.position + adjacentPosition;
-            Collider2D[] colliders = Physics2D.OverlapPointAll(pos);
-            foreach (Collider2D collider in colliders)
+            Vector2[] checkPositions = GetCheckPositions(con);
+
+            foreach (Vector2 pos in checkPositions)
             {
-                PipeObject receiver = collider.GetComponent<PipeObject>();
-                if (receiver != null)
+                Collider2D[] colliders = Physics2D.OverlapPointAll(pos);
+                foreach (Collider2D collider in colliders)
                 {
-                    Connect(receiver, con);
+                    FluidUserObject receiver = collider.GetComponent<FluidUserObject>();
+                    if (receiver != null && receiver != this)
+                    {
+                        Connect(receiver, con);
+                        return;
+                    }
                 }
             }
         }
-
 
         public override void Connect(FluidUserObject other, Connection con)
         {

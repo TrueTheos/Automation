@@ -11,7 +11,7 @@ namespace MapObjects.ElectricGrids
     public interface IPowerGridUser : IRightClick
     {
         PowerGrid PowerGrid { get; set; }
-        Vector3 ConnectionPoint { get; }
+        Transform ConnectionPoint { get; set; }
         int PowerAmount { get; }
         
         void OnPowerGridUserClick(Player player)

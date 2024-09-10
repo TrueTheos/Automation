@@ -6,30 +6,87 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Assets.Scripts.Managers;
 using static Assets.Scripts.Utilities;
+using MapObjects.ElectricGrids;
+using Managers;
+using Assets.Scripts.Items;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class SteamEngineObject : FluidUserObject
+    public class SteamEngineObject : FluidUserObject, IPowerGridUser
     {
-        private FluidManager waterManager;
-        public override Connection InputDirection { get; set; } = Connection.Left;
-
         public override FluidType InputFluidType { get; set; } = FluidType.Steam;
+        public PowerGrid PowerGrid { get; set; }
+
+        [SerializeField] private Transform _connectionPoint;
+        public Transform ConnectionPoint
+        {
+            get => _connectionPoint;
+            set => _connectionPoint = value;
+        }
+
+        [SerializeField]
+        private int maxPowerSupplied = 100;
+        private int _currentPowerSupply;
+        public int PowerAmount => _currentPowerSupply;
+
+        [SerializeField] private float _steamPullRate = 10f;
+        [SerializeField] private float _steamConsumption = 10f;
+        [SerializeField] private float _steamCapacity = 100f;
+        private float _currentSteam = 0f;
+
+        private IPowerGridUser _iPowerGridUser;
 
         private void Start()
         {
-            waterManager = FluidManager.Instance;
+            _iPowerGridUser = this;
         }
 
         private void Update()
         {
-            CheckWaterAvailability();
+            PullSteamFromInput();
+
+            if(_currentSteam > 0f && _currentSteam > _steamConsumption)
+            {
+                _currentPowerSupply = maxPowerSupplied;
+
+                _currentSteam -= _steamConsumption;
+            }
+            else
+            {
+                _currentPowerSupply = 0;
+            }
         }
+
+        private void PullSteamFromInput()
+        {
+            FluidUserObject inputObject = ConnectedObjects.Values.Where(x => x != null).FirstOrDefault();
+            if (inputObject != null)
+            {
+                float steamToPull = Mathf.Min(_steamPullRate * Time.deltaTime, _steamCapacity - _currentSteam, inputObject.CurrentFill);
+                if (steamToPull > 0)
+                {
+                    _currentSteam += steamToPull;
+                    inputObject.CurrentFill -= steamToPull;
+                    FluidManager.Instance.UpdateNetworks();
+                }
+            }
+        }
+
 
         protected override void OnPlace(Direction direction)
         {
             base.OnPlace(direction);
             Place();
+        }
+
+        public void OnClick(Player player)
+        {
+            var selectedItemItem = player.PlayeMovement.SelectedItem.Item;
+
+            if (selectedItemItem != null && selectedItemItem.ItemType == ItemType.Wire)
+            {
+                _iPowerGridUser.OnPowerGridUserClick(player);
+            }
         }
 
         public bool Place()
@@ -41,40 +98,38 @@ namespace Assets.Scripts.MapObjects
 
         private void ConnectToAdjacentPipes()
         {
-            foreach (var con in InputDirection.GetFlags().Cast<Connection>())
+            foreach (var con in Enum.GetValues(typeof(Connection)).Cast<Connection>())
             {
                 if (con == Connection.None) continue;
-                CheckAndConnectPipe(ConnectionToVector(con), con);
-            }
-            foreach (var con in OutputDirection.GetFlags().Cast<Connection>())
-            {
-                if (con == Connection.None) continue;
-                CheckAndConnectPipe(ConnectionToVector(con), con);
+                CheckAndConnectPipe(con);
             }
         }
 
-        private void CheckAndConnectPipe(Vector2 adjacentPosition, Connection con)
+        private void CheckAndConnectPipe(Connection con)
         {
-            Vector2 pos = (Vector2)transform.position + adjacentPosition;
-            Collider2D[] colliders = Physics2D.OverlapPointAll(pos);
-            foreach (Collider2D collider in colliders)
+            Vector2[] checkPositions = GetCheckPositions(con);
+
+            foreach (Vector2 pos in checkPositions)
             {
-                FluidUserObject receiver = collider.GetComponent<FluidUserObject>();
-                if (receiver != null)
+                Collider2D[] colliders = Physics2D.OverlapPointAll(pos);
+                foreach (Collider2D collider in colliders)
                 {
-                    Connect(receiver, con);
+                    FluidUserObject receiver = collider.GetComponent<FluidUserObject>();
+                    if (receiver != null && receiver != this)
+                    {
+                        Connect(receiver, con);
+                        return;
+                    }
                 }
             }
         }
 
-
         public override void Connect(FluidUserObject other, Connection con)
         {
-            if (!ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)))
-            {
-                ConnectedObjects[con] = other;
+            if (CanConnect(other, con) && !ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)))
+            {              
                 other.Connect(this, GetOppositeConnection(con));
-
+                ConnectedObjects[con] = other;
                 UpdateConnections(FluidType.Steam);
                 other.UpdateConnections(FluidType.Steam);
             }
@@ -94,11 +149,6 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        private void CheckWaterAvailability()
-        {
-            //todo
-        }
-
         public override bool IsConnectedTo(FluidUserObject other)
         {
             return ConnectedObjects.ContainsValue(other);
@@ -107,11 +157,9 @@ namespace Assets.Scripts.MapObjects
         public override bool CanConnect(FluidUserObject other, Connection comingFrom)
         {
             if (other is not PipeObject pipe) return false;
-            if (comingFrom != InputDirection) return false;
-            if (ConnectedObjects.ContainsKey(comingFrom) && ConnectedObjects[comingFrom] != null) return false;
+            if(ConnectedObjects.Values.Where(x => x != null).Count() > 0) return false;
             if (pipe.FluidType == FluidType.None|| pipe.FluidType == InputFluidType) return true;
             return false;
         }
-
     }
 }

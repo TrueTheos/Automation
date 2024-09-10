@@ -40,7 +40,7 @@ namespace Managers
                 }
                 else
                 {
-                    CableStarted?.Invoke(value.ConnectionPoint);
+                    CableStarted?.Invoke(value.ConnectionPoint.position);
                 }
             }
         }
@@ -169,8 +169,8 @@ namespace Managers
             cable.LineRenderer.material.color = cableColor;
             
             cable.LineRenderer.positionCount = 2;
-            cable.LineRenderer.SetPosition(0, start.ConnectionPoint);
-            cable.LineRenderer.SetPosition(1, end.ConnectionPoint);
+            cable.LineRenderer.SetPosition(0, start.ConnectionPoint.position);
+            cable.LineRenderer.SetPosition(1, end.ConnectionPoint.position);
 
             return cable;
         }

@@ -11,7 +11,12 @@ namespace MapObjects.ElectricGrids
     public class PowerGeneratorObject : MapObject, IPowerGridUser
     {
         public PowerGrid PowerGrid { get; set; }
-        public Vector3 ConnectionPoint => transform.position;
+        [SerializeField] private Transform _connectionPoint;
+        public Transform ConnectionPoint
+        {
+            get => _connectionPoint;
+            set => _connectionPoint = value;
+        }
 
         [SerializeField]
         private int powerSupplied = 100;
