@@ -3,6 +3,7 @@ using Assets.Scripts.MapObjects;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.Managers
 {

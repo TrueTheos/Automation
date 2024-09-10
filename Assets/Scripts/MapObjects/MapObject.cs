@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static Assets.Scripts.Utilities;
 namespace Assets.Scripts.MapObjects
 {
     public abstract class MapObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler

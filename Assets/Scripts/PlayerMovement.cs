@@ -15,6 +15,7 @@ using UnityEditor;
 using Assets.Scripts.Managers;
 
 using Managers;
+using static Assets.Scripts.Utilities;
 
 public class PlayerMovement : MonoBehaviour
 {

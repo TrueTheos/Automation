@@ -2,6 +2,7 @@ using Assets.Scripts.Items;
 using Assets.Scripts.Managers;
 using System.Collections.Generic;
 using UnityEngine;
+using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.MapObjects
 {
@@ -18,14 +19,6 @@ namespace Assets.Scripts.MapObjects
 
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
-
-        private static Dictionary<Direction, Direction> _oppositeDirection = new()
-        {
-            {Direction.Left, Direction.Right },
-            {Direction.Right, Direction.Left },
-            {Direction.Up, Direction.Down },
-            {Direction.Down, Direction.Up },
-        };
 
         private BeltDirection _direction;
         private BeltDirection _defaultDirection;
@@ -63,7 +56,7 @@ namespace Assets.Scripts.MapObjects
         protected override void OnPlace(Direction direction)
         {
             _defaultDirection = DirectionToBeltDirection(direction);
-            InputConnection = _oppositeDirection[direction];
+            InputConnection = GetOppositeDirection(direction);
             OutputConnection = direction;
             UpdateSprite(Direction.None);
         }
@@ -229,7 +222,7 @@ namespace Assets.Scripts.MapObjects
 
                 if (OutputConnection == Direction.None)
                 {
-                    OutputConnection = _oppositeDirection[neighborOutput];
+                    OutputConnection = GetOppositeDirection(neighborOutput);
                 }
             }
             else if (Child == null && Parent != receiver)
@@ -239,7 +232,7 @@ namespace Assets.Scripts.MapObjects
 
                 if (OutputConnection == Direction.None)
                 {
-                    OutputConnection = _oppositeDirection[neighborOutput];
+                    OutputConnection = GetOppositeDirection(neighborOutput);
                 }
             }
 
@@ -310,16 +303,6 @@ namespace Assets.Scripts.MapObjects
 
         private BeltDirection GetBeltDirection()
         {
-            //if (Child == null && InputConnection != Direction.None)
-            //{
-            //    return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
-            //}
-
-            //if (Parent == null && OutputConnection != Direction.None)
-            //{
-            //    return DirectionToBeltDirection(OutputConnection);
-            //}
-
             if(InputConnection == Direction.Left)
             {
                 if(OutputConnection == Direction.Right) return BeltDirection.WE;
@@ -331,21 +314,21 @@ namespace Assets.Scripts.MapObjects
                 if (OutputConnection == Direction.Left) return BeltDirection.EW;
                 if (OutputConnection == Direction.Up) return BeltDirection.EN;
                 if (OutputConnection == Direction.Down) return BeltDirection.ES;
-                if (OutputConnection == Direction.None) return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
+                if (OutputConnection == Direction.None) return DirectionToBeltDirection(GetOppositeDirection(InputConnection));
             }
             if(InputConnection == Direction.Down)
             {
                 if (OutputConnection == Direction.Right) return BeltDirection.SE;
                 if (OutputConnection == Direction.Up) return BeltDirection.SN;
                 if (OutputConnection == Direction.Left) return BeltDirection.SW;
-                if (OutputConnection == Direction.None) return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
+                if (OutputConnection == Direction.None) return DirectionToBeltDirection(GetOppositeDirection(InputConnection));
             }
             if (InputConnection == Direction.Up)
             {
                 if (OutputConnection == Direction.Right) return BeltDirection.NE;
                 if (OutputConnection == Direction.Down) return BeltDirection.NS;
                 if (OutputConnection == Direction.Left) return BeltDirection.NW;
-                if (OutputConnection == Direction.None) return DirectionToBeltDirection(_oppositeDirection[InputConnection]);
+                if (OutputConnection == Direction.None) return DirectionToBeltDirection(GetOppositeDirection(InputConnection));
             }
 
             return _defaultDirection;
@@ -395,14 +378,5 @@ namespace Assets.Scripts.MapObjects
         {
             return gameObject;
         }
-    }
-
-    public enum Direction
-    {
-        None = -1,
-        Up = 0,
-        Right = 1,
-        Down = 2,
-        Left = 3
     }
 }

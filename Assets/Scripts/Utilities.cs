@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
@@ -62,6 +63,54 @@ namespace Assets.Scripts
             foreach (Enum value in Enum.GetValues(input.GetType()))
                 if (input.HasFlag(value))
                     yield return value;
+        }
+
+
+        public static Connection GetOppositeConnection(Connection con)
+        {
+            if (con == Connection.Down) return Connection.Up;
+            if (con == Connection.Up) return Connection.Down;
+            if (con == Connection.Left) return Connection.Right;
+            if (con == Connection.Right) return Connection.Left;
+            return Connection.None;
+        }
+
+        public static Direction GetOppositeDirection(Direction dir)
+        {
+            if (dir == Direction.Down) return Direction.Up;
+            if (dir == Direction.Up) return Direction.Down;
+            if (dir == Direction.Left) return Direction.Right;
+            if (dir == Direction.Right) return Direction.Left;
+            return Direction.None;
+        }
+
+        public static Vector2 ConnectionToVector(Connection con)
+        {
+            if (con == Connection.Down) return Vector2.down;
+            if (con == Connection.Up) return Vector2.up;
+            if (con == Connection.Left) return Vector2.left;
+            if (con == Connection.Right) return Vector2.right;
+            return Vector2.zero;
+        }
+
+
+        [System.Flags]
+        public enum Connection
+        {
+            None = 0,
+            Up = 1,
+            Right = 2,
+            Down = 4,
+            Left = 8
+        }
+
+        public enum Direction
+        {
+            None = -1,
+            Up = 0,
+            Right = 1,
+            Down = 2,
+            Left = 3
         }
     }
 }

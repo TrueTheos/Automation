@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Assets.Scripts.Managers;
+using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.MapObjects
 {
