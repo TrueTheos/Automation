@@ -44,6 +44,11 @@ namespace Managers
             OnPowerRecalculationRequired -= OnPowerRecalculationRequired_Calculate;
         }
 
+        public void UpdatePower()
+        {
+            OnPowerRecalculationRequired?.Invoke();
+        }
+
         public void Connect(IPowerGridUser first, IPowerGridUser second)
         {
             if (TryAddConnection(first, second) && TryAddConnection(second, first))

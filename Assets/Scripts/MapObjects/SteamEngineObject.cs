@@ -15,7 +15,6 @@ namespace Assets.Scripts.MapObjects
 {
     public class SteamEngineObject : FluidUserObject, IPowerGridUser
     {
-        public override FluidType InputFluidType { get; set; } = FluidType.Steam;
         public PowerGrid PowerGrid { get; set; }
 
         [SerializeField] private List<ParticleSystem> Particles;
@@ -27,8 +26,7 @@ namespace Assets.Scripts.MapObjects
             set => _connectionPoint = value;
         }
 
-        [SerializeField]
-        private Watt maxPowerSupplied;
+        [SerializeField] private Watt maxPowerSupplied;
         private Watt _currentPowerSupply;
 
         public Watt ConsumedPower { get; set; } = null;
@@ -43,10 +41,15 @@ namespace Assets.Scripts.MapObjects
 
         private IPowerGridUser _iPowerGridUser;
 
+        private void Awake()
+        {
+            _inputFluidType = FluidType.Steam;
+        }
+
         private void Start()
         {
             _iPowerGridUser = this;
-            _currentPowerSupply = maxPowerSupplied;
+            _currentPowerSupply = new Watt(maxPowerSupplied.WattType, maxPowerSupplied.Value);
         }
 
         private void Update()

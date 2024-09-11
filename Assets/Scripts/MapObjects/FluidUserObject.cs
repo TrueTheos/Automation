@@ -16,8 +16,18 @@ namespace Assets.Scripts.MapObjects
         public Dictionary<Connection, FluidUserObject> ConnectedObjects = new();
         public virtual Connection InputDirection {get; set;}
         public virtual Connection OutputDirection { get; set; }
-        public virtual FluidType InputFluidType { get; set; }
-        public virtual FluidType OutputFluidType { get; set; }
+        protected FluidType _inputFluidType = FluidType.None;
+        public virtual FluidType InputFluidType
+        {
+            get => _inputFluidType;
+            set => _inputFluidType = value;
+        }
+        protected FluidType _outputFluidType = FluidType.None;
+        public virtual FluidType OutputFluidType
+        {
+            get => _outputFluidType;
+            set => _outputFluidType = value;
+        }
         public Connection CurrentConnections = Connection.None;
         public abstract bool IsConnectedTo(FluidUserObject other);
         public abstract void Connect(FluidUserObject other, Connection comingFrom);

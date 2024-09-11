@@ -4777,7 +4777,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5018,10 +5018,10 @@ MonoBehaviour:
   - {fileID: 8764046054297986420}
   _connectionPoint: {fileID: 6464154954919029872}
   maxPowerSupplied:
-    WattType: 0
-    Value: 0
+    WattType: 1
+    Value: 1
   _steamPullRate: 10
-  _steamConsumption: 10
+  _steamConsumption: 5
   _steamCapacity: 100
 --- !u!1 &8896697580468512437
 GameObject:
@@ -9800,7 +9800,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

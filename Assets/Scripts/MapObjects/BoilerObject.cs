@@ -15,9 +15,6 @@ namespace Assets.Scripts.MapObjects
         public override Connection OutputDirection { get; set; } = Connection.Right;
         public override Connection InputDirection { get; set; } = Connection.Left;
 
-        public override FluidType InputFluidType { get; set; } = FluidType.Water;
-        public override FluidType OutputFluidType { get; set; } = FluidType.Steam;
-
         public override float Capacity
         {
             get => _waterCapacity + _steamCapacity;
@@ -42,6 +39,13 @@ namespace Assets.Scripts.MapObjects
 
         private float _currentWater = 0f;
         private float _currentSteam = 0f;
+
+        private void Awake()
+        {
+            _inputFluidType = FluidType.Water;
+            _outputFluidType = FluidType.Steam;
+        }
+
 
         protected override void OnPlace(Direction direction)
         {

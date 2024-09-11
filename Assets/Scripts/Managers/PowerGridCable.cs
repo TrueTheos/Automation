@@ -19,15 +19,15 @@ namespace Managers
 
         public void SetState(PowerState powerState)
         {
-            if (powerState.HasFlag(PowerState.IsConnected))
-            {
-                LineRenderer.material.color = Color.gray;
-            }
+            //if (powerState.HasFlag(PowerState.IsConnected))
+            //{
+            //    LineRenderer.material.color = Color.gray;
+            //}
             
-            if (powerState.HasFlag(PowerState.HasPower))
-            {
-                LineRenderer.material.color = Color.green;
-            }
+            //if (powerState.HasFlag(PowerState.HasPower))
+            //{
+            //    LineRenderer.material.color = Color.green;
+            //}
         }
     }
 }

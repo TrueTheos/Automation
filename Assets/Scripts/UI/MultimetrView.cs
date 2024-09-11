@@ -77,7 +77,9 @@ namespace Assets.Scripts.UI
             WattType highestUnit = GetHighestUnit(availablePower.WattType, consumedPower.WattType);
             double availableInHighestUnit = ConvertToUnit(availablePower, highestUnit);
             double requiredInHighestUnit = ConvertToUnit(consumedPower, highestUnit);
-            float ratio = (float)(requiredInHighestUnit / availableInHighestUnit);
+            float ratio;
+            if (requiredInHighestUnit == 0 || availableInHighestUnit == 0) ratio = 0;
+            else { ratio = (float)(requiredInHighestUnit / availableInHighestUnit); }
 
             CableFillBar.fillAmount = Mathf.Max(0, 1 - ratio);
 

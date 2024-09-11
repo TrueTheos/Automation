@@ -13,12 +13,19 @@ namespace Assets.Scripts.MapObjects
     public class WaterPumpObject : FluidUserObject
     {
         public float PumpRate;
+        public ParticleSystem ParticleSystem;
+        private ParticleSystem.EmissionModule _emissionModule;
 
         public override Connection OutputDirection { get; set; } = Connection.Up;
 
-        public override FluidType OutputFluidType { get; set; } = FluidType.Water;
-
         private MapGenerator _mapGenerator;
+
+        private void Awake()
+        {
+            _outputFluidType = FluidType.Water;
+            _emissionModule = ParticleSystem.emission;
+        }
+
 
         protected override void OnPlace(Direction direction)
         {
@@ -33,6 +40,15 @@ namespace Assets.Scripts.MapObjects
             if (_mapGenerator.GetTileTypeAtPos(X, Y - 1) != TileType.WATER &&
                 _mapGenerator.GetTileTypeAtPos(X + 1, Y - 1) != TileType.WATER) return;
             FluidManager.Instance.SimulatePumpFlow(this, Time.deltaTime);
+
+            if(ConnectedObjects.Values.Where(x => x != null).Count() > 0)
+            {
+                _emissionModule.enabled = true;
+            }
+            else
+            {
+                _emissionModule.enabled = false;
+            }
         }
 
         public override bool IsConnectedTo(FluidUserObject other)

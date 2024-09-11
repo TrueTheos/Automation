@@ -12,7 +12,16 @@ namespace Managers
         {
             PowerGrids = new List<PowerGrid>();
         }
- 
+
+        private void Update()
+        {
+            // zobaczymy jak wolne to będzie :D ~ theos
+            foreach (var powerGrid in PowerGrids) 
+            {
+                powerGrid.UpdatePower();
+            }
+        }
+
         public void AddPowerGrid(PowerGrid powerGrid)
         {
             PowerGrids.Add(powerGrid);
