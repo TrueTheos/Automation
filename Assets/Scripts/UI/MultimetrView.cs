@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Items;
 using Assets.Scripts.Managers;
 using Managers;
+using MapObjects.ElectricGrids;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,18 +43,27 @@ namespace Assets.Scripts.UI
 
         public void OnItemChange()
         {
-            if(_player.PlayeMovement.SelectedItem != _multimetr)
+            if(_player.PlayeMovement.SelectedItem.Item != _multimetr)
             {
                 CableParent.SetActive(false);
                 _enabled = false;
             }
+            else
+            {
+                _enabled = true;
+            }
         }
 
-        public void OnCableHover(PowerGridCable cable)
+        public void OnElectricPoleHover(ElectricPoleObject pole)
         {
-            if (_enabled) return;
+            if(pole == null)
+            {
+                CableParent.SetActive(false);
+                return;
+            }
+            if (!_enabled) return;
 
-            PowerGrid currentGrid = cable.Start.PowerGrid;
+            PowerGrid currentGrid = pole.PowerGrid;
             if (currentGrid == null)
             {
                 return;

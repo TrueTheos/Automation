@@ -1,6 +1,6 @@
 ﻿using Assets.Scripts.Items;
 using Assets.Scripts.MapObjects;
-
+using Assets.Scripts.UI;
 using Managers;
 
 using UnityEngine;
@@ -39,6 +39,16 @@ namespace MapObjects.ElectricGrids
             {
                 _iPowerGridUser.OnPowerGridUserClick(player);
             }
+        }
+
+        public void OnMouseOver()
+        {
+            UIManager.Instance.MultimetrView.OnElectricPoleHover(this);
+        }
+
+        public void OnMouseExit()
+        {
+            UIManager.Instance.MultimetrView.OnElectricPoleHover(null);
         }
     }
 }
