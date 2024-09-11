@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Assets.Scripts;
+using Assets.Scripts.MapObjects;
 using MapObjects.ElectricGrids;
 
 using Unity.VisualScripting;
 
 using UnityEngine;
+using static Assets.Scripts.WattsUtils;
 
 namespace Managers
 {
@@ -20,13 +22,12 @@ namespace Managers
         public event Action<IPowerGridUser, IPowerGridUser> OnConnected;
         public event Action<IPowerGridUser, IPowerGridUser> OnDisconnected;
         public event Action OnPowerRecalculationRequired;
-        
-        public int CurrentPower;
+
+        public Watt CurrentPower;
 
         public PowerGrid(CableBuilder playerCableBuilder)
         {
             _playerCableBuilder = playerCableBuilder;
-            CurrentPower = 0;
 
             OnConnected += OnConnected_DrawCable();
             OnDisconnected += OnDisconnected_DeleteCable;
@@ -113,10 +114,41 @@ namespace Managers
         
         private void OnPowerRecalculationRequired_Calculate()
         {
-            CurrentPower = PowerGridConnections.Keys.Sum(user => user.PowerAmount);
             var cables = Cables.Values;
 
-            if (CurrentPower > 0)
+            var powerConsumers = PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Consumer).ToList();
+            Watt availableW = SumWatts(PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Producer).Select(x => x.ProducedPower));
+            Watt requiredW = SumWatts(powerConsumers.Select(x => x.ConsumedPower));
+
+            CurrentPower = availableW;
+
+            float speed = 0;
+
+            if (availableW.Value == 0)
+            {
+                speed = 0;
+            }
+            else if (CompareWatts(requiredW, availableW) > 0) // requiredW is greater than availableW
+            {
+                WattType highestUnit = GetHighestUnit(availableW.WattType, requiredW.WattType);
+                double availableInHighestUnit = ConvertToUnit(availableW, highestUnit);
+                double requiredInHighestUnit = ConvertToUnit(requiredW, highestUnit);
+                speed = (float)(availableInHighestUnit / requiredInHighestUnit);
+            }
+            else
+            {
+                speed = 1;
+            }
+
+            foreach (var consumer in powerConsumers)
+            {
+                if(consumer is MapObject mapObject)
+                {
+                    mapObject.Speed = speed;
+                }
+            }
+
+            if (availableW.Value > 0)
             {
                 foreach (var cable in cables)
                 {
@@ -131,7 +163,7 @@ namespace Managers
                 }
             }
         }
-        
+
         private Action<IPowerGridUser, IPowerGridUser> OnConnected_DrawCable()
         {
             return delegate(IPowerGridUser user1, IPowerGridUser user2)

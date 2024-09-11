@@ -9,6 +9,7 @@ using static Assets.Scripts.Utilities;
 using MapObjects.ElectricGrids;
 using Managers;
 using Assets.Scripts.Items;
+using static Assets.Scripts.WattsUtils;
 
 namespace Assets.Scripts.MapObjects
 {
@@ -25,9 +26,13 @@ namespace Assets.Scripts.MapObjects
         }
 
         [SerializeField]
-        private int maxPowerSupplied = 100;
-        private int _currentPowerSupply;
-        public int PowerAmount => _currentPowerSupply;
+        private Watt maxPowerSupplied;
+        private Watt _currentPowerSupply;
+
+        public Watt ConsumedPower { get; set; } = null;
+        public Watt ProducedPower => _currentPowerSupply;
+
+        public PowerGridUserType PowerGridUserType => PowerGridUserType.Producer;
 
         [SerializeField] private float _steamPullRate = 10f;
         [SerializeField] private float _steamConsumption = 10f;
@@ -39,6 +44,7 @@ namespace Assets.Scripts.MapObjects
         private void Start()
         {
             _iPowerGridUser = this;
+            _currentPowerSupply = maxPowerSupplied;
         }
 
         private void Update()
@@ -47,13 +53,13 @@ namespace Assets.Scripts.MapObjects
 
             if(_currentSteam > 0f && _currentSteam > _steamConsumption)
             {
-                _currentPowerSupply = maxPowerSupplied;
+                _currentPowerSupply.Value = maxPowerSupplied.Value;
 
                 _currentSteam -= _steamConsumption;
             }
             else
             {
-                _currentPowerSupply = 0;
+                _currentPowerSupply.Value = 0;
             }
         }
 

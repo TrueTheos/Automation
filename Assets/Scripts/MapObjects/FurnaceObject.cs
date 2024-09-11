@@ -16,8 +16,6 @@ namespace Assets.Scripts.MapObjects
         public int InputCapacity;
         public int OutputCapacity;
 
-        public float Speed;
-
         public ParticleSystem ParticleSystem;
 
         private ItemAmount _inputItem;

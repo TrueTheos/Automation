@@ -5,6 +5,7 @@ using Assets.Scripts;
 using Managers;
 
 using UnityEngine;
+using static Assets.Scripts.WattsUtils;
 
 namespace MapObjects.ElectricGrids
 {
@@ -12,8 +13,11 @@ namespace MapObjects.ElectricGrids
     {
         PowerGrid PowerGrid { get; set; }
         Transform ConnectionPoint { get; set; }
-        int PowerAmount { get; }
-        
+        Watt ConsumedPower { get; }
+        Watt ProducedPower { get; }
+
+        PowerGridUserType PowerGridUserType { get;}
+
         void OnPowerGridUserClick(Player player)
         {
             if (PowerGrid == null)
@@ -23,6 +27,13 @@ namespace MapObjects.ElectricGrids
             
             player.CableBuilder.HandleCableActionFor(this);
         }
+    }
+
+    public enum PowerGridUserType
+    {
+        None, 
+        Consumer,
+        Producer
     }
 
     [Flags]

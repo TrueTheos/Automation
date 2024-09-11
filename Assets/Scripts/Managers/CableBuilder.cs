@@ -1,6 +1,8 @@
-﻿using MapObjects.ElectricGrids;
+﻿using Assets.Scripts;
+using MapObjects.ElectricGrids;
 
 using UnityEngine;
+using static Assets.Scripts.WattsUtils;
 
 namespace Managers
 {
@@ -98,7 +100,7 @@ namespace Managers
                 return previous.PowerGrid;
             }
 
-            if (previous.PowerGrid.CurrentPower >= current.PowerGrid.CurrentPower)
+            if (CompareWatts(previous.PowerGrid.CurrentPower, current.PowerGrid.CurrentPower) >= 0)
             {
                 previous.PowerGrid.DevourGrid(current.PowerGrid);
                 targetGrid = previous.PowerGrid;

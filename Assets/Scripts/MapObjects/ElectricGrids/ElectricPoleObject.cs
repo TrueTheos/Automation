@@ -4,6 +4,7 @@ using Assets.Scripts.MapObjects;
 using Managers;
 
 using UnityEngine;
+using static Assets.Scripts.WattsUtils;
 
 namespace MapObjects.ElectricGrids
 {
@@ -18,10 +19,11 @@ namespace MapObjects.ElectricGrids
             set => _connectionPoint = value;
         }
 
-        [SerializeField]
-        private int powerSupplied = -5;
-        public int PowerAmount => powerSupplied;
-        
+        public Watt ConsumedPower { get; set; } = null;
+        public Watt ProducedPower { get; set; } = null;
+
+        public PowerGridUserType PowerGridUserType => PowerGridUserType.None;
+
         private IPowerGridUser _iPowerGridUser;
 
         private void Start()
