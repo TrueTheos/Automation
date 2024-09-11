@@ -1,9 +1,12 @@
 ﻿using DG.Tweening;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Assets.Scripts
 {
@@ -50,6 +53,9 @@ namespace Assets.Scripts
 
         public static int CompareWatts(Watt watt1, Watt watt2)
         {
+            if (watt1 == null && watt2 == null) return 0;
+            else if (watt1 == null && watt2 != null) return -1;
+            else if (watt1 != null && watt2 == null) return 1;
             double watts1 = watt1.Value * WattTypeValue[watt1.WattType];
             double watts2 = watt2.Value * WattTypeValue[watt2.WattType];
 
@@ -107,6 +113,26 @@ namespace Assets.Scripts
             }
 
             return new Watt(appropriateType, resultValue);
+        }
+
+        public static string WattsToString(Watt watt)
+        {
+            switch (watt.WattType)
+            {
+                case WattType.Watt:
+                    return string.Format("{0:N1}{1}", watt.Value, "W");
+                case WattType.Kilowatt:
+                    return string.Format("{0:N1}{1}", watt.Value, "kW");
+                case WattType.Megawatt:
+                    return string.Format("{0:N1}{1}", watt.Value, "MW");
+                case WattType.Gigawatt:
+                    return string.Format("{0:N1}{1}", watt.Value, "GW");
+                default:
+                    Debug.LogError($"Watt type not implemented: {watt.WattType}");
+                    break;
+            }
+
+            return "0W";
         }
 
         private static WattType DetermineAppropriateWattType(double watts)

@@ -40,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
     public ItemSlot SelectedItem => _selectedItem;
     private Direction _selectedItemDirection = Direction.Down;
     private int _selectedObjectIndex;
+    public event Action OnSelectedItemChange; 
 
     [SerializeField] private GameObject _hand;
     private SpriteRenderer _handArt;
@@ -267,6 +268,8 @@ public class PlayerMovement : MonoBehaviour
         _selectedItem = _inventory.HotbarItems[_selectedObjectIndex];
         if (_selectedItem.Item is MapItem mapItem) _selectedItemDirection = mapItem.DefaultDirection;
         _selectedItem.Highlight();
+
+        OnSelectedItemChange?.Invoke();
 
         UpdatePreviewSprite();
     }

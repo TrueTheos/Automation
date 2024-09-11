@@ -24,6 +24,7 @@ namespace Managers
         public event Action OnPowerRecalculationRequired;
 
         public Watt CurrentPower;
+        public Watt ConsumedPower;
 
         public PowerGrid(CableBuilder playerCableBuilder)
         {
@@ -118,7 +119,7 @@ namespace Managers
 
             var powerConsumers = PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Consumer).ToList();
             Watt availableW = SumWatts(PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Producer).Select(x => x.ProducedPower));
-            Watt requiredW = SumWatts(powerConsumers.Select(x => x.ConsumedPower));
+            ConsumedPower = SumWatts(powerConsumers.Select(x => x.ConsumedPower));
 
             CurrentPower = availableW;
 
@@ -128,11 +129,11 @@ namespace Managers
             {
                 speed = 0;
             }
-            else if (CompareWatts(requiredW, availableW) > 0) // requiredW is greater than availableW
+            else if (CompareWatts(ConsumedPower, availableW) > 0) // requiredW is greater than availableW
             {
-                WattType highestUnit = GetHighestUnit(availableW.WattType, requiredW.WattType);
+                WattType highestUnit = GetHighestUnit(availableW.WattType, ConsumedPower.WattType);
                 double availableInHighestUnit = ConvertToUnit(availableW, highestUnit);
-                double requiredInHighestUnit = ConvertToUnit(requiredW, highestUnit);
+                double requiredInHighestUnit = ConvertToUnit(ConsumedPower, highestUnit);
                 speed = (float)(availableInHighestUnit / requiredInHighestUnit);
             }
             else

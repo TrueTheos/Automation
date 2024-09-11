@@ -13,6 +13,7 @@ namespace Assets.Scripts.UI
 
         public FurnaceView FurnaceView;
         public IronCrateView IronCrateView;
+        public MultimetrView MultimetrView;
 
         private void Awake()
         {

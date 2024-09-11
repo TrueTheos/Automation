@@ -4978,7 +4978,7 @@ MonoBehaviour:
   Size: 1
   SpriteRend: {fileID: 8682204378943370106}
   MapItem: {fileID: 11400000, guid: 7aa771a5a4f0efe4f8d4af04d76c55b0, type: 2}
+  Speed: 2
   InputCapacity: 30
   OutputCapacity: 30
-  Speed: 2
   ParticleSystem: {fileID: 2401593113067665983}

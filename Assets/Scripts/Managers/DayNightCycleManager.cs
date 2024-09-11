@@ -16,6 +16,7 @@ namespace Assets.Scripts.Managers
 
         [SerializeField] private float _dayLength;
         private TimeSpan _currentTime;
+        [Range(0,24), SerializeField] private int _startHour;
         private float _minuteLength => _dayLength / MinutesInDay;
         public const int MinutesInDay = 1440;
 
@@ -31,6 +32,7 @@ namespace Assets.Scripts.Managers
 
         private void Start()
         {
+            _currentTime = TimeSpan.FromHours(_startHour);
             StartCoroutine(AddMinute());
         }
 

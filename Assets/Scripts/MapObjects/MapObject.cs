@@ -28,7 +28,7 @@ namespace Assets.Scripts.MapObjects
 
         private GameManager _gameManager;
 
-        [Range(0f, 1f)] public float Speed = 1f; //How fast building will work based on the provided electricity
+        [Range(0f, 1f), HideInInspector] public float Speed = 1f; //How fast building will work based on the provided electricity
 
         public Vector2Int[] GetOccupiedPositions(int x, int y)
         {

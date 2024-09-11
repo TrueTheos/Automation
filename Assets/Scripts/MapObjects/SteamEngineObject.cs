@@ -18,6 +18,8 @@ namespace Assets.Scripts.MapObjects
         public override FluidType InputFluidType { get; set; } = FluidType.Steam;
         public PowerGrid PowerGrid { get; set; }
 
+        [SerializeField] private List<ParticleSystem> Particles;
+
         [SerializeField] private Transform _connectionPoint;
         public Transform ConnectionPoint
         {
@@ -53,12 +55,23 @@ namespace Assets.Scripts.MapObjects
 
             if(_currentSteam > 0f && _currentSteam > _steamConsumption)
             {
+                foreach (var particle in Particles)
+                {
+                    ParticleSystem.EmissionModule emissionModule = particle.emission;
+                    emissionModule.enabled = true;
+                }
+
                 _currentPowerSupply.Value = maxPowerSupplied.Value;
 
-                _currentSteam -= _steamConsumption;
+                _currentSteam -= _steamConsumption * Time.deltaTime;
             }
             else
             {
+                foreach (var particle in Particles)
+                {
+                    ParticleSystem.EmissionModule emissionModule = particle.emission;
+                    emissionModule.enabled = false;
+                }
                 _currentPowerSupply.Value = 0;
             }
         }

@@ -10,15 +10,18 @@ namespace Assets.Scripts.Managers
     {
         public Transform ObjectHighlight;
 
+        public Player CurrentPlayer { get; private set; }
+
         public static GameManager Instance;
         private void Awake()
         {
             Instance = this;
+            CurrentPlayer = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         }
 
         void Start()
         {
-            Init();
+            Init();         
         }
 
         private void Init()
