@@ -128,7 +128,6 @@ public class MapGenerator : MonoBehaviour
                     currentChunk.SetTile(x, y, TileType.WATER);
                     Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), WaterTile);
                     Layer1Tilemap.SetTile(new Vector3Int(x, y, 0), null);
-
                 }
             }
         }
