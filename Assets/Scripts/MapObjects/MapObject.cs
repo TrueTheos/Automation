@@ -86,6 +86,12 @@ namespace Assets.Scripts.MapObjects
             {
                 SpriteRend.sprite = MapItem.DirectionSprites[Direction];
             }
+
+            if(MapItem.PickRandomSprite)
+            {
+                var sprites = MapItem.SpriteRandomVariants.Where(x => x != null).ToList();
+                if(sprites.Count > 0) SpriteRend.sprite = sprites.GetRandom();
+            }
         }
 
         public void Hit(int power)

@@ -24,7 +24,6 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private Tilemap Layer1Tilemap;
 
     [SerializeField] private Tile GreenTile;
-    [SerializeField] private Tile DarkGreenTile;
     [SerializeField] private Tile StoneTile;
     [SerializeField] private RuleTile WaterTile;
     [SerializeField] private List<Tile> GrassTiles;

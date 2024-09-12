@@ -15,12 +15,17 @@ MonoBehaviour:
   Name: Iron
   Icon: {fileID: -1646164329, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
   MaxStack: 1
-  ItemFlags: 0
+  ItemFlags: 1
+  ItemType: 0
   Prefab: {fileID: 129681216205148547, guid: 25fdac0e9799a4745858f4d19fd5cd8b, type: 3}
   MaxDurability: 40
   CanBeRotated: 0
-  DefaultDirection: 2
+  PickRandomSprite: 1
+  SpriteRandomVariants:
+  - {fileID: -67534524, guid: 7e37f84d243b73141a58fd500425fa47, type: 3}
+  - {fileID: -886532334, guid: 7e37f84d243b73141a58fd500425fa47, type: 3}
+  - {fileID: -1540783602, guid: 7e37f84d243b73141a58fd500425fa47, type: 3}
+  - {fileID: 1813266785, guid: 7e37f84d243b73141a58fd500425fa47, type: 3}
+  DefaultDirection: -1
   DirectionSprites:
-    dictionary:
-    - Key: 2
-      Value: {fileID: -1646164329, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
+    dictionary: []

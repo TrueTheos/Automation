@@ -16,11 +16,12 @@ MonoBehaviour:
   Icon: {fileID: 1874827971, guid: c7a869f0978e39843bc130bf8d238e7e, type: 3}
   MaxStack: 1
   ItemFlags: 0
+  ItemType: 0
   Prefab: {fileID: 3622930042120849815, guid: 7d9d6a252f3c72a4ca8808d8a70fb2f5, type: 3}
   MaxDurability: 30
   CanBeRotated: 0
-  DefaultDirection: 2
+  PickRandomSprite: 0
+  SpriteRandomVariants: []
+  DefaultDirection: -1
   DirectionSprites:
-    dictionary:
-    - Key: 2
-      Value: {fileID: 1874827971, guid: c7a869f0978e39843bc130bf8d238e7e, type: 3}
+    dictionary: []

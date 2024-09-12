@@ -15,12 +15,17 @@ MonoBehaviour:
   Name: Copper
   Icon: {fileID: 1412756841, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
   MaxStack: 1
-  ItemFlags: 0
+  ItemFlags: 1
+  ItemType: 0
   Prefab: {fileID: 5636715138489654252, guid: ae8792dd5b9595c48ad13ae00cbc4dc7, type: 3}
   MaxDurability: 30
   CanBeRotated: 0
-  DefaultDirection: 2
+  PickRandomSprite: 1
+  SpriteRandomVariants:
+  - {fileID: 1273105651, guid: c9d9ef20f4b09cc40bd014aef27eb200, type: 3}
+  - {fileID: 1929499798, guid: c9d9ef20f4b09cc40bd014aef27eb200, type: 3}
+  - {fileID: -1333634038, guid: c9d9ef20f4b09cc40bd014aef27eb200, type: 3}
+  - {fileID: -2109178502, guid: c9d9ef20f4b09cc40bd014aef27eb200, type: 3}
+  DefaultDirection: -1
   DirectionSprites:
-    dictionary:
-    - Key: 2
-      Value: {fileID: 1412756841, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
+    dictionary: []
