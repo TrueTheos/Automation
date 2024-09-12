@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
+using static Assets.Scripts.Managers.DayNightCycleManager;
 
 namespace Assets.Scripts.Managers
 {
@@ -16,7 +18,7 @@ namespace Assets.Scripts.Managers
 
         [SerializeField] private float _dayLength;
         private TimeSpan _currentTime;
-        [Range(0,24), SerializeField] private int _startHour;
+        [Range(0,23), SerializeField] private int _startHour;
         private float _minuteLength => _dayLength / MinutesInDay;
         public const int MinutesInDay = 1440;
 
@@ -25,8 +27,11 @@ namespace Assets.Scripts.Managers
         [SerializeField] private Gradient _gradient;
 
         [Header("Debug Info")]
+        [SerializeField] private bool _stopTime;
         [SerializeField] private int _currentHour;
         [SerializeField] private int _currentMinute;
+
+        private List<ScheduledEvent> _scheduledEvents = new();
 
         private void Awake()
         {
@@ -44,12 +49,36 @@ namespace Assets.Scripts.Managers
         {
             while (true)
             {
-                _currentTime += TimeSpan.FromMinutes(1);
-                _light.color = _gradient.Evaluate(PercentOfDay(_currentTime));
+                if (!_stopTime)
+                {
+                    _currentTime += TimeSpan.FromMinutes(1);
+                    _light.color = _gradient.Evaluate(PercentOfDay(_currentTime));
 
-                _currentHour = _currentTime.Hours;
-                _currentMinute = _currentTime.Minutes;
-                yield return new WaitForSeconds(_minuteLength);
+                    _currentHour = _currentTime.Hours;
+                    _currentMinute = _currentTime.Minutes;
+                    CheckScheduledEvents();
+                    yield return new WaitForSeconds(_minuteLength);
+                }
+                else
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+        }
+
+        private void CheckScheduledEvents()
+        {
+            for (int i = _scheduledEvents.Count - 1; i >= 0; i--)
+            {
+                var schedule = _scheduledEvents[i];
+                if (schedule.Hour == _currentHour && schedule.Minute == _currentMinute)
+                {
+                    schedule.Event.Invoke();
+                    if (!schedule.Repeat)
+                    {
+                        _scheduledEvents.RemoveAt(i);
+                    }
+                }
             }
         }
 
@@ -57,5 +86,19 @@ namespace Assets.Scripts.Managers
         {
             return (float)timeSpan.TotalMinutes % MinutesInDay / MinutesInDay;
         }
+
+        public void AddScheduledEvent(ScheduledEvent schedule)
+        {
+            _scheduledEvents.Add(schedule);
+        }
+    }
+
+    [Serializable]
+    public class ScheduledEvent
+    {
+        [Range(0, 23)] public int Hour;
+        [Range(0, 60)] public int Minute;
+        public bool Repeat;
+        public UnityEvent Event;
     }
 }
