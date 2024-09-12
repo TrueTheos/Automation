@@ -26,7 +26,7 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private Tile GreenTile;
     [SerializeField] private Tile DarkGreenTile;
     [SerializeField] private Tile StoneTile;
-    [SerializeField] private Tile WaterTile;
+    [SerializeField] private RuleTile WaterTile;
     [SerializeField] private List<Tile> GrassTiles;
     [SerializeField][Range(0f, 100f)] private float GrassSpawnChance;
 

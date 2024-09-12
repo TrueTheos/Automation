@@ -24,6 +24,10 @@ namespace Assets.Scripts.Managers
 
         [SerializeField] private Gradient _gradient;
 
+        [Header("Debug Info")]
+        [SerializeField] private int _currentHour;
+        [SerializeField] private int _currentMinute;
+
         private void Awake()
         {
             Instance = this;
@@ -42,6 +46,9 @@ namespace Assets.Scripts.Managers
             {
                 _currentTime += TimeSpan.FromMinutes(1);
                 _light.color = _gradient.Evaluate(PercentOfDay(_currentTime));
+
+                _currentHour = _currentTime.Hours;
+                _currentMinute = _currentTime.Minutes;
                 yield return new WaitForSeconds(_minuteLength);
             }
         }
