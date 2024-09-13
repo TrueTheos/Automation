@@ -160,7 +160,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: 21300000, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  m_Sprite: {fileID: -1669018724, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -237,4 +237,20 @@ MonoBehaviour:
   _capacity:
     WattType: 2
     Value: 1
+  _maxChargeRate:
+    WattType: 1
+    Value: 100
+  _maxDischargeRate:
+    WattType: 1
+    Value: 100
   _rangeHighlight: {fileID: 1376128050967716726}
+  _chargeSprites:
+  - {fileID: -1669018724, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -854307036, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -74649386, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1025458696, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1796893599, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -900149323, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1626101767, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1577379164, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -1922606184, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}

@@ -69,7 +69,7 @@ namespace Assets.Scripts.UI
                 return;
             }
 
-            Watt availablePower = currentGrid.CurrentPower;
+            Watt availablePower = currentGrid.ProducedPower;
             Watt consumedPower = currentGrid.ConsumedPower;
             AvailableCablePower.text = WattsToString(availablePower);
             ConsumedCablePower.text = WattsToString(consumedPower);

@@ -23,7 +23,7 @@ namespace Managers
         public event Action<IPowerGridUser, IPowerGridUser> OnDisconnected;
         public event Action OnPowerRecalculationRequired;
 
-        public Watt CurrentPower;
+        public Watt ProducedPower;
         public Watt ConsumedPower;
 
         public PowerGrid(CableBuilder playerCableBuilder)
@@ -126,7 +126,7 @@ namespace Managers
             Watt availableW = SumWatts(PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Producer).Select(x => x.ProducedPower));
             ConsumedPower = SumWatts(powerConsumers.Select(x => x.ConsumedPower));
 
-            CurrentPower = availableW;
+            ProducedPower = availableW;
 
             float speed = 0;
 

@@ -100,7 +100,7 @@ namespace Managers
                 return previous.PowerGrid;
             }
 
-            if (CompareWatts(previous.PowerGrid.CurrentPower, current.PowerGrid.CurrentPower) >= 0)
+            if (CompareWatts(previous.PowerGrid.ProducedPower, current.PowerGrid.ProducedPower) >= 0)
             {
                 previous.PowerGrid.DevourGrid(current.PowerGrid);
                 targetGrid = previous.PowerGrid;

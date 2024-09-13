@@ -24,6 +24,27 @@ namespace Assets.Scripts
             return list[UnityEngine.Random.Range(0, list.Count)];
         }
 
+        public static T IndexByPercentage<T>(this IList<T> list, float percentage)
+        {
+            if (list == null || list.Count == 0)
+            {
+                throw new ArgumentException("List cannot be null or empty.");
+            }
+
+            if (percentage < 0 || percentage > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(percentage), "Percentage must be between 0 and 1.");
+            }
+
+            int index = (int)Math.Floor(percentage * list.Count);
+
+            // Ensure the index is within bounds (important when percentage is exactly 1)
+            index = Math.Min(index, list.Count - 1);
+
+            return list[index];
+        }
+
+
         /// <summary>
         /// Returns and removes a random element from the list.
         /// </summary>

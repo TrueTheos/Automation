@@ -5019,7 +5019,7 @@ MonoBehaviour:
   _connectionPoint: {fileID: 6464154954919029872}
   maxPowerSupplied:
     WattType: 1
-    Value: 1
+    Value: 1000
   _steamPullRate: 10
   _steamConsumption: 5
   _steamCapacity: 100

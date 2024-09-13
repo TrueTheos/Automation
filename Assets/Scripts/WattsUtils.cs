@@ -135,6 +135,15 @@ namespace Assets.Scripts
             return "0W";
         }
 
+        public static float CalculateWattPercentage(Watt part, Watt whole)
+        {
+            double partInWatts = ConvertToUnit(part, WattType.Watt);
+            double wholeInWatts = ConvertToUnit(whole, WattType.Watt);
+
+            double percentage = partInWatts / wholeInWatts;
+            return (float)percentage;
+        }
+
         private static WattType DetermineAppropriateWattType(double watts)
         {
             if (watts >= WattTypeValue[WattType.Gigawatt])
