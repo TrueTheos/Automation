@@ -183,5 +183,7 @@ namespace Assets.Scripts.MapObjects
             if (pipe.FluidType == FluidType.None|| pipe.FluidType == InputFluidType) return true;
             return false;
         }
+
+        public bool IsConsumingPower() => false;
     }
 }

@@ -58,14 +58,13 @@ namespace Assets.Scripts.MapObjects
             if (_inputItem.GetItem() == null) return false; 
             if (_inputItem.GetItem() is NormalItem normalItem && normalItem.SmeltedResult == null) return false;
             if (IsFull()) return false;
-            if(Speed <= 0) return false;
             if (PowerGrid == null) return false;
             return true;
         }
 
         private void Update()
         {
-            if (!CanSmelt())
+            if (!CanSmelt() || Speed <= 0)
             {
                 ParticleSystem.gameObject.SetActive(false);
                 _furnaceView.ProgressBar.fillAmount = 0;
@@ -119,6 +118,11 @@ namespace Assets.Scripts.MapObjects
         {
             if (_outputItem.Amount >= OutputCapacity) return true;
             return false;
+        }
+
+        public bool IsConsumingPower()
+        {
+            return CanSmelt();
         }
 
         public void UpdateItems(ItemSlot input, ItemSlot output)

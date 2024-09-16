@@ -34,9 +34,6 @@ namespace Assets.Scripts.MapObjects
 
         private void Update()
         {
-            //todo nie powinno dischargowac jezeli np furnace nie ma nic w inpucie
-            //takie obiekty powinny miec cos typu "isRunning" i wtedy w powerGridzie w sumowaniu brac to pod uwage
-
             if (_powerGrids != null)
             {
                 Watt maxChargeThisFrame = new Watt(_maxChargeRate.WattType, _maxChargeRate.Value * Time.deltaTime);

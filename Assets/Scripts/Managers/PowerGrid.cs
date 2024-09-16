@@ -123,7 +123,7 @@ namespace Managers
         {
             var cables = Cables.Values;
 
-            var powerConsumers = PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Consumer).ToList();
+            var powerConsumers = PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Consumer && x.IsConsumingPower()).ToList();
             Watt availableW = SumWatts(PowerGridConnections.Keys.Where(x => x.PowerGridUserType == PowerGridUserType.Producer).Select(x => x.ProducedPower));
             ConsumedPower = SumWatts(powerConsumers.Select(x => x.ConsumedPower));
 

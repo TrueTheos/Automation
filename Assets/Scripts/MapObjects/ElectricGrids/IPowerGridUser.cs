@@ -27,6 +27,8 @@ namespace MapObjects.ElectricGrids
             
             player.CableBuilder.HandleCableActionFor(this);
         }
+
+        bool IsConsumingPower();
     }
 
     public enum PowerGridUserType

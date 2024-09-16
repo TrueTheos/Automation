@@ -44,5 +44,7 @@ namespace MapObjects.ElectricGrids
 
             //Tu Logika na ewentualne dorzucanie do pieca? drewno żeby była para? coś takiego
         }
+
+        public bool IsConsumingPower() => false;
     }
 }

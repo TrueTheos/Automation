@@ -50,5 +50,7 @@ namespace MapObjects.ElectricGrids
         {
             UIManager.Instance.MultimetrView.OnElectricPoleHover(null);
         }
+
+        public bool IsConsumingPower() => false;
     }
 }
