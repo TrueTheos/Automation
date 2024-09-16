@@ -33,7 +33,8 @@ namespace MapObjects.ElectricGrids
     {
         None, 
         Consumer,
-        Producer
+        Producer,
+        Battery
     }
 
     [Flags]

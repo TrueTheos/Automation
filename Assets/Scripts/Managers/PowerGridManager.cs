@@ -18,6 +18,7 @@ namespace Managers
             // zobaczymy jak wolne to będzie :D ~ theos
             foreach (var powerGrid in PowerGrids) 
             {
+                if (powerGrid == null) continue;
                 powerGrid.UpdatePower();
             }
         }
@@ -35,7 +36,7 @@ namespace Managers
         public PowerGrid CreatePowerGrid(CableBuilder playerCableBuilder)
         {
             var powerGrid = new PowerGrid(playerCableBuilder);
-            //AddPowerGrid(powerGrid);
+            AddPowerGrid(powerGrid);
 
             return powerGrid;
         }

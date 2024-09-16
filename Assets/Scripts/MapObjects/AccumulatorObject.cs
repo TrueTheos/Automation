@@ -41,48 +41,74 @@ namespace Assets.Scripts.MapObjects
 
                 foreach (var grid in _powerGrids)
                 {
-                    //todo dodac ze to co pobierzemy zostanie zabrane z gridu w jakis sposob
                     Watt excessPower = SumWatts(new List<Watt> { grid.ProducedPower, new Watt(grid.ConsumedPower.WattType, -grid.ConsumedPower.Value) });
 
                     if (CompareWatts(excessPower, new Watt(excessPower.WattType, 0)) > 0)
                     {
-                        double remainingCapacity = _capacity.Value - _storedPower.Value;
-
-                        if (remainingCapacity <= 0)
-                        {
-                            break;
-                        }
-
-                        Watt availableCharge = new Watt(_maxChargeRate.WattType,
-                            Math.Min(
-                                ConvertToUnit(excessPower, _maxChargeRate.WattType),
-                                maxChargeThisFrame.Value - totalChargeThisFrame.Value
-                            )
-                        );
-
-                        availableCharge = new Watt(availableCharge.WattType,
-                            Math.Min(
-                                availableCharge.Value,
-                                ConvertToUnit(new Watt(_capacity.WattType, remainingCapacity), availableCharge.WattType)
-                            )
-                        );
-
-                        Watt newStoredPower = SumWatts(new List<Watt> { _storedPower, ConvertWatt(availableCharge, _storedPower.WattType) });
-
-                        _storedPower = new Watt(_capacity.WattType,
-                            Math.Min(ConvertToUnit(newStoredPower, _capacity.WattType), _capacity.Value));
-                        totalChargeThisFrame = SumWatts(new List<Watt> { totalChargeThisFrame, availableCharge });
-
-                        // TODO: Subtract the taken power from the grid
-                        // grid.ProducedPower = SumWatts(new List<Watt> { grid.ProducedPower, new Watt(availableCharge.WattType, -availableCharge.Value) });
-
-                        if (CompareWatts(totalChargeThisFrame, maxChargeThisFrame) >= 0 || CompareWatts(_storedPower, _capacity) >= 0)
-                            break;
+                        ChargeAccumulator(grid, excessPower, maxChargeThisFrame, totalChargeThisFrame);
+                    }
+                    else
+                    {
+                        DischargeAccumulator(grid);
                     }
                 }
 
                 double chargePercentage = ConvertToUnit(_storedPower, _capacity.WattType) / _capacity.Value;
                 UpdateSprite((float)chargePercentage);
+            }
+        }
+
+        private void ChargeAccumulator(PowerGrid grid, Watt excessPower, Watt maxChargeThisFrame, Watt totalChargeThisFrame)
+        {
+            double remainingCapacity = _capacity.Value - _storedPower.Value;
+
+            if (remainingCapacity <= 0)
+            {
+                return;
+            }
+
+            Watt availableCharge = new Watt(_maxChargeRate.WattType,
+                Math.Min(
+                    ConvertToUnit(excessPower, _maxChargeRate.WattType),
+                    maxChargeThisFrame.Value - totalChargeThisFrame.Value
+                )
+            );
+
+            availableCharge = new Watt(availableCharge.WattType,
+                Math.Min(
+                    availableCharge.Value,
+                    ConvertToUnit(new Watt(_capacity.WattType, remainingCapacity), availableCharge.WattType)
+                )
+            );
+
+            Watt newStoredPower = SumWatts(new List<Watt> { _storedPower, ConvertWatt(availableCharge, _storedPower.WattType) });
+
+            _storedPower = new Watt(_capacity.WattType,
+                Math.Min(ConvertToUnit(newStoredPower, _capacity.WattType), _capacity.Value));
+            totalChargeThisFrame = SumWatts(new List<Watt> { totalChargeThisFrame, availableCharge });
+           // if (CompareWatts(totalChargeThisFrame, maxChargeThisFrame) >= 0 || CompareWatts(_storedPower, _capacity) >= 0)
+             //   break;
+        }
+
+        private void DischargeAccumulator(PowerGrid grid)
+        {
+            if (CompareWatts(_storedPower, new Watt(_storedPower.WattType, 0)) > 0)
+            {
+                Watt maxDischargeThisFrame = new Watt(_maxDischargeRate.WattType, _maxDischargeRate.Value * Time.deltaTime);
+                Watt powerDeficit = SumWatts(new List<Watt> { grid.ConsumedPower, new Watt(grid.ProducedPower.WattType, -grid.ProducedPower.Value) });
+
+                Watt dischargeAmount = new Watt(_maxDischargeRate.WattType,
+                    Math.Min(
+                        ConvertToUnit(_storedPower, _maxDischargeRate.WattType),
+                        Math.Min(
+                            ConvertToUnit(powerDeficit, _maxDischargeRate.WattType),
+                            maxDischargeThisFrame.Value
+                        )
+                    )
+                );
+
+                _storedPower = SumWatts(new List<Watt> { _storedPower, new Watt(dischargeAmount.WattType, -dischargeAmount.Value) });
+                grid.AdditionalPower = SumWatts(new List<Watt> { grid.AdditionalPower, dischargeAmount });
             }
         }
 

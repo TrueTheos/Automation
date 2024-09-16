@@ -12,6 +12,7 @@ namespace Assets.Scripts.UI
         public static UIManager Instance;
 
         public FurnaceView FurnaceView;
+        public ElectricFurnaceView ElectricFurnaceView;
         public IronCrateView IronCrateView;
         public MultimetrView MultimetrView;
 

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 159b2f86cd494d349af108cd89750ccd, type: 3}
+  m_Name: ElectricFurnace
+  m_EditorClassIdentifier: 
+  Name: Electric Furnace
+  Icon: {fileID: -551512628, guid: 102c8263366675f43b7ccc8986cc361f, type: 3}
+  MaxStack: 1
+  ItemFlags: 0
+  ItemType: 1
+  Prefab: {fileID: 6045272719439814571, guid: 160fd65789ab2de4d9e01eedc3ed2e4a, type: 3}
+  MaxDurability: 40
+  CanBeRotated: 0
+  PickRandomSprite: 0
+  SpriteRandomVariants: []
+  DefaultDirection: -1
+  DirectionSprites:
+    dictionary: []

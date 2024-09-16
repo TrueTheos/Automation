@@ -23,8 +23,9 @@ namespace Managers
         public event Action<IPowerGridUser, IPowerGridUser> OnDisconnected;
         public event Action OnPowerRecalculationRequired;
 
-        public Watt ProducedPower;
-        public Watt ConsumedPower;
+        public Watt ProducedPower = new(WattType.Watt, 0);
+        public Watt ConsumedPower = new(WattType.Watt, 0);
+        public Watt AdditionalPower = new(WattType.Watt, 0);
 
         public PowerGrid(CableBuilder playerCableBuilder)
         {
@@ -128,16 +129,18 @@ namespace Managers
 
             ProducedPower = availableW;
 
+            Watt totalAvailablePower = SumWatts(new List<Watt> { availableW, AdditionalPower });
+
             float speed = 0;
 
-            if (availableW.Value == 0)
+            if (totalAvailablePower.Value == 0)
             {
                 speed = 0;
             }
-            else if (CompareWatts(ConsumedPower, availableW) > 0) // requiredW is greater than availableW
+            else if (totalAvailablePower.Value > 0 && CompareWatts(ConsumedPower, totalAvailablePower) > 0) // requiredW is greater than availableW
             {
-                WattType highestUnit = GetHighestUnit(availableW.WattType, ConsumedPower.WattType);
-                double availableInHighestUnit = ConvertToUnit(availableW, highestUnit);
+                WattType highestUnit = GetHighestUnit(totalAvailablePower.WattType, ConsumedPower.WattType);
+                double availableInHighestUnit = ConvertToUnit(totalAvailablePower, highestUnit);
                 double requiredInHighestUnit = ConvertToUnit(ConsumedPower, highestUnit);
                 speed = (float)(availableInHighestUnit / requiredInHighestUnit);
             }
@@ -154,7 +157,7 @@ namespace Managers
                 }
             }
 
-            if (availableW.Value > 0)
+            if (totalAvailablePower.Value > 0)
             {
                 foreach (var cable in cables)
                 {
@@ -168,6 +171,16 @@ namespace Managers
                     cable.SetState(PowerState.IsConnected);
                 }
             }
+
+            if(AdditionalPower.Value > 0)
+            {
+                var difference = SumWatts(new List<Watt> { ProducedPower, new(ConsumedPower.WattType, -ConsumedPower.Value) });
+                difference.Value = difference.Value * Time.deltaTime;
+                if (difference.Value < 0)
+                {
+                    AdditionalPower = SumWatts(new List<Watt> { AdditionalPower, difference });
+                }
+            }        
         }
 
         private Action<IPowerGridUser, IPowerGridUser> OnConnected_DrawCable()
@@ -236,6 +249,11 @@ namespace Managers
             
             otherGrid.PowerGridConnections.Clear();
             otherGrid.Cables.Clear();
+        }
+
+        public bool HasEnoughPower(IPowerGridUser user)
+        {
+            return CompareWatts(user.ConsumedPower, ProducedPower) >= 0;
         }
     }
     
