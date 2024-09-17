@@ -367,7 +367,7 @@ namespace Assets.Scripts.MapObjects
             if (Item != null)
             {
                 Item itemToReturn = Item.ItemData;
-                Destroy(Item.gameObject);
+                DestroyImmediate(Item.gameObject);
                 Item = null;
                 return itemToReturn;
             }

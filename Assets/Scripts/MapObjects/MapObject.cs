@@ -79,8 +79,12 @@ namespace Assets.Scripts.MapObjects
             foreach (Vector2Int pos in GetOccupiedPositions(X, Y))
             {
                 Chunk chunk = MapGenerator.Instance.GetChunk(pos.x, pos.y);
-                chunk.SpawnObject(this);
+                chunk.SpawnObjectPart(this, pos.x, pos.y);
             }
+
+            Chunk originChunk = MapGenerator.Instance.GetChunk(X, Y);
+            if (this is OreObject) originChunk.OresCount++;
+            else if (this is TreeObject) originChunk.TreesCount++;
 
             _gameManager = GameManager.Instance;
 

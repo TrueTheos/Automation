@@ -22,6 +22,10 @@ namespace Assets.Scripts.MapObjects
         private void Awake()
         {
             _items = new ItemAmount[SlotsCount];
+            for (int i = 0; i < SlotsCount; i++)
+            {
+                _items[i] = new(null, 0);
+            }
         }
 
         private void Start()
@@ -37,7 +41,12 @@ namespace Assets.Scripts.MapObjects
 
         public bool CanReceive(ItemObject item)
         {
-            return Items.Any(x => x.Item == null || x.Amount + item.Amount < x.Item.MaxStack);
+            foreach (var slot in Items)
+            {
+                if (slot.Item == null) return true;
+                else if (slot.Item == item.ItemData && slot.Amount + item.Amount < slot.Item.MaxStack) return true;
+            }
+            return false;
         }
 
         public Item GetOutputData()
@@ -58,7 +67,7 @@ namespace Assets.Scripts.MapObjects
             {
                 if(toAdd <= 0)
                 {
-                    return;
+                    break;
                 }
 
                 if (_items[i].Item == null || _items[i].Item == incomingItem.ItemData)

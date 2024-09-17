@@ -364,7 +364,7 @@ namespace Assets.Scripts
     }
 
     [Serializable]
-    public struct ItemAmount
+    public class ItemAmount
     {
         public Item Item;
         public int Amount;

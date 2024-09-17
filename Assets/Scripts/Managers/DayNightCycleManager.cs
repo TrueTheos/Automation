@@ -52,7 +52,7 @@ namespace Assets.Scripts.Managers
                 if (!_stopTime)
                 {
                     _currentTime += TimeSpan.FromMinutes(1);
-                    _light.color = _gradient.Evaluate(PercentOfDay(_currentTime));
+                    _light.color = _gradient.Evaluate(PercentOfDay());
 
                     _currentHour = _currentTime.Hours;
                     _currentMinute = _currentTime.Minutes;
@@ -82,9 +82,9 @@ namespace Assets.Scripts.Managers
             }
         }
 
-        private float PercentOfDay(TimeSpan timeSpan)
+        public float PercentOfDay()
         {
-            return (float)timeSpan.TotalMinutes % MinutesInDay / MinutesInDay;
+            return (float)_currentTime.TotalMinutes % MinutesInDay / MinutesInDay;
         }
 
         public void AddScheduledEvent(ScheduledEvent schedule)

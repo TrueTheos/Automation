@@ -15,19 +15,13 @@ namespace Assets.Scripts.MapObjects
     [RequireComponent(typeof(BoxCollider2D))]
     public class DrillObject : MapObject, IItemReceiver, IRightClick, IPowerGridUser
     {
-        public int InputCapacity;
-        public int OutputCapacity;
-        public float SmeltDuration;
+        [SerializeField] private ParticleSystem _particleSystem;
+        [SerializeField] private Animator _animator;
+        [SerializeField] private RandomDropTable _dropTable;
 
-        public ParticleSystem ParticleSystem;
-        public Animator Animator;
-
-        private ItemAmount _inputItem;
-        private ItemAmount _outputItem;
-
-        private ElectricFurnaceView _furnaceView;
-
-        private float _cooldown;
+        [SerializeField] private float _cooldown;
+        private float _currentCooldown;
+        private Item _currentItem;
 
         public PowerGrid PowerGrid { get; set; }
         [SerializeField] private Transform _connectionPoint;
@@ -58,13 +52,21 @@ namespace Assets.Scripts.MapObjects
         {
             if(!CanDrill() || Speed <= 0)
             {
-                Animator.SetBool("isDrilling", false);
-                ParticleSystem.gameObject.SetActive(false);
+                _animator.SetBool("isDrilling", false);
+                _particleSystem.gameObject.SetActive(false);
                 return;
             }
 
-            Animator.SetBool("isDrilling", true);
-            ParticleSystem.gameObject.SetActive(true);
+            _animator.SetBool("isDrilling", true);
+            _particleSystem.gameObject.SetActive(true);
+
+            _currentCooldown += Time.deltaTime;
+
+            if (_currentCooldown >= _cooldown)
+            {
+                _currentCooldown = 0;
+                _currentItem = _dropTable.GetRandomDrop().Item;
+            }
         }
 
         //niezły check xd
@@ -101,7 +103,7 @@ namespace Assets.Scripts.MapObjects
 
         public Item TakeOutItem()
         {
-            return null; //todo
+            return _currentItem;
         }
     }
 }

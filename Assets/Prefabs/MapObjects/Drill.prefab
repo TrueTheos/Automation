@@ -99,11 +99,23 @@ MonoBehaviour:
   SpriteRend: {fileID: 1914557770821813768}
   MapItem: {fileID: 11400000, guid: 312a89a45d7b6af44a9c060a812e06d8, type: 2}
   Speed: 1
-  InputCapacity: 0
-  OutputCapacity: 0
-  SmeltDuration: 0
-  ParticleSystem: {fileID: 7196306910549555457}
-  Animator: {fileID: 5102596293785397082}
+  _particleSystem: {fileID: 7196306910549555457}
+  _animator: {fileID: 5102596293785397082}
+  _dropTable:
+    Table:
+    - ItemAmount:
+        Item: {fileID: 11400000, guid: d4c4a6cd452f2f143ad6550c215baea3, type: 2}
+        Amount: 1
+      Probability: 0.3
+    - ItemAmount:
+        Item: {fileID: 11400000, guid: 9d0edea45af0ba74ba6dd03f2af77b70, type: 2}
+        Amount: 1
+      Probability: 0.2
+    - ItemAmount:
+        Item: {fileID: 11400000, guid: a546707c34a43744e81c3cb64cd3ba50, type: 2}
+        Amount: 1
+      Probability: 0.5
+  _cooldown: 0.5
   _connectionPoint: {fileID: 5031934179322633710}
   _consumedPower:
     WattType: 1

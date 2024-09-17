@@ -281,11 +281,26 @@ public class Chunk
         return _tiles[x - WorldX, y - WorldY];
     }
 
-    public void SpawnObject(MapObject obj)
+    public void SpawnObjectPart(MapObject obj, int x, int y)
     {
-        if (obj is OreObject) OresCount++;
-        else if (obj is TreeObject) TreesCount++;
-        Objects[obj.X - WorldX, obj.Y - WorldY] = obj;
+        int localX = x - WorldX;
+        int localY = y - WorldY;
+
+        if (localX >= 0 && localX < _chunkSize && localY >= 0 && localY < _chunkSize)
+        {
+            Objects[localX, localY] = obj;
+        }
+    }
+
+    public void DestroyObjectPart(int x, int y)
+    {
+        int localX = x - WorldX;
+        int localY = y - WorldY;
+
+        if (localX >= 0 && localX < _chunkSize && localY >= 0 && localY < _chunkSize)
+        {
+            Objects[localX, localY] = null;
+        }
     }
 
     public MapObject GetObjectAtPos(int x, int y)
@@ -295,9 +310,13 @@ public class Chunk
 
     public void DestroyObject(MapObject obj)
     {
-        if(obj is OreObject) OresCount--;
+        foreach (Vector2Int pos in obj.GetOccupiedPositions(obj.X, obj.Y))
+        {
+            DestroyObjectPart(pos.x, pos.y);
+        }
+
+        if (obj is OreObject) OresCount--;
         else if (obj is TreeObject) TreesCount--;
-        Objects[obj.X - WorldX, obj.Y - WorldY] = null;
     }
 
     public Vector2Int GetFreeSpace(TileType tileType = TileType.NONE)
