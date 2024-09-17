@@ -53,6 +53,18 @@ namespace Assets.Scripts.MapObjects
                     new(x, y),
                     new(x, y + 1)
                 };
+                case ObjectSize._3x3:
+                    return new Vector2Int[] {
+                    new(x, y),
+                    new(x + 1, y),
+                    new(x, y + 1),
+                    new(x + 1, y + 1),
+                    new(x + 2, y),
+                    new(x + 2, y + 2),
+                    new(x, y + 2),
+                    new(x + 2, y + 1),
+                    new(x + 1, y + 2),
+                };
                 default:
                     return new Vector2Int[] { new(x, y) };
             }
@@ -142,6 +154,7 @@ namespace Assets.Scripts.MapObjects
         _1x1,
         _2x2,
         _2x1,
-        _1x2
+        _1x2,
+        _3x3
     }
 }

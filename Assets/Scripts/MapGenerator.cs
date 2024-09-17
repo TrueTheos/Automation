@@ -24,7 +24,9 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private Tilemap Layer1Tilemap;
 
     [SerializeField] private Tile GreenTile;
+    public Color GreenTileColor;
     [SerializeField] private Tile StoneTile;
+    public Color StoneTileColor;
     [SerializeField] private RuleTile WaterTile;
     [SerializeField] private List<Tile> GrassTiles;
     [SerializeField][Range(0f, 100f)] private float GrassSpawnChance;
@@ -41,14 +43,15 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private TreeObject TreeObject;
     [SerializeField] private AnimationCurve SpawnProbability; // by number of ores
     public List<OreObject> Ores;
-    private Chunk[,] Chunks;
+    private Chunk[,] _chunks;
+    public Chunk[,] Chunks { get => _chunks; }
 
     [SerializeField] private MapManager _mapManager;
 
     private void Awake()
     {
         Instance = this;
-        Chunks = new Chunk[Mathf.CeilToInt((float)_mapManager.Width / CHUNK_SIZE), Mathf.CeilToInt((float)_mapManager.Height / CHUNK_SIZE)];
+        _chunks = new Chunk[Mathf.CeilToInt((float)_mapManager.Width / CHUNK_SIZE), Mathf.CeilToInt((float)_mapManager.Height / CHUNK_SIZE)];
     }
 
     public void Generate()
@@ -58,17 +61,17 @@ public class MapGenerator : MonoBehaviour
         Layer0Tilemap.ClearAllTiles();
         Layer1Tilemap.ClearAllTiles();
 
-        for (int xChunk = 0; xChunk < Chunks.GetLength(0); xChunk++)
+        for (int xChunk = 0; xChunk < _chunks.GetLength(0); xChunk++)
         {
-            for (int yChunk = 0; yChunk < Chunks.GetLength(1); yChunk++)
+            for (int yChunk = 0; yChunk < _chunks.GetLength(1); yChunk++)
             {
-                Chunks[xChunk, yChunk] = new Chunk(xChunk, yChunk, CHUNK_SIZE);
+                _chunks[xChunk, yChunk] = new Chunk(xChunk, yChunk, CHUNK_SIZE);
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
                     for (int y = 0; y < CHUNK_SIZE; y++)
                     {
                         Layer0Tilemap.SetTile(new Vector3Int(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, 0), GreenTile);
-                        Chunks[xChunk, yChunk].SetTile(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, TileType.GRASS);
+                        _chunks[xChunk, yChunk].SetTile(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, TileType.GRASS);
                     }
                 }           
             }
@@ -78,6 +81,8 @@ public class MapGenerator : MonoBehaviour
         GenerateWater();
         StartCoroutine(GenerateOres());
         StartCoroutine(GenerateTrees());
+
+        //_mapManager.GenerateBlendTexture();
     }
 
     private void GenerateStoneBiome()
@@ -135,7 +140,7 @@ public class MapGenerator : MonoBehaviour
 
     public Chunk GetChunk(int x, int y)
     {       
-        return Chunks[x / CHUNK_SIZE, y / CHUNK_SIZE];
+        return _chunks[x / CHUNK_SIZE, y / CHUNK_SIZE];
     }
 
     public MapObject GetObjectAtPos(int x, int y)
@@ -148,6 +153,19 @@ public class MapGenerator : MonoBehaviour
         return GetChunk(x, y).GetType(x, y);
     }
 
+    public Color GetTileColor(int x, int y)
+    {
+        switch (GetTileTypeAtPos(x, y))
+        {
+            case TileType.GRASS:
+                return GreenTileColor;
+            case TileType.STONE:
+                return StoneTileColor;
+            default:
+                return new Color(0, 0, 0, 0);
+        }
+    }
+
     public IEnumerator GenerateOres()
     {
         if (Ores == null || Ores.Count == 0) yield break;
@@ -156,11 +174,11 @@ public class MapGenerator : MonoBehaviour
         {
             yield return new WaitForSeconds(OreGenerateTickInterval);
 
-            for (int x = 0; x < Chunks.GetLength(0); x++)
+            for (int x = 0; x < _chunks.GetLength(0); x++)
             {
-                for (int y = 0; y < Chunks.GetLength(1); y++)
+                for (int y = 0; y < _chunks.GetLength(1); y++)
                 {
-                    Chunk chunk = Chunks[x, y];
+                    Chunk chunk = _chunks[x, y];
                     if (chunk.OresCount >= MaximumOres || chunk.OresCount >= chunk.TilesCount[TileType.STONE]) continue;
                     float spawnChance = Random.Range(0f, 1f);
                     if(spawnChance <= SpawnProbability.Evaluate(chunk.OresCount / MaximumOres))
@@ -188,11 +206,11 @@ public class MapGenerator : MonoBehaviour
         {
             yield return new WaitForSeconds(TreeGenerateTickInterval);
 
-            for (int x = 0; x < Chunks.GetLength(0); x++)
+            for (int x = 0; x < _chunks.GetLength(0); x++)
             {
-                for (int y = 0; y < Chunks.GetLength(1); y++)
+                for (int y = 0; y < _chunks.GetLength(1); y++)
                 {
-                    Chunk chunk = Chunks[x, y];
+                    Chunk chunk = _chunks[x, y];
                     if (chunk.TreesCount >= MaximumTrees || chunk.TreesCount >= chunk.TilesCount[TileType.GRASS]) continue;
                     float spawnChance = Random.Range(0f, 1f);
                     if (spawnChance <= SpawnProbability.Evaluate(chunk.TreesCount / MaximumTrees))

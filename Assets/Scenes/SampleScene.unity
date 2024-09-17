@@ -1614,6 +1614,7 @@ GameObject:
   - component: {fileID: 674382115}
   - component: {fileID: 674382117}
   - component: {fileID: 674382116}
+  - component: {fileID: 674382118}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -1651,6 +1652,8 @@ MonoBehaviour:
   ItemObject: {fileID: 6101335976905877904, guid: f934d3ce3024cd44f858c46b40b05e21, type: 3}
   Width: 100
   Height: 100
+  _blendSpriteRend: {fileID: 674382118}
+  _blendMaterial: {fileID: 2100000, guid: b708cdbcd809f6245a738b0348446783, type: 2}
 --- !u!114 &674382117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1669,7 +1672,9 @@ MonoBehaviour:
   Layer0Tilemap: {fileID: 808021709}
   Layer1Tilemap: {fileID: 1589493627}
   GreenTile: {fileID: 11400000, guid: 5f80896d88d636244a22e3d30b9dbaef, type: 2}
+  GreenTileColor: {r: 0.38823533, g: 0.67058825, b: 0.24705884, a: 1}
   StoneTile: {fileID: 11400000, guid: 937e2af75d6c070419413609692c3cb2, type: 2}
+  StoneTileColor: {r: 0.5803922, g: 0.47450984, b: 0.47450984, a: 1}
   WaterTile: {fileID: 11400000, guid: c0c4399b4beaeab4e83a624548d98255, type: 2}
   GrassTiles:
   - {fileID: 11400000, guid: a965bc2a80b926d4facb1457f1a2ef79, type: 2}
@@ -1755,6 +1760,58 @@ MonoBehaviour:
   - {fileID: 129681216205148547, guid: 25fdac0e9799a4745858f4d19fd5cd8b, type: 3}
   - {fileID: 5636715138489654252, guid: ae8792dd5b9595c48ad13ae00cbc4dc7, type: 3}
   _mapManager: {fileID: 674382116}
+--- !u!212 &674382118
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674382114}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 0
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
 --- !u!1 &788184167
 GameObject:
   m_ObjectHideFlags: 0
