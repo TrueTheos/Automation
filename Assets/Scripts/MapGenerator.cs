@@ -20,16 +20,20 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private float NoiseScale;
     [SerializeField] private float WaterNoiseScale;
 
-    [SerializeField] private Tilemap Layer0Tilemap;
-    [SerializeField] private Tilemap Layer1Tilemap;
+    [SerializeField] private Tilemap BaseTilemap;
+    [SerializeField] private Tilemap DualTileTilemap;
+    [SerializeField] private Tilemap DetailsTilemap;
+    [SerializeField] private Tilemap WaterTilemap;
+    [SerializeField] private Tilemap SandTilemap;
+    [SerializeField] private Tilemap WaterShadowTilemap;
 
     [SerializeField] private Tile GreenTile;
-    public Color GreenTileColor;
     [SerializeField] private Tile StoneTile;
-    public Color StoneTileColor;
-    [SerializeField] private RuleTile WaterTile;
-    [SerializeField] private List<Tile> GrassTiles;
-    [SerializeField][Range(0f, 100f)] private float GrassSpawnChance;
+    [SerializeField] private RuleTile AnimatedWaterTile;
+    [SerializeField] private RuleTile PlainWaterTile;
+    [SerializeField] private RuleTile StaticWaterTile;
+    [SerializeField] private List<Tile> GrassBladeTiles;
+    [SerializeField][Range(0f, 100f)] private float GrassBladeSpawnChance;
 
     [SerializeField] private float StoneBiomeThreshold;
     [SerializeField] private float WaterThreshold;
@@ -48,6 +52,30 @@ public class MapGenerator : MonoBehaviour
 
     [SerializeField] private MapManager _mapManager;
 
+    [SerializeField] private Texture2D _dualTileAtlas;
+
+    readonly List<Vector2Int> NEIGHBOURS = new() { new(0, 0), new(1, 0), new(0, 1), new(1, 1) };
+
+    readonly Dictionary<(TileType, TileType, TileType, TileType), Vector2Int> _neighboursToAtlasCoors = new()
+    {
+        {new (TileType.GRASS, TileType.GRASS, TileType.GRASS, TileType.GRASS), new Vector2Int(2,2) },
+        {new (TileType.NONE, TileType.NONE, TileType.NONE, TileType.GRASS), new Vector2Int(1,0) },
+        {new (TileType.NONE, TileType.NONE, TileType.GRASS, TileType.NONE), new Vector2Int(0,3) },
+        {new (TileType.NONE, TileType.GRASS, TileType.NONE, TileType.NONE), new Vector2Int(0,1) },
+        {new (TileType.GRASS, TileType.NONE, TileType.NONE, TileType.NONE), new Vector2Int(3,0) },
+        {new (TileType.NONE, TileType.GRASS, TileType.NONE, TileType.GRASS), new Vector2Int(1,3) },
+        {new (TileType.GRASS, TileType.NONE, TileType.GRASS, TileType.NONE), new Vector2Int(3,1) },
+        {new (TileType.NONE, TileType.NONE, TileType.GRASS, TileType.GRASS), new Vector2Int(3,3) },
+        {new (TileType.GRASS, TileType.GRASS, TileType.NONE, TileType.NONE), new Vector2Int(1,1) },
+        {new (TileType.NONE, TileType.GRASS, TileType.GRASS, TileType.GRASS), new Vector2Int(1,2) },
+        {new (TileType.GRASS, TileType.NONE, TileType.GRASS, TileType.GRASS), new Vector2Int(2,3) },
+        {new (TileType.GRASS, TileType.GRASS, TileType.NONE, TileType.GRASS), new Vector2Int(2,1) },
+        {new (TileType.GRASS, TileType.GRASS, TileType.GRASS, TileType.NONE), new Vector2Int(3,2) },
+        {new (TileType.NONE, TileType.GRASS, TileType.GRASS, TileType.NONE), new Vector2Int(2,0) },
+        {new (TileType.GRASS, TileType.NONE, TileType.NONE, TileType.GRASS), new Vector2Int(0,2) },
+        {new (TileType.NONE, TileType.NONE, TileType.NONE, TileType.NONE), new Vector2Int(0,0) },
+    };
+
     private void Awake()
     {
         Instance = this;
@@ -58,8 +86,8 @@ public class MapGenerator : MonoBehaviour
     {
         Random.InitState(Seed);
 
-        Layer0Tilemap.ClearAllTiles();
-        Layer1Tilemap.ClearAllTiles();
+        BaseTilemap.ClearAllTiles();
+        DetailsTilemap.ClearAllTiles();
 
         for (int xChunk = 0; xChunk < _chunks.GetLength(0); xChunk++)
         {
@@ -70,7 +98,7 @@ public class MapGenerator : MonoBehaviour
                 {
                     for (int y = 0; y < CHUNK_SIZE; y++)
                     {
-                        Layer0Tilemap.SetTile(new Vector3Int(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, 0), GreenTile);
+                        BaseTilemap.SetTile(new Vector3Int(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, 0), GreenTile);
                         _chunks[xChunk, yChunk].SetTile(x + CHUNK_SIZE * xChunk, y + CHUNK_SIZE * yChunk, TileType.GRASS);
                     }
                 }           
@@ -81,8 +109,57 @@ public class MapGenerator : MonoBehaviour
         GenerateWater();
         StartCoroutine(GenerateOres());
         StartCoroutine(GenerateTrees());
-
+        GenerateDualTileTilemap();
         //_mapManager.GenerateBlendTexture();
+    }
+
+    private Vector2Int CalculateDualTile(Vector2Int coords)
+    {
+        TileType botRight = GetTileTypeAtPos(coords + new Vector2Int(1,0)) == TileType.GRASS ? TileType.GRASS : TileType.NONE;
+        TileType botLeft = GetTileTypeAtPos(coords + new Vector2Int(0, 0)) == TileType.GRASS ? TileType.GRASS : TileType.NONE;
+        TileType topRight = GetTileTypeAtPos(coords + new Vector2Int(1, 1)) == TileType.GRASS ? TileType.GRASS : TileType.NONE;
+        TileType topLeft = GetTileTypeAtPos(coords + new Vector2Int(0, 1)) == TileType.GRASS ? TileType.GRASS : TileType.NONE;
+
+        var key = (topLeft, topRight, botLeft, botRight);
+
+        if (_neighboursToAtlasCoors.TryGetValue(key, out Vector2Int result))
+        {
+            return result;
+        }
+        else
+        {
+            return new Vector2Int(0,0);
+        }
+    }
+
+    private void GenerateDualTileTilemap()
+    {
+        DualTileTilemap.ClearAllTiles();
+        for (int x = 0; x < _mapManager.Width; x++)
+        {
+            for (int y = 0; y < _mapManager.Height; y++)
+            {
+                for (int i = 0; i < NEIGHBOURS.Count; i++)
+                {
+                    Vector2Int newPos = new Vector2Int(x, y) - NEIGHBOURS[i];
+                    Vector2Int tilePos = CalculateDualTile(newPos);
+                    int pixelX = tilePos.x * 16;
+                    int pixelY = tilePos.y * 16;
+
+                    // Create a rectangle for the sprite
+                    Rect spriteRect = new Rect(pixelX, pixelY, 16, 16);
+
+                    // Create the sprite
+                    Sprite sprite = Sprite.Create(_dualTileAtlas, spriteRect, new Vector2(.5f, .5f), 16);
+
+                    // Create and return a new tile with this sprite
+                    Tile tile = ScriptableObject.CreateInstance<Tile>();
+                    tile.sprite = sprite;
+                    DualTileTilemap.SetTile(new Vector3Int(newPos.x, newPos.y, 0), tile);
+                }
+               
+            }
+        }
     }
 
     private void GenerateStoneBiome()
@@ -101,14 +178,14 @@ public class MapGenerator : MonoBehaviour
                 {
                     Chunk currentChunk = GetChunk(x, y);
                     currentChunk.SetTile(x, y, TileType.STONE);
-                    Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), StoneTile);
+                    BaseTilemap.SetTile(new Vector3Int(x, y, 0), StoneTile);
                 }
                 else
                 {
                     float r = Random.Range(0, 100f);
-                    if(r <= GrassSpawnChance)
+                    if(r <= GrassBladeSpawnChance)
                     {
-                        Layer1Tilemap.SetTile(new Vector3Int(x, y, 0), GrassTiles.GetRandom());
+                        DetailsTilemap.SetTile(new Vector3Int(x, y, 0), GrassBladeTiles.GetRandom());
                     }
                 }
             }
@@ -131,8 +208,10 @@ public class MapGenerator : MonoBehaviour
                 {
                     Chunk currentChunk = GetChunk(x, y);
                     currentChunk.SetTile(x, y, TileType.WATER);
-                    Layer0Tilemap.SetTile(new Vector3Int(x, y, 0), WaterTile);
-                    Layer1Tilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    WaterTilemap.SetTile(new Vector3Int(x, y, 0), StaticWaterTile);
+                    DetailsTilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    //SandTilemap.SetTile(new Vector3Int(x, y, 0), StaticWaterTile);
+                    //WaterShadowTilemap.SetTile(new Vector3Int(x, y, 0), PlainWaterTile);
                 }
             }
         }
@@ -148,22 +227,18 @@ public class MapGenerator : MonoBehaviour
         return GetChunk(x, y).GetObjectAtPos(x,y);
     }
 
-    public TileType GetTileTypeAtPos(int x, int y)
+    public TileType GetTileTypeAtPos(Vector2Int pos)
     {
-        return GetChunk(x, y).GetType(x, y);
+        return GetTileTypeAtPos(pos.x, pos.y);
     }
 
-    public Color GetTileColor(int x, int y)
+    public TileType GetTileTypeAtPos(int x, int y)
     {
-        switch (GetTileTypeAtPos(x, y))
+        if (x < 0 || x >= _mapManager.Width || y < 0 || y >= _mapManager.Height)
         {
-            case TileType.GRASS:
-                return GreenTileColor;
-            case TileType.STONE:
-                return StoneTileColor;
-            default:
-                return new Color(0, 0, 0, 0);
+            return TileType.NONE;
         }
+        return GetChunk(x, y).GetType(x, y);
     }
 
     public IEnumerator GenerateOres()

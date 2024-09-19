@@ -103,7 +103,9 @@ namespace Assets.Scripts.MapObjects
 
         public Item TakeOutItem()
         {
-            return _currentItem;
+            var ret = Instantiate(_currentItem);
+            _currentItem = null;
+            return ret;
         }
     }
 }
