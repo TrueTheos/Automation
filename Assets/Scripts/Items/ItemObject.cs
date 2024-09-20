@@ -13,7 +13,7 @@ namespace Assets.Scripts.Items
 
         private Vector3 _startPos;
 
-        public enum ItemState { OnBelt, OnGround}
+        public enum ItemState { OnBelt, OnGround, PulledToPlayer}
         private ItemState _state;
         public ItemState State
         {
@@ -36,8 +36,8 @@ namespace Assets.Scripts.Items
                 if(_state != ItemState.OnGround)
                 {
                     _shadow.SetActive(true);
-                    transform.DOMoveY(_startPos.y + .5f, 2)
-                        .SetEase(Ease.InOutQuad)
+                    transform.DOMoveY(_startPos.y + .3f, 2)
+                        .SetEase(Ease.InOutSine)
                         .SetLoops(-1, LoopType.Yoyo);
                 }
             }
@@ -45,7 +45,7 @@ namespace Assets.Scripts.Items
             {
                 if(_state == ItemState.OnGround)
                 {
-                    _shadow.SetActive(false);
+                    if(newState == ItemState.OnBelt) _shadow.SetActive(false);
                     DOTween.Kill(transform);
                 }
             }

@@ -187,12 +187,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void PickupItems()
     {
-        List<ItemObject> items = Physics2D.OverlapCircleAll(transform.position, AttractionRange, PickupLayer).Select(x => x.GetComponent<ItemObject>()).ToList();
+        List<ItemObject> items = Physics2D.OverlapCircleAll(transform.position, AttractionRange, PickupLayer).Select(x => x.GetComponent<ItemObject>()).Where(x => x != null).ToList();
         foreach (var item in items)
         {
             float distanceToPlayer = Vector2.Distance(item.transform.position, transform.position);
             if (distanceToPlayer <= AttractionRange && distanceToPlayer > PickupRange)
             {
+                if(item.State != ItemObject.ItemState.PulledToPlayer)
+                {
+                    item.State = ItemObject.ItemState.PulledToPlayer;
+                }
+
                 Vector2 direction = (transform.position - item.transform.position).normalized;
                 float currentSpeed = Mathf.Lerp(0f, MaxAttractionSpeed, (AttractionRange - distanceToPlayer) / AttractionRange);
 
@@ -200,6 +205,11 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
+                if(item.State == ItemObject.ItemState.PulledToPlayer)
+                {
+                    item.State = ItemObject.ItemState.OnGround;
+                }
+
                 if (distanceToPlayer <= PickupRange)
                 {
                     _inventory.PickupItem(item);
