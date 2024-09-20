@@ -25,7 +25,8 @@ namespace Assets.Scripts.MapObjects
                 MapManager.Instance.SpawnItem(Drop,
                     transform.position.x + randomXOffset,
                     transform.position.y + randomYOffset,
-                    Random.Range(DropCountRange.x, DropCountRange.y));
+                    Random.Range(DropCountRange.x, DropCountRange.y),
+                    ItemObject.ItemState.OnGround);
             }
             base.Break();
         }

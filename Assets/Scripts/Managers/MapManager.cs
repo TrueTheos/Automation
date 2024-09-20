@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TreeEditor;
 using UnityEngine;
+using static Assets.Scripts.Items.ItemObject;
 using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.Managers
@@ -49,10 +50,10 @@ namespace Assets.Scripts.Managers
             return chunk.IsFreeWorldPos(x, y);
         }
 
-        public ItemObject SpawnItem(Item item, float x, float y, int count)
+        public ItemObject SpawnItem(Item item, float x, float y, int count, ItemState state)
         {
             ItemObject itemObj = Instantiate(ItemObject, new Vector3(x, y, 0), Quaternion.identity);
-            itemObj.Init(item, count);
+            itemObj.Init(item, count, state);
             return itemObj;
         }
     }

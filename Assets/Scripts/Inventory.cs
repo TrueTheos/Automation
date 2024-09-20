@@ -270,7 +270,8 @@ namespace Assets.Scripts
                 MapManager.Instance.SpawnItem(item.GetItem(), 
                     transform.position.x, 
                     transform.position.y, 
-                    leftOver);
+                    leftOver,
+                    ItemObject.ItemState.OnGround);
             }
         }
 
@@ -283,7 +284,8 @@ namespace Assets.Scripts
                 MapManager.Instance.SpawnItem(itemObj.ItemData, 
                     itemObj.transform.position.x, 
                     itemObj.transform.position.y, 
-                    leftOver);
+                    leftOver,
+                    ItemObject.ItemState.OnGround);
             }
 
             Destroy(itemObj.gameObject);

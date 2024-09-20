@@ -89,7 +89,7 @@ namespace Assets.Scripts.MapObjects
                 Item output = Parent.TakeOutItem();
                 if (output != null)
                 {
-                    ReceiveItem(MapManager.Instance.SpawnItem(output, transform.position.x, transform.position.y, 1));
+                    ReceiveItem(MapManager.Instance.SpawnItem(output, transform.position.x, transform.position.y, 1, ItemObject.ItemState.OnBelt));
                 }
             }
         }
@@ -164,7 +164,7 @@ namespace Assets.Scripts.MapObjects
         {
             if (CanReceive(null))
             {
-                ItemObject newItemObject = MapManager.Instance.SpawnItem(item, transform.position.x, transform.position.y, 1);
+                ItemObject newItemObject = MapManager.Instance.SpawnItem(item, transform.position.x, transform.position.y, 1, ItemObject.ItemState.OnBelt);
                 ReceiveItem(newItemObject);
             }
         }
