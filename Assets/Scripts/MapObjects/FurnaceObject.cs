@@ -10,7 +10,6 @@ using Item = Assets.Scripts.Items.Item;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class FurnaceObject : MapObject, IItemReceiver, IRightClick
     {
         public int InputCapacity;

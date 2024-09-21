@@ -12,7 +12,6 @@ using static Assets.Scripts.WattsUtils;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class ElectricFuranceObject : MapObject, IItemReceiver, IRightClick, IPowerGridUser
     {
         public int InputCapacity;

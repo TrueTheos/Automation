@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 277319133236302021}
   - component: {fileID: 7631471799708160134}
-  - component: {fileID: 7887301937895446529}
   - component: {fileID: 5636715138489654252}
+  - component: {fileID: 1268029974843635144}
   m_Layer: 0
   m_Name: Coper
   m_TagString: Untagged
@@ -86,8 +86,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &7887301937895446529
-BoxCollider2D:
+--- !u!114 &5636715138489654252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559852179404410944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4518c79a9fb92ab4184ed2651b3a810f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Direction: 0
+  Size: 0
+  SpriteRend: {fileID: 7631471799708160134}
+  MapItem: {fileID: 11400000, guid: fe1bd418bb37eda4b89001a1080cda1b, type: 2}
+  Speed: 1
+  Drop: {fileID: 11400000, guid: 9d0edea45af0ba74ba6dd03f2af77b70, type: 2}
+  DropCountRange: {x: 5, y: 15}
+  SpawnTileType: 2
+--- !u!58 &1268029974843635144
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -119,34 +139,5 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!114 &5636715138489654252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 559852179404410944}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4518c79a9fb92ab4184ed2651b3a810f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Direction: 0
-  Size: 0
-  SpriteRend: {fileID: 7631471799708160134}
-  MapItem: {fileID: 11400000, guid: fe1bd418bb37eda4b89001a1080cda1b, type: 2}
-  Drop: {fileID: 11400000, guid: 9d0edea45af0ba74ba6dd03f2af77b70, type: 2}
-  DropCountRange: {x: 5, y: 15}
-  SpawnTileType: 2
+  m_Radius: 0.4

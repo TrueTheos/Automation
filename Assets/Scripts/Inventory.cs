@@ -138,7 +138,7 @@ namespace Assets.Scripts
             }
             
             _selectedCraftingOption = craft;
-            _selectedCraftingOption.Highlight(SelectedCraftColor);
+            _selectedCraftingOption.Highlight();
 
             float selectedChildPos = _selectedCraftingOption.Rect.position.y;
             float target = _craftingOptionsTargetPos - selectedChildPos - _selectedCraftingOption.Rect.rect.height;

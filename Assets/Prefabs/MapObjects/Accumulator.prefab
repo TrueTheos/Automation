@@ -94,8 +94,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1093538129871084185}
   - component: {fileID: 1237495475513103536}
-  - component: {fileID: 8282002230965125808}
   - component: {fileID: 6866019410470086155}
+  - component: {fileID: 6728098443650804475}
   m_Layer: 0
   m_Name: Accumulator
   m_TagString: Untagged
@@ -171,7 +171,45 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &8282002230965125808
+--- !u!114 &6866019410470086155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2923760077965522388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b55e47aa43bb5234aabdbefa81cffbdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Direction: 0
+  Size: 0
+  SpriteRend: {fileID: 1237495475513103536}
+  MapItem: {fileID: 11400000, guid: ac0616f785468c148a938b65e876e8bc, type: 2}
+  Speed: 1
+  _range: 7
+  _capacity:
+    WattType: 2
+    Value: 1
+  _maxChargeRate:
+    WattType: 1
+    Value: 100
+  _maxDischargeRate:
+    WattType: 1
+    Value: 100
+  _rangeHighlight: {fileID: 1376128050967716726}
+  _chargeSprites:
+  - {fileID: -1669018724, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -854307036, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -74649386, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1025458696, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1796893599, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -900149323, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1626101767, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: 1577379164, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+  - {fileID: -1922606184, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
+--- !u!61 &6728098443650804475
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -216,41 +254,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &6866019410470086155
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2923760077965522388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b55e47aa43bb5234aabdbefa81cffbdb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Direction: 0
-  Size: 0
-  SpriteRend: {fileID: 1237495475513103536}
-  MapItem: {fileID: 11400000, guid: ac0616f785468c148a938b65e876e8bc, type: 2}
-  Speed: 1
-  _range: 7
-  _capacity:
-    WattType: 2
-    Value: 1
-  _maxChargeRate:
-    WattType: 1
-    Value: 100
-  _maxDischargeRate:
-    WattType: 1
-    Value: 100
-  _rangeHighlight: {fileID: 1376128050967716726}
-  _chargeSprites:
-  - {fileID: -1669018724, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: -854307036, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: -74649386, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: 1025458696, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: 1796893599, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: -900149323, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: 1626101767, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: 1577379164, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  - {fileID: -1922606184, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}

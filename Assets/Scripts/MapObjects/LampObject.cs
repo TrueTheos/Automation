@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class LampObject : MapObject
     {
         [SerializeField] private ParticleSystem _particle;

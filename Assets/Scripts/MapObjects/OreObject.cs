@@ -10,7 +10,6 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class OreObject : MapObject
     {
         public NormalItem Drop;

@@ -6,7 +6,6 @@ using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class ConveyorBeltObject : MapObject, IRightClick, IItemReceiver
     {
         [SerializeField] private float _speed;

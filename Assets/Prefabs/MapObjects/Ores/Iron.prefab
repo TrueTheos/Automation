@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7974137202140151684}
   - component: {fileID: 4678086982190568008}
   - component: {fileID: 129681216205148547}
-  - component: {fileID: 6629687668892915324}
+  - component: {fileID: 4759165741794800950}
   m_Layer: 0
   m_Name: Iron
   m_TagString: Untagged
@@ -102,11 +102,12 @@ MonoBehaviour:
   Size: 0
   SpriteRend: {fileID: 4678086982190568008}
   MapItem: {fileID: 11400000, guid: e0af175ea7d9ac743aa7403b39a55057, type: 2}
+  Speed: 1
   Drop: {fileID: 11400000, guid: d4c4a6cd452f2f143ad6550c215baea3, type: 2}
   DropCountRange: {x: 5, y: 10}
   SpawnTileType: 2
---- !u!61 &6629687668892915324
-BoxCollider2D:
+--- !u!58 &4759165741794800950
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -138,15 +139,5 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Radius: 0.4

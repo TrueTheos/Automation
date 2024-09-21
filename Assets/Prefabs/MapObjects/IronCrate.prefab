@@ -147,4 +147,5 @@ MonoBehaviour:
   Size: 0
   SpriteRend: {fileID: 4063170707660098691}
   MapItem: {fileID: 11400000, guid: bbcb0bfd08f52bf4f83a9dbf69bdfe18, type: 2}
+  Speed: 1
   SlotsCount: 8

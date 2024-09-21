@@ -11,9 +11,14 @@ namespace Assets.Scripts
 {
     public class CraftingOption : MonoBehaviour
     {
+        [SerializeField] private Color _notSelectedColor;
+        [SerializeField] private Sprite _notSelectedSprite;
+        [SerializeField] private Color _selectedColor;
+        [SerializeField] private Sprite _selectedSprite;
+
         public GameObject RequirementsParent;
-        public Image Icon;
-        public GameObject RequirementPrefab;
+        [SerializeField] private Image _icon;
+        [SerializeField] private ItemAmountUI _requirementPrefab;
 
         private float _initialCraftInterval = .5f;
         private float _minCraftInterval = 0.01f;
@@ -22,17 +27,15 @@ namespace Assets.Scripts
         private float _currentCraftInterval;
         private float _timeSinceLastCraft;
 
-        public CraftRecipe Recipe;
+        [HideInInspector] public CraftRecipe Recipe;
 
-        [SerializeField] public Inventory Inventory;
+        [HideInInspector] public Inventory Inventory;
 
-        private Color _normalColor;
-
-        public Image Background;
+        [SerializeField] private Image _background;
         public RectTransform Rect;
-        public Button Button;
+        [HideInInspector] public Button Button;
 
-        public bool IsSelected;
+        [HideInInspector] public bool IsSelected;
 
         private Vector3 _initialScale;
 
@@ -40,7 +43,6 @@ namespace Assets.Scripts
 
         private void Awake()
         {
-            _normalColor = Background.color;
             _initialScale = transform.localScale;
             Button = GetComponentInChildren<Button>();
         }
@@ -48,11 +50,11 @@ namespace Assets.Scripts
         public void Init(CraftRecipe recipe)
         {
             Recipe = recipe;
-            Icon.sprite = recipe.Result.GetItem().Icon;
+            _icon.sprite = recipe.Result.GetItem().Icon;
 
             foreach (var requirement in recipe.Requirements)
             {
-                ItemAmountUI requirementItemUI = Instantiate(RequirementPrefab, RequirementsParent.transform).GetComponent<ItemAmountUI>();
+                ItemAmountUI requirementItemUI = Instantiate(_requirementPrefab, RequirementsParent.transform).GetComponent<ItemAmountUI>();
 
                 requirementItemUI.Init(requirement);
             }
@@ -66,14 +68,16 @@ namespace Assets.Scripts
             }
         }
 
-        public void Highlight(Color color)
+        public void Highlight()
         {
-            Background.color = color;
+            _background.color = _selectedColor;
+            _background.sprite = _selectedSprite;
         }
 
         public void DeHighlight()
         {
-            Background.color = _normalColor;
+            _background.color = _notSelectedColor;
+            _background.sprite = _notSelectedSprite;
             if(IsSelected)
             {
                 transform.localScale = _initialScale;

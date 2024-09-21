@@ -9,7 +9,6 @@ using UnityEngine;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class IronCrateObject : MapObject, IItemReceiver, IRightClick
     {
         public int SlotsCount;

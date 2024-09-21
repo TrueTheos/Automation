@@ -130,7 +130,10 @@ public class PlayerMovement : MonoBehaviour
         
         if(Input.GetMouseButtonDown(1))
         {
-            if (MapGenerator.Instance.GetObjectAtPos(gridMousePos.x, gridMousePos.y) is IRightClick rightClickable)
+            Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);
+
+            if (hit.collider != null && hit.collider.gameObject.TryGetComponent(out IRightClick rightClickable))
             {
                 rightClickable.OnClick(_player);
             }
@@ -304,6 +307,7 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 _handArt.sprite = _selectedItem.Item.Icon;
+                _placeObjectPreview.gameObject.SetActive(false);
             }
         }
         else

@@ -9,7 +9,6 @@ using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class BoilerObject : FluidUserObject
     {
         public override Connection OutputDirection { get; set; } = Connection.Right;

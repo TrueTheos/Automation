@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Items;
 using Assets.Scripts.Managers;
 using DG.Tweening;
+using Managers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace Assets.Scripts.MapObjects
 
         private GameManager _gameManager;
 
-        [Range(0f, 1f), HideInInspector] public float Speed = 1f; //How fast building will work based on the provided electricity
+        [Range(0f, 1f), HideInInspector] public float Speed = 1f; //How fast building will work based on the provided electricity    
 
         public Vector2Int[] GetOccupiedPositions(int x, int y)
         {

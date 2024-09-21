@@ -12,7 +12,6 @@ using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class AccumulatorObject : MapObject
     {
         [SerializeField] private float _range;

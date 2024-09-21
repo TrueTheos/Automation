@@ -12,7 +12,6 @@ using static Assets.Scripts.WattsUtils;
 
 namespace Assets.Scripts.MapObjects
 {
-    [RequireComponent(typeof(BoxCollider2D))]
     public class SolarPanelObject : MapObject, IPowerGridUser
     {
         [SerializeField] private AnimationCurve _efficiencyCurve;
