@@ -1,6 +1,7 @@
 using Assets.Scripts.Items;
 using Assets.Scripts.Managers;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using static Assets.Scripts.Utilities;
 
@@ -8,53 +9,51 @@ namespace Assets.Scripts.MapObjects
 {
     public class ConveyorBeltObject : MapObject, IRightClick, IItemReceiver
     {
-        [SerializeField] private float _speed;
-
-        public IItemReceiver Parent;
-        public IItemReceiver Child;
-
+        [SerializeField] private float _speed; 
         //public ItemObject IncomingItem;
-        public ItemObject Item;
-
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
+
+        public IItemReceiver Parent { get; set; }
+        public IItemReceiver Child { get; set; }
+        public ItemObject Item { get; set; }
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
 
         private BeltDirection _direction;
-        private BeltDirection _defaultDirection;
 
         private Vector3 _itemStartPosition;
         private Vector3 _itemTargetPosition;
         private float _itemProgress;
+        public Direction InputConnection { get; set; } = Direction.None;
+        public Direction OutputConnection { get; set; } = Direction.None;
 
-
-        private Direction _inputDirection = Direction.None;
-        public Direction InputConnection
-        {
-            get
-            {
-                return _inputDirection;
-            }
-            set
-            {
-                _inputDirection = value;
-            }
-        }
-        private Direction _outputDirection = Direction.None;
-        public Direction OutputConnection
-        {
-            get
-            {
-                return _outputDirection;
-            }
-            set
-            {
-                _outputDirection = value;
-            }
-        }
+        //private Direction _inputDirection = Direction.None;
+        //public Direction InputConnection
+        //{
+        //    get
+        //    {
+        //        return _inputDirection;
+        //    }
+        //    set
+        //    {
+        //        _inputDirection = value;
+        //    }
+        //}
+        //private Direction _outputDirection = Direction.None;
+        //public Direction OutputConnection
+        //{
+        //    get
+        //    {
+        //        return _outputDirection;
+        //    }
+        //    set
+        //    {
+        //        _outputDirection = value;
+        //    }
+        //}
 
         protected override void OnPlace(Direction direction)
         {
-            _defaultDirection = DirectionToBeltDirection(direction);
+            _direction = DirectionToBeltDirection(direction);
             InputConnection = GetOppositeDirection(direction);
             OutputConnection = direction;
             UpdateSprite(Direction.None);
@@ -62,28 +61,43 @@ namespace Assets.Scripts.MapObjects
 
         private void Update()
         {
-            if (Item != null)
+            MoveItem();
+            TryReceiveFromParent();
+        }
+
+        private void FixedUpdate()
+        {
+            if (Child == null) UpdateNeighbor(OutputConnection);
+            if (Parent == null) UpdateNeighbor(InputConnection);
+        }
+
+        private void MoveItem()
+        {
+            if (Item == null) return;
+
+            _itemProgress += Time.deltaTime * _speed;
+            if (_itemProgress >= 1f)
             {
-                _itemProgress += Time.deltaTime * _speed;
-                if (_itemProgress >= 1f)
+                if (Child != null && Child.CanReceive(Item))
                 {
-                    if (Child != null && Child.CanReceive(Item))
-                    {
-                        Child.ReceiveItem(Item);
-                        Item = null;
-                        _itemProgress = 0f;
-                    }
-                    else
-                    {
-                        _itemProgress = 1f;
-                    }
+                    Child.ReceiveItem(Item);
+                    Item = null;
+                    _itemProgress = 0f;
                 }
                 else
                 {
-                    Item.transform.position = Vector3.Lerp(_itemStartPosition, _itemTargetPosition, _itemProgress);
+                    _itemProgress = 1f;
                 }
             }
-            else if (Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
+            else
+            {
+                Item.transform.position = Vector3.Lerp(_itemStartPosition, _itemTargetPosition, _itemProgress);
+            }
+        }
+
+        private void TryReceiveFromParent()
+        {
+            if (Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
             {
                 Item output = Parent.TakeOutItem();
                 if (output != null)
@@ -93,71 +107,15 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        private void FixedUpdate()
-        {
-            if(Child == null)
-            {
-                UpdateNeighbor(OutputConnection);
-            }
-            if(Parent == null)
-            {
-                UpdateNeighbor(InputConnection);
-            }
-        }
-
-        private BeltDirection DirectionToBeltDirection(Direction dir)
-        {
-            if (dir == Direction.Left) return BeltDirection.EW;
-            if (dir == Direction.Right) return BeltDirection.WE;
-            if (dir == Direction.Up) return BeltDirection.SN;
-            if (dir == Direction.Down) return BeltDirection.NS;
-            return BeltDirection.EW;
-        }
-
-        //public void MoveItems()
-        //{
-        //    if(Child == null)
-        //    {
-        //        UpdateNeighbor(OutputConnection);
-        //    }
-        //    if(Parent == null)
-        //    {
-        //        UpdateNeighbor(InputConnection);
-        //    }
-
-        //    if(Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
-        //    {
-        //        Item output = Parent.TakeOutItem();
-        //        if (output != null)
-        //        {
-        //            IncomingItem = MapManager.Instance.SpawnItem(output, transform.position.x, transform.position.y, 1);
-        //        }
-        //    }
-
-        //    if(IncomingItem != null)
-        //    {
-        //        if (Item != null && Child != null && Child.CanReceive(IncomingItem))
-        //        {
-        //            Child.ReceiveItem(Item);
-        //            Item = null;
-        //        }
-
-        //        if (Item == null)
-        //        {
-        //            Item = IncomingItem;
-        //            IncomingItem = null;
-        //            Item.MoveToPosition(transform.position);
-        //        }
-        //    }     
-        //    else
-        //    {
-        //        if (Item != null && Child != null && Child.CanReceive(Item))
-        //        {
-        //            Child.ReceiveItem(Item);
-        //            Item = null;
-        //        }
-        //    }
-        //}
+        private BeltDirection DirectionToBeltDirection(Direction dir) =>
+           dir switch
+           {
+               Direction.Left => BeltDirection.EW,
+               Direction.Right => BeltDirection.WE,
+               Direction.Up => BeltDirection.SN,
+               Direction.Down => BeltDirection.NS,
+               _ => BeltDirection.EW
+           };
 
         public void SpawnItem(NormalItem item)
         {
@@ -189,10 +147,15 @@ namespace Assets.Scripts.MapObjects
 
         private void UpdateNeighbor(Direction dir)
         {
-            if (dir == Direction.Down) UpdateNeighborConnection(Vector2.down, Direction.Up, Direction.Down);
-            if (dir == Direction.Up) UpdateNeighborConnection(Vector2.up, Direction.Down, Direction.Up);
-            if (dir == Direction.Right) UpdateNeighborConnection(Vector2.right, Direction.Left, Direction.Right);
-            if (dir == Direction.Left) UpdateNeighborConnection(Vector2.left, Direction.Right, Direction.Left);
+            Vector2 direction = dir switch
+            {
+                Direction.Down => Vector2.down,
+                Direction.Up => Vector2.up,
+                Direction.Right => Vector2.right,
+                Direction.Left => Vector2.left,
+                _ => Vector2.zero
+            };
+            UpdateNeighborConnection(direction, GetOppositeDirection(dir), dir);
         }
 
         private void UpdateNeighborConnection(Vector2 direction, Direction neighborInput, Direction neighborOutput)
@@ -235,102 +198,88 @@ namespace Assets.Scripts.MapObjects
                 }
             }
 
-            BeltDirection dir = GetBeltDirection();
-            _direction = dir;
-            SpriteRend.sprite = BeltSprites[dir];
+            UpdateSpriteDirection();
         }
 
         private void UpdateBeltConnection(ConveyorBeltObject belt, Direction neighborInput, Direction neighborOutput)
         {
+            if (IsParallelBelt(belt, neighborInput, neighborOutput)) return;
+
             if (Parent == null && belt.Child == null)
             {
                 Parent = belt;
                 belt.Child = this;
                 belt.OutputConnection = neighborInput;
-
-                if (belt.InputConnection == Direction.None || belt.Parent == null)
-                {
-                    belt.InputConnection = neighborOutput;
-                }
                 InputConnection = neighborOutput;
-
                 if (OutputConnection == Direction.None)
                 {
                     OutputConnection = neighborInput;
                 }
-
-                belt.UpdateSprite(neighborInput);
-                BeltDirection dir = GetBeltDirection();
-                _direction = dir;
-                SpriteRend.sprite = BeltSprites[dir];
+                if (belt.InputConnection == Direction.None || belt.Parent == null)
+                {
+                    belt.InputConnection = neighborOutput;
+                }
             }
             else if (Child == null && belt.Parent == null)
             {
                 Child = belt;
                 belt.Parent = this;
                 belt.InputConnection = neighborInput;
-
-                if (belt.OutputConnection == Direction.None || belt.Child == null)
-                {
-                    belt.OutputConnection = neighborOutput;
-                }
-
                 OutputConnection = neighborOutput;
-
                 if (InputConnection == Direction.None)
                 {
                     InputConnection = neighborInput;
                 }
+                if (belt.OutputConnection == Direction.None || belt.Child == null)
+                {
+                    belt.OutputConnection = neighborOutput;
+                }
+            }
 
-                belt.UpdateSprite(neighborInput);
-                BeltDirection dir = GetBeltDirection();
-                _direction = dir;
-                SpriteRend.sprite = BeltSprites[dir];
-            }     
+            belt.UpdateSprite(neighborInput);
+            UpdateSpriteDirection();
         }
+
+        private bool IsParallelBelt(ConveyorBeltObject belt, Direction neighborInput, Direction neighborOutput)
+        {
+            return (_direction == belt._direction) &&
+                   (neighborInput != OutputConnection) &&
+                   (neighborOutput != InputConnection);
+        }
+
+        private void UpdateSpriteDirection()
+        {
+            BeltDirection dir = GetBeltDirection();
+            _direction = dir;
+            SpriteRend.sprite = BeltSprites[dir];
+        }
+
 
         private IItemReceiver GetReceiverAtPosition(Vector2 position)
         {
             Collider2D[] colliders = Physics2D.OverlapPointAll(position);
-            foreach (Collider2D collider in colliders)
-            {
-                IItemReceiver receiver = collider.GetComponent<IItemReceiver>();
-                if (receiver != null) return receiver;
-            }
-            return null;
+            return System.Array.Find(colliders, c => c.TryGetComponent<IItemReceiver>(out _))?.GetComponent<IItemReceiver>();
         }
 
         private BeltDirection GetBeltDirection()
         {
-            if(InputConnection == Direction.Left)
+            return (InputConnection, OutputConnection) switch
             {
-                if(OutputConnection == Direction.Right) return BeltDirection.WE;
-                if(OutputConnection == Direction.Up) return BeltDirection.WN;
-                if(OutputConnection == Direction.Down) return BeltDirection.WS;
-            }
-            if(InputConnection == Direction.Right)
-            {
-                if (OutputConnection == Direction.Left) return BeltDirection.EW;
-                if (OutputConnection == Direction.Up) return BeltDirection.EN;
-                if (OutputConnection == Direction.Down) return BeltDirection.ES;
-                if (OutputConnection == Direction.None) return DirectionToBeltDirection(GetOppositeDirection(InputConnection));
-            }
-            if(InputConnection == Direction.Down)
-            {
-                if (OutputConnection == Direction.Right) return BeltDirection.SE;
-                if (OutputConnection == Direction.Up) return BeltDirection.SN;
-                if (OutputConnection == Direction.Left) return BeltDirection.SW;
-                if (OutputConnection == Direction.None) return DirectionToBeltDirection(GetOppositeDirection(InputConnection));
-            }
-            if (InputConnection == Direction.Up)
-            {
-                if (OutputConnection == Direction.Right) return BeltDirection.NE;
-                if (OutputConnection == Direction.Down) return BeltDirection.NS;
-                if (OutputConnection == Direction.Left) return BeltDirection.NW;
-                if (OutputConnection == Direction.None) return DirectionToBeltDirection(GetOppositeDirection(InputConnection));
-            }
-
-            return _defaultDirection;
+                (Direction.Left, Direction.Right) => BeltDirection.WE,
+                (Direction.Left, Direction.Up) => BeltDirection.WN,
+                (Direction.Left, Direction.Down) => BeltDirection.WS,
+                (Direction.Right, Direction.Left) => BeltDirection.EW,
+                (Direction.Right, Direction.Up) => BeltDirection.EN,
+                (Direction.Right, Direction.Down) => BeltDirection.ES,
+                (Direction.Down, Direction.Right) => BeltDirection.SE,
+                (Direction.Down, Direction.Up) => BeltDirection.SN,
+                (Direction.Down, Direction.Left) => BeltDirection.SW,
+                (Direction.Up, Direction.Right) => BeltDirection.NE,
+                (Direction.Up, Direction.Down) => BeltDirection.NS,
+                (Direction.Up, Direction.Left) => BeltDirection.NW,
+                (_, Direction.None) => DirectionToBeltDirection(GetOppositeDirection(InputConnection)),
+                _ => _direction
+            };
         }
 
         public void OnClick(Player player)
@@ -351,15 +300,9 @@ namespace Assets.Scripts.MapObjects
             _itemProgress = 0f;
         }
 
-        public bool CanReceive(ItemObject item)
-        {
-            return Item == null;
-        }
+        public bool CanReceive(ItemObject item) => Item == null;
 
-        public Item GetOutputData()
-        {
-            return Item.ItemData;
-        }
+        public Item GetOutputData() => Item?.ItemData;
 
         public Item TakeOutItem()
         {
@@ -373,9 +316,6 @@ namespace Assets.Scripts.MapObjects
             return null;
         }
 
-        public GameObject GetGameObject()
-        {
-            return gameObject;
-        }
+        public GameObject GetGameObject() => gameObject;
     }
 }

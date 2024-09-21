@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 159b2f86cd494d349af108cd89750ccd, type: 3}
+  m_Name: Splitter
+  m_EditorClassIdentifier: 
+  Name: Splitter
+  Icon: {fileID: -1793099873, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+  MaxStack: 1
+  ItemFlags: 0
+  ItemType: 1
+  Prefab: {fileID: 9014068675371668990, guid: 0ed10bf2fb30eed44a071562bc920d2e, type: 3}
+  MaxDurability: 20
+  CanBeRotated: 1
+  PickRandomSprite: 0
+  SpriteRandomVariants: []
+  DefaultDirection: 2
+  DirectionSprites:
+    dictionary:
+    - Key: 2
+      Value: {fileID: 2076593648, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+    - Key: 0
+      Value: {fileID: -210316045, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+    - Key: 3
+      Value: {fileID: 1291956426, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+    - Key: 1
+      Value: {fileID: -1768194725, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
