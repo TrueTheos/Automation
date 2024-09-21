@@ -30,10 +30,6 @@ public class PlayerMovement : MonoBehaviour
     public float MaxAttractionSpeed;
     public LayerMask PickupLayer;
 
-    [Header("Keybinds")]
-    [SerializeField] private KeyCode _sprintKey;
-    [SerializeField] private KeyCode _rotateKey;
-
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _placeObjectPreview;
     private ItemSlot _selectedItem;
@@ -52,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
     private Inventory _inventory;
     private Player _player;
 
-    private Camera _cam;
+    private Camera _cam => _cameraManager.MainCam;
 
     private bool _isClicking = false;
     private float _lastClickTime = 0f;
@@ -61,12 +57,13 @@ public class PlayerMovement : MonoBehaviour
     
     private CableBuilder _cableBuilder;
 
+    private CameraManager _cameraManager;
+
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _inventory = GetComponent<Inventory>();
-        _cam = Camera.main;
         _player = GetComponent<Player>();
         _handArt = _hand.GetComponentInChildren<SpriteRenderer>();
 
@@ -75,6 +72,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        _cameraManager = CameraManager.Instance;
         _mapManager = MapManager.Instance;
         _selectedItem = _inventory.HotbarItems[0];
         if (_selectedItem.Item is MapItem mapItem) _selectedItemDirection = mapItem.DefaultDirection;
@@ -102,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
 
         _currentMovementSpeed = Mathf.Clamp(_moveInput.magnitude, 0f, 1f);
 
-        if (Input.GetKey(_sprintKey))
+        if (Input.GetKey(PlayerKeybinds.SprintKey))
         {
             _rb.velocity = _moveInput * SprintSpeed;
             _isRunning = true;
@@ -160,7 +158,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 _placeholderPos = new Vector3(.5f + gridMousePos.x, .5f + gridMousePos.y, 0);
             _placeObjectPreview.gameObject.transform.position = _placeholderPos;
 
-            if(Input.GetKeyDown(_rotateKey) && mapItem.CanBeRotated)
+            if(Input.GetKeyDown(PlayerKeybinds.RotateKey) && mapItem.CanBeRotated)
             {
                 for (int i = 1; i <= 4; i++)
                 {
@@ -237,6 +235,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void ScrollThruItems()
     {
+        if (Input.GetKey(PlayerKeybinds.ZoomKey)) return;
+
         for (int i = 1; i <= 9; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha0 + i) || Input.GetKeyDown(KeyCode.Keypad0 + i))
