@@ -194,18 +194,9 @@ public class PlayerMovement : MonoBehaviour
         {
             if (belt.Child != null && belt.Child is ConveyorBeltObject childBelt)
             {
-                Vector2 direction = DirectionToVector(belt.OutputConnection);
-
-                // Calculate the child's belt position (center of the next belt)
                 Vector2 childBeltCenter = new Vector2(childBelt.X + .5f, childBelt.Y + .75f);
-
-                // Calculate the vector towards the center of the next belt
                 Vector2 toNextBelt = (childBeltCenter - (Vector2)transform.position).normalized;
-
-                // Calculate the movement towards the next belt's center with the conveyor's speed
                 Vector2 conveyorMovement = toNextBelt * belt.ItemMoveSpeed * 100 * Time.fixedDeltaTime;
-
-                // Apply the movement to the player's velocity
                 _rb.velocity += conveyorMovement;
             }
         }

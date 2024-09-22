@@ -166,9 +166,10 @@ namespace Assets.Scripts.MapObjects
 
         private void UpdateNeighborConnection(Vector2 direction, Direction neighborInput, Direction neighborOutput)
         {
-            Vector2 neighborPos = (Vector2)transform.position + direction;
-            IItemReceiver neighbor = GetReceiverAtPosition(neighborPos);
-            if (neighbor != null)
+            //Vector2 neighborPos = (Vector2)transform.position + direction;
+            //IItemReceiver neighbor = GetReceiverAtPosition(neighborPos);
+            var neighbor = _mapGenerator.GetObjectAtPos(X + (int)direction.x, Y  + (int)direction.y);
+            if (neighbor is IItemReceiver receiver)
             {
                 if(neighbor is ConveyorBeltObject belt)
                 {
@@ -176,7 +177,7 @@ namespace Assets.Scripts.MapObjects
                 }
                 else
                 {
-                    UpdateConnection(neighbor, neighborInput, neighborOutput);
+                    UpdateConnection(receiver, neighborInput, neighborOutput);
                 }
             }
         }

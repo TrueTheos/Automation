@@ -28,6 +28,7 @@ namespace Assets.Scripts.MapObjects
         public int Y => _y;
 
         private GameManager _gameManager;
+        protected MapGenerator _mapGenerator => MapGenerator.Instance;
 
         [Range(0f, 1f), HideInInspector] public float Speed = 1f; //How fast building will work based on the provided electricity    
 
