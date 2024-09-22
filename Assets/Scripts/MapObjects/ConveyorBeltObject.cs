@@ -4,12 +4,18 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using static Assets.Scripts.Utilities;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace Assets.Scripts.MapObjects
 {
     public class ConveyorBeltObject : MapObject, IRightClick, IItemReceiver
     {
-        [SerializeField] private float _speed; 
+        [SerializeField] private float _itemMoveSpeed;
+        public float ItemMoveSpeed
+        {
+            get => _itemMoveSpeed;
+            private set => _itemMoveSpeed = value;
+        }
         //public ItemObject IncomingItem;
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
 
@@ -75,7 +81,7 @@ namespace Assets.Scripts.MapObjects
         {
             if (Item == null) return;
 
-            _itemProgress += Time.deltaTime * _speed;
+            _itemProgress += Time.deltaTime * ItemMoveSpeed;
             if (_itemProgress >= 1f)
             {
                 if (Child != null && Child.CanReceive(Item))
@@ -186,6 +192,8 @@ namespace Assets.Scripts.MapObjects
                 {
                     OutputConnection = GetOppositeDirection(neighborOutput);
                 }
+
+                if (receiver is SplitterObject splitter) splitter.UpdateConnections(this, false);
             }
             else if (Child == null && Parent != receiver)
             {
@@ -196,6 +204,8 @@ namespace Assets.Scripts.MapObjects
                 {
                     OutputConnection = GetOppositeDirection(neighborOutput);
                 }
+
+                if (receiver is SplitterObject splitter) splitter.UpdateConnections(this, true);
             }
 
             UpdateSpriteDirection();

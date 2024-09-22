@@ -114,6 +114,18 @@ namespace Assets.Scripts
             return Vector2.zero;
         }
 
+        public static Vector2 DirectionToVector(Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.Up: return Vector2.up;
+                case Direction.Right: return Vector2.right;
+                case Direction.Down: return Vector2.down;
+                case Direction.Left: return Vector2.left;
+            }
+            return Vector2.zero;
+        }
+
 
         [System.Flags]
         public enum Connection

@@ -2,10 +2,11 @@
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 namespace Assets.Scripts.Items
 {
-    public class ItemObject : MonoBehaviour
+    public class ItemObject : MonoBehaviour, IRightClick
     {
         [HideInInspector] public Item ItemData;
         [HideInInspector] public int Amount;
@@ -70,6 +71,15 @@ namespace Assets.Scripts.Items
                 Amount = count;
             }
             GetComponent<SpriteRenderer>().sprite = item.Icon;
+        }
+
+        public void OnClick(Player player)
+        {
+            if(State == ItemState.OnBelt)
+            {
+                player.Inventory.PickupItem(this);
+                AudioManager.Instance.PickupItem();
+            }
         }
     }
 }

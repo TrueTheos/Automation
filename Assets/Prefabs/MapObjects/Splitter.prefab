@@ -73,15 +73,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 7
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -497190802, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &6582651872984334807
@@ -141,6 +141,25 @@ MonoBehaviour:
   OutputA: {fileID: 0}
   OutputB: {fileID: 0}
   Filter: {fileID: 0}
+  _secondArtRend: {fileID: 3331667571396479873}
+  _artDict:
+    dictionary:
+    - Key: 0
+      Value:
+      - {fileID: 2076593648, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+      - {fileID: -1327572283, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+    - Key: 2
+      Value:
+      - {fileID: -210316045, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+      - {fileID: -497190802, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+    - Key: 3
+      Value:
+      - {fileID: 1291956426, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+      - {fileID: -243432327, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+    - Key: 1
+      Value:
+      - {fileID: -1768194725, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
+      - {fileID: -44392798, guid: ac0162e522ffcfb43bc8a91beafd6913, type: 3}
 --- !u!212 &7941770052184360041
 SpriteRenderer:
   m_ObjectHideFlags: 0

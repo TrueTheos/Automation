@@ -186,11 +186,38 @@ public class PlayerMovement : MonoBehaviour
         Animate();
     }
 
+    private void FixedUpdate()
+    {
+        int x = Mathf.RoundToInt(transform.position.x - .5f);
+        int y = Mathf.RoundToInt(transform.position.y - .75f);
+        if (MapGenerator.Instance.GetObjectAtPos(x,y) is ConveyorBeltObject belt)
+        {
+            if (belt.Child != null && belt.Child is ConveyorBeltObject childBelt)
+            {
+                Vector2 direction = DirectionToVector(belt.OutputConnection);
+
+                // Calculate the child's belt position (center of the next belt)
+                Vector2 childBeltCenter = new Vector2(childBelt.X + .5f, childBelt.Y + .75f);
+
+                // Calculate the vector towards the center of the next belt
+                Vector2 toNextBelt = (childBeltCenter - (Vector2)transform.position).normalized;
+
+                // Calculate the movement towards the next belt's center with the conveyor's speed
+                Vector2 conveyorMovement = toNextBelt * belt.ItemMoveSpeed * 100 * Time.fixedDeltaTime;
+
+                // Apply the movement to the player's velocity
+                _rb.velocity += conveyorMovement;
+            }
+        }
+    }
+
     private void PickupItems()
     {
         List<ItemObject> items = Physics2D.OverlapCircleAll(transform.position, AttractionRange, PickupLayer).Select(x => x.GetComponent<ItemObject>()).Where(x => x != null).ToList();
         foreach (var item in items)
         {
+            if (item.State == ItemObject.ItemState.OnBelt) continue;
+
             float distanceToPlayer = Vector2.Distance(item.transform.position, transform.position);
             if (distanceToPlayer <= AttractionRange && distanceToPlayer > PickupRange)
             {
@@ -206,11 +233,6 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                if(item.State == ItemObject.ItemState.PulledToPlayer)
-                {
-                    item.State = ItemObject.ItemState.OnGround;
-                }
-
                 if (distanceToPlayer <= PickupRange)
                 {
                     _inventory.PickupItem(item);

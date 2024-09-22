@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4210697785589834073}
   - component: {fileID: 3121999503643082909}
   - component: {fileID: -4215521760549013068}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FastConveyor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -50,8 +50,8 @@ MonoBehaviour:
   Size: 0
   SpriteRend: {fileID: 3121999503643082909}
   MapItem: {fileID: 11400000, guid: f6b97646b3f4ecb4cb91524735f4f38a, type: 2}
-  _speed: 3.75
-  Item: {fileID: 0}
+  Speed: 1
+  _itemMoveSpeed: 3.75
   BeltSprites:
     dictionary:
     - Key: 0
@@ -118,7 +118,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 4
   m_Sprite: {fileID: -129201297, guid: 742af8a92a4f95a48be936aa94505b52, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

@@ -19,66 +19,40 @@ namespace Assets.Scripts.MapObjects
         private bool _useInputA = true;
         private bool _useOutputA = true;
 
+        [SerializeField] private SpriteRenderer _secondArtRend;
+        [SerializeField] private SerializableDictionary<Direction, Sprite[]> _artDict = new();
+
         private Dictionary<Direction, Vector2Int[]> _connectionOffsets = new()
-    {
-        // inputA, inputB, outputA, outputB
-        {Direction.Right, new Vector2Int[] {new(-1,0), new(-1,1), new(1,0), new(1,1)}},
-        {Direction.Left, new Vector2Int[] {new(1,0), new(1,1), new(-1,0), new(-1,1)}},
-        {Direction.Up, new Vector2Int[] {new(0,-1), new(1,-1), new(0,1), new(1,1)}},
-        {Direction.Down, new Vector2Int[] {new(0,1), new(1,1), new(0,-1), new(1,-1)}}
-    };
+        {
+            // inputA, inputB, outputA, outputB
+            {Direction.Right, new Vector2Int[] {new(-1,0), new(-1,1), new(1,0), new(1,1)}},
+            {Direction.Left, new Vector2Int[] {new(1,0), new(1,1), new(-1,0), new(-1,1)}},
+            {Direction.Up, new Vector2Int[] {new(0,-1), new(1,-1), new(0,1), new(1,1)}},
+            {Direction.Down, new Vector2Int[] {new(0,1), new(1,1), new(0,-1), new(1,-1)}}
+        };
 
         protected override void OnPlace(Direction direction)
         {
-            base.OnPlace(Direction);
-            UpdateConnections();
-
+            base.OnPlace(direction);
+            SpriteRend.sprite = _artDict[direction][0];
+            _secondArtRend.sprite = _artDict[direction][1];
             //if rotation update collider and second art
         }
 
-        private void UpdateConnections()
+        public void UpdateConnections(ConveyorBeltObject belt, bool input)
         {
-            Vector2Int[] offsets = _connectionOffsets[Direction];
-            UpdateConnection(ref InputA, offsets[0]);
-            UpdateConnection(ref InputB, offsets[1]);
-            UpdateConnection(ref OutputA, offsets[2]);
-            UpdateConnection(ref OutputB, offsets[3]);
-        }
+            Vector2Int beltPos = new(belt.X, belt.Y);
+            Vector2Int myPos = new(X, Y);
 
-        private void UpdateConnection(ref ConveyorBeltObject connection, Vector2Int offset)
-        {
-            Vector2 position = (Vector2)transform.position + offset;
-            ConveyorBeltObject newConnection = GetConveyorAtPosition(position);
-
-            // If there was a previous connection, remove this splitter as its child or parent
-            if (connection != null)
+            if (input)
             {
-                if (connection.Child == this)
-                    connection.Child = null;
-                if (connection.Parent == this)
-                    connection.Parent = null;
+                if (InputA == null && myPos + _connectionOffsets[Direction][0] == beltPos) InputA = belt;
+                if (InputB == null && myPos + _connectionOffsets[Direction][1] == beltPos) InputB = belt;
             }
-
-            connection = newConnection;
-
-            if (connection != null)
+            else //output
             {
-                Direction connectionDirection = GetDirectionFromOffset(offset);
-
-                // Determine if this splitter should be the parent or child of the conveyor
-                if (IsInput(connectionDirection))
-                {
-                    connection.Child = this;
-                    connection.OutputConnection = connectionDirection;
-                }
-                else
-                {
-                    connection.Parent = this;
-                    connection.InputConnection = GetOppositeDirection(connectionDirection);
-                }
-
-                // Update the conveyor's sprite
-                connection.UpdateSprite(connectionDirection);
+                if (OutputA == null && myPos + _connectionOffsets[Direction][2] == beltPos) OutputA = belt;
+                if (OutputB == null && myPos + _connectionOffsets[Direction][3] == beltPos) OutputB = belt;
             }
         }
 
