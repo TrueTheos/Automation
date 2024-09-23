@@ -1,20 +1,23 @@
 ﻿using Assets.Scripts.Items;
+using Assets.Scripts.Managers;
+using Assets.Scripts.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class SplitterObject : MapObject, IItemReceiver
+    public class SplitterObject : MapObject, IItemReceiver, IRightClick
     {
-        public ConveyorBeltObject InputA, InputB;
+        public ConveyorBeltObject Input;
         public ConveyorBeltObject OutputA, OutputB;
 
-        public Item Filter;
+        [HideInInspector] public Item FilterA, FilterB;
 
         private bool _useInputA = true;
         private bool _useOutputA = true;
@@ -28,8 +31,16 @@ namespace Assets.Scripts.MapObjects
             {Direction.Right, new Vector2Int[] {new(-1,0), new(-1,1), new(1,0), new(1,1)}},
             {Direction.Left, new Vector2Int[] {new(1,0), new(1,1), new(-1,0), new(-1,1)}},
             {Direction.Up, new Vector2Int[] {new(0,-1), new(1,-1), new(0,1), new(1,1)}},
-            {Direction.Down, new Vector2Int[] {new(0,1), new(1,1), new(0,-1), new(1,-1)}}
+            {Direction.Down, new Vector2Int[] {new(0,1), new(1,1), new(0,-1), new(1,-1)}},
         };
+
+        [SerializeField] private float _itemMoveSpeed = 1f;
+        private ItemObject _currentItem;
+        private Vector3 _itemStartPosition;
+        private Vector3 _itemTargetPosition;
+        private float _itemProgress;
+
+        private SplitterView _splitterView => UIManager.Instance.SplitterView;
 
         protected override void OnPlace(Direction direction)
         {
@@ -39,6 +50,74 @@ namespace Assets.Scripts.MapObjects
             //if rotation update collider and second art
         }
 
+        private void Update()
+        {
+            MoveItem();
+            //TryReceiveFromInput();
+        }
+
+        private void MoveItem()
+        {
+            if (_currentItem == null) return;
+
+            _itemProgress += Time.deltaTime * _itemMoveSpeed;
+            if (_itemProgress >= 1f)
+            {
+                ConveyorBeltObject outputConveyor = DetermineOutputConveyor(_currentItem);
+                if (outputConveyor != null && outputConveyor.CanReceive(_currentItem))
+                {
+                    outputConveyor.ReceiveItem(_currentItem);
+                    _currentItem = null;
+                    _itemProgress = 0f;
+                    ToggleOutput();
+                }
+                else
+                {
+                    _itemProgress = 1f;
+                }
+            }
+            else
+            {
+                _currentItem.transform.position = Vector3.Lerp(_itemStartPosition, _itemTargetPosition, _itemProgress);
+            }
+        }
+
+        /*private void TryReceiveFromInput()
+        {
+            if (_currentItem == null)
+            {
+                ConveyorBeltObject inputConveyor = DetermineInputConveyor();
+                if (inputConveyor != null)
+                {
+                    Item inputItemData = inputConveyor.GetOutputData();
+                    if (inputItemData != null && CanReceiveItem(inputItemData))
+                    {
+                        Item takenItem = inputConveyor.TakeOutItem();
+                        if (takenItem != null)
+                        {
+                            ItemObject newItemObject = MapManager.Instance.SpawnItem(takenItem, transform.position.x, transform.position.y, 1, ItemObject.ItemState.OnBelt);
+                            ReceiveItem(newItemObject);
+                            ToggleInput();
+                        }
+                    }
+                }
+            }
+        }*/
+
+        public override Vector2Int[] GetOccupiedPositions(int x, int y)
+        {
+            switch (Direction)
+            {
+                case Direction.Down:
+                case Direction.Up:
+                    return new Vector2Int[] { new(x, y), new(x + 1,y) };
+                case Direction.Right:
+                case Direction.Left:
+                    return new Vector2Int[] { new(x, y), new(x, y + 1) };
+                default: return new Vector2Int[] { new(x, y) };
+            }
+        }
+
         public void UpdateConnections(ConveyorBeltObject belt, bool input)
         {
             Vector2Int beltPos = new(belt.X, belt.Y);
@@ -46,64 +125,72 @@ namespace Assets.Scripts.MapObjects
 
             if (input)
             {
-                if (InputA == null && myPos + _connectionOffsets[Direction][0] == beltPos) InputA = belt;
-                if (InputB == null && myPos + _connectionOffsets[Direction][1] == beltPos) InputB = belt;
+                if (Input == null && myPos + _connectionOffsets[Direction][0] == beltPos)
+                {
+                    Input = belt;
+                }
             }
             else //output
             {
-                if (OutputA == null && myPos + _connectionOffsets[Direction][2] == beltPos) OutputA = belt;
-                if (OutputB == null && myPos + _connectionOffsets[Direction][3] == beltPos) OutputB = belt;
+                if (OutputA == null && myPos + _connectionOffsets[Direction][2] == beltPos)
+                {
+                    OutputA = belt;
+                }
+                if (OutputB == null && myPos + _connectionOffsets[Direction][3] == beltPos)
+                {
+                    OutputB = belt;
+                }
             }
-        }
-
-        private bool IsInput(Direction direction)
-        {
-            // Assuming inputs are always on the left or top of the splitter
-            return direction == Direction.Right || direction == Direction.Down;
-        }
-
-        private ConveyorBeltObject GetConveyorAtPosition(Vector2 position)
-        {
-            Collider2D[] colliders = Physics2D.OverlapPointAll(position);
-            foreach (Collider2D collider in colliders)
-            {
-                ConveyorBeltObject conveyor = collider.GetComponent<ConveyorBeltObject>();
-                if (conveyor != null) return conveyor;
-            }
-            return null;
-        }
-
-        private Direction GetDirectionFromOffset(Vector2Int offset)
-        {
-            if (offset.x > 0) return Direction.Left;
-            if (offset.x < 0) return Direction.Right;
-            if (offset.y > 0) return Direction.Down;
-            if (offset.y < 0) return Direction.Up;
-            return Direction.None;
         }
 
         public bool CanReceive(ItemObject item)
         {
-            return (InputA != null || InputB != null) && (OutputA != null || OutputB != null);
+            return _currentItem == null && (OutputA != null || OutputB != null);
+        }
+
+        private bool CanReceiveItem(Item item)
+        {
+            return true;
+            // todo return Filter == null || Filter.Equals(item);
         }
 
         public void ReceiveItem(ItemObject item)
         {
-            ConveyorBeltObject outputConveyor = DetermineOutputConveyor();
-            if (outputConveyor != null && outputConveyor.CanReceive(item))
-            {
-                outputConveyor.ReceiveItem(item);
-                ToggleOutput();
-            }
+            _currentItem = item;
+            _itemStartPosition = Input.transform.position;
+            _itemTargetPosition = transform.position;
+            _itemProgress = 0f;
         }
 
-        private ConveyorBeltObject DetermineOutputConveyor()
+        private ConveyorBeltObject DetermineOutputConveyor(ItemObject item)
         {
+            if(FilterA != null && FilterA == item.ItemData && OutputA.CanReceive(item))
+            {
+                return OutputA;
+            }
+            if (FilterB != null && FilterB == item.ItemData && OutputB.CanReceive(item))
+            {
+                return OutputB;
+            }
+
             if (OutputA != null && OutputB != null)
             {
                 return _useOutputA ? OutputA : OutputB;
             }
-            return OutputA ?? OutputB;
+            else if (OutputA != null)
+            {
+                return OutputA;
+            }
+            else if (OutputB != null)
+            {
+                return OutputB;
+            }
+            return null;
+        }
+
+        public void OnClick(Player player)
+        {
+            _splitterView.OpenSplitter(this);
         }
 
         private void ToggleOutput()
@@ -116,54 +203,24 @@ namespace Assets.Scripts.MapObjects
 
         public Item TakeOutItem()
         {
-            ConveyorBeltObject inputConveyor = DetermineInputConveyor();
-            if (inputConveyor != null)
+            if (_currentItem != null)
             {
-                Item item = inputConveyor.TakeOutItem();
-                ToggleInput();
-                return item;
+                Item itemToReturn = _currentItem.ItemData;
+                Destroy(_currentItem.gameObject);
+                _currentItem = null;
+                return itemToReturn;
             }
             return null;
         }
 
-        private ConveyorBeltObject DetermineInputConveyor()
-        {
-            if (InputA != null && InputB != null)
-            {
-                return _useInputA ? InputA : InputB;
-            }
-            return InputA ?? InputB;
-        }
-
-        private void ToggleInput()
-        {
-            if (InputA != null && InputB != null)
-            {
-                _useInputA = !_useInputA;
-            }
-        }
-
         public Item GetOutputData()
         {
-            ConveyorBeltObject outputConveyor = DetermineOutputConveyor();
-            return outputConveyor?.GetOutputData();
+            return _currentItem?.ItemData;
         }
 
         public GameObject GetGameObject()
         {
             return gameObject;
-        }
-
-        private Direction GetNextDirection(Direction current)
-        {
-            return current switch
-            {
-                Direction.Right => Direction.Down,
-                Direction.Down => Direction.Left,
-                Direction.Left => Direction.Up,
-                Direction.Up => Direction.Right,
-                _ => Direction.Right,
-            };
         }
     }
 }

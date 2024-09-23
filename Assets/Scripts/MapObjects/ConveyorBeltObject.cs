@@ -103,7 +103,7 @@ namespace Assets.Scripts.MapObjects
 
         private void TryReceiveFromParent()
         {
-            if (Parent != null && Parent is not ConveyorBeltObject && CanReceive(null))
+            if (Parent != null && Parent is not ConveyorBeltObject && Parent is not SplitterObject && CanReceive(null))
             {
                 Item output = Parent.TakeOutItem();
                 if (output != null)

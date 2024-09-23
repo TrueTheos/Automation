@@ -15,6 +15,7 @@ namespace Assets.Scripts
     {
         [SerializeField] private Image Background;
         [SerializeField] private Color HighlightColor;
+
         private DraggableItem _currentItem;
         public DraggableItem CurrentItem
         {
@@ -144,7 +145,7 @@ namespace Assets.Scripts
             {
                 DraggableItem currentItem = transform.GetChild(0).gameObject.GetComponent<DraggableItem>();
 
-                if(currentItem.ItemData.GetItem() == draggedItem.ItemData.GetItem()) 
+                if (currentItem.ItemData.GetItem() == draggedItem.ItemData.GetItem())
                 {
                     if (currentItem.ItemData.Amount + draggedItem.ItemData.Amount > currentItem.ItemData.Item.MaxStack)
                     {

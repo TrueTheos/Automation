@@ -102,6 +102,7 @@ namespace Assets.Scripts.MapObjects
 
         public Item TakeOutItem()
         {
+            if (_currentItem == null) return null;
             var ret = Instantiate(_currentItem);
             _currentItem = null;
             return ret;
