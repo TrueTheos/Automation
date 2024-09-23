@@ -69,7 +69,6 @@ namespace Assets.Scripts.MapObjects
                     outputConveyor.ReceiveItem(_currentItem);
                     _currentItem = null;
                     _itemProgress = 0f;
-                    ToggleOutput();
                 }
                 else
                 {
@@ -164,27 +163,72 @@ namespace Assets.Scripts.MapObjects
 
         private ConveyorBeltObject DetermineOutputConveyor(ItemObject item)
         {
-            if(FilterA != null && FilterA == item.ItemData && OutputA.CanReceive(item))
+            // Case 1: Both filters are set
+            if (FilterA != null && FilterB != null)
             {
-                return OutputA;
-            }
-            if (FilterB != null && FilterB == item.ItemData && OutputB.CanReceive(item))
-            {
-                return OutputB;
+                if (FilterA == item.ItemData && OutputA.CanReceive(item))
+                    return OutputA;
+                if (FilterB == item.ItemData && OutputB.CanReceive(item))
+                    return OutputB;
+                return null; // Item doesn't match any filter
             }
 
+            // Case 2: Only FilterA is set
+            if (FilterA != null)
+            {
+                if (FilterA == item.ItemData)
+                {
+                    if (OutputA.CanReceive(item))
+                    {
+                        return OutputA;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                    
+                return OutputB.CanReceive(item) ? OutputB : null;
+            }
+
+            // Case 3: Only FilterB is set
+            if (FilterB != null)
+            {
+                if (FilterB == item.ItemData)
+                {
+                    if (OutputB.CanReceive(item))
+                    {
+                        return OutputB;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                return OutputA.CanReceive(item) ? OutputA : null;
+            }
+
+            // Case 4: No filters set, alternate between outputs
             if (OutputA != null && OutputB != null)
             {
-                return _useOutputA ? OutputA : OutputB;
+                var selectedOutput = _useOutputA ? OutputA : OutputB;
+                if (selectedOutput.CanReceive(item))
+                {
+                    ToggleOutput();
+                    return selectedOutput;
+                }
+                // If the selected output can't receive, try the other one
+                var alternateOutput = _useOutputA ? OutputB : OutputA;
+                return alternateOutput.CanReceive(item) ? alternateOutput : null;
             }
-            else if (OutputA != null)
-            {
+
+            // Case 5: Only one output is available
+            if (OutputA != null && OutputA.CanReceive(item))
                 return OutputA;
-            }
-            else if (OutputB != null)
-            {
+            if (OutputB != null && OutputB.CanReceive(item))
                 return OutputB;
-            }
+
+            // No valid output found
             return null;
         }
 

@@ -737,6 +737,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 118559111}
     m_Modifications:
+    - target: {fileID: 965912070488080909, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2505623447585250243, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
       propertyPath: m_Name
       value: FilterB
@@ -831,6 +835,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7177524494097916179, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801173954722867098, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -5913,6 +5921,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 118559111}
     m_Modifications:
+    - target: {fileID: 965912070488080909, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2505623447585250243, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
       propertyPath: m_Name
       value: FilterA
@@ -6007,6 +6019,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7177524494097916179, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801173954722867098, guid: 6b7e4af172df64b428cf7a477a07d020, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
