@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public interface IItemReceiver
+    public interface IItemMover
     {
         public void ReceiveItem(ItemObject item);
-        public bool CanReceive(ItemObject item);
+        public bool CanReceive(ItemObject item, IItemMover sender);
         public Item GetOutputData();
         public Item TakeOutItem();
         public GameObject GetGameObject();

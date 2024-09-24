@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class IronCrateObject : MapObject, IItemReceiver, IRightClick
+    public class IronCrateObject : MapObject, IItemMover, IRightClick
     {
         public int SlotsCount;
 
@@ -38,7 +38,7 @@ namespace Assets.Scripts.MapObjects
             _items[index].Amount = slot.Amount;
         }
 
-        public bool CanReceive(ItemObject item)
+        public bool CanReceive(ItemObject item, IItemMover sender)
         {
             foreach (var slot in Items)
             {

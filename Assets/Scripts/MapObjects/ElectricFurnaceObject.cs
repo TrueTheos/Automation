@@ -12,7 +12,7 @@ using static Assets.Scripts.WattsUtils;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class ElectricFuranceObject : MapObject, IItemReceiver, IRightClick, IPowerGridUser
+    public class ElectricFuranceObject : MapObject, IItemMover, IRightClick, IPowerGridUser
     {
         public int InputCapacity;
         public int OutputCapacity;
@@ -20,8 +20,8 @@ namespace Assets.Scripts.MapObjects
 
         public ParticleSystem ParticleSystem;
 
-        private ItemAmount _inputItem;
-        private ItemAmount _outputItem;
+        private ItemAmount _inputItem = new(null, 0);
+        private ItemAmount _outputItem = new(null, 0);
 
         private ElectricFurnaceView _furnaceView;
 
@@ -102,7 +102,7 @@ namespace Assets.Scripts.MapObjects
         }
 
         //niezły check xd
-        public bool CanReceive(ItemObject item)
+        public bool CanReceive(ItemObject item, IItemMover sender)
         {
             if (_inputItem.Amount >= InputCapacity) return false;
             if (item.ItemData is not NormalItem normalItem) return false;

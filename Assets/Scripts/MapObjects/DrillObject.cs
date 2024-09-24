@@ -12,7 +12,7 @@ using static Assets.Scripts.WattsUtils;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class DrillObject : MapObject, IItemReceiver, IRightClick, IPowerGridUser
+    public class DrillObject : MapObject, IItemMover, IRightClick, IPowerGridUser
     {
         [SerializeField] private ParticleSystem _particleSystem;
         [SerializeField] private Animator _animator;
@@ -69,7 +69,7 @@ namespace Assets.Scripts.MapObjects
         }
 
         //niezły check xd
-        public bool CanReceive(ItemObject item)
+        public bool CanReceive(ItemObject item, IItemMover sender)
         {
             return false;
         }

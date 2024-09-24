@@ -8,7 +8,7 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class ConveyorBeltObject : MapObject, IRightClick, IItemReceiver
+    public class ConveyorBeltObject : MapObject, IRightClick, IItemMover
     {
         [SerializeField] private float _itemMoveSpeed;
         public float ItemMoveSpeed
@@ -19,8 +19,8 @@ namespace Assets.Scripts.MapObjects
         //public ItemObject IncomingItem;
         public SerializableDictionary<BeltDirection, Sprite> BeltSprites = new();
 
-        public IItemReceiver Parent { get; set; }
-        public IItemReceiver Child { get; set; }
+        public IItemMover Parent { get; set; }
+        public IItemMover Child { get; set; }
         public ItemObject Item { get; set; }
         public enum BeltDirection { NS, SN, WE, EW, SE, ES, NE, EN, NW, WN, WS, SW}
 
@@ -84,7 +84,7 @@ namespace Assets.Scripts.MapObjects
             _itemProgress += Time.deltaTime * ItemMoveSpeed;
             if (_itemProgress >= 1f)
             {
-                if (Child != null && Child.CanReceive(Item))
+                if (Child != null && Child.CanReceive(Item, this))
                 {
                     Child.ReceiveItem(Item);
                     Item = null;
@@ -103,7 +103,9 @@ namespace Assets.Scripts.MapObjects
 
         private void TryReceiveFromParent()
         {
-            if (Parent != null && Parent is not ConveyorBeltObject && Parent is not SplitterObject && CanReceive(null))
+            if (Parent != null && Parent is not ConveyorBeltObject &&
+                Parent is not SplitterObject && Parent is not CombinerObject &&
+                CanReceive(null, Parent))
             {
                 Item output = Parent.TakeOutItem();
                 if (output != null)
@@ -125,7 +127,7 @@ namespace Assets.Scripts.MapObjects
 
         public void SpawnItem(NormalItem item)
         {
-            if (CanReceive(null))
+            if (CanReceive(null, null))
             {
                 ItemObject newItemObject = MapManager.Instance.SpawnItem(item, transform.position.x, transform.position.y, 1, ItemObject.ItemState.OnBelt);
                 ReceiveItem(newItemObject);
@@ -169,7 +171,7 @@ namespace Assets.Scripts.MapObjects
             //Vector2 neighborPos = (Vector2)transform.position + direction;
             //IItemReceiver neighbor = GetReceiverAtPosition(neighborPos);
             var neighbor = _mapGenerator.GetObjectAtPos(X + (int)direction.x, Y  + (int)direction.y);
-            if (neighbor is IItemReceiver receiver)
+            if (neighbor is IItemMover receiver)
             {
                 if(neighbor is ConveyorBeltObject belt)
                 {
@@ -182,7 +184,7 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        private void UpdateConnection(IItemReceiver receiver, Direction neighborInput, Direction neighborOutput)
+        private void UpdateConnection(IItemMover receiver, Direction neighborInput, Direction neighborOutput)
         {
             if (Parent == null)
             {
@@ -195,6 +197,7 @@ namespace Assets.Scripts.MapObjects
                 }
 
                 if (receiver is SplitterObject splitter) splitter.UpdateConnections(this, false);
+                if (receiver is CombinerObject combiner) combiner.UpdateConnections(this, false);
             }
             else if (Child == null && Parent != receiver)
             {
@@ -207,6 +210,7 @@ namespace Assets.Scripts.MapObjects
                 }
 
                 if (receiver is SplitterObject splitter) splitter.UpdateConnections(this, true);
+                if (receiver is CombinerObject combiner) combiner.UpdateConnections(this, true);
             }
 
             UpdateSpriteDirection();
@@ -266,10 +270,10 @@ namespace Assets.Scripts.MapObjects
         }
 
 
-        private IItemReceiver GetReceiverAtPosition(Vector2 position)
+        private IItemMover GetReceiverAtPosition(Vector2 position)
         {
             Collider2D[] colliders = Physics2D.OverlapPointAll(position);
-            return System.Array.Find(colliders, c => c.TryGetComponent<IItemReceiver>(out _))?.GetComponent<IItemReceiver>();
+            return System.Array.Find(colliders, c => c.TryGetComponent<IItemMover>(out _))?.GetComponent<IItemMover>();
         }
 
         private BeltDirection GetBeltDirection()
@@ -311,7 +315,7 @@ namespace Assets.Scripts.MapObjects
             _itemProgress = 0f;
         }
 
-        public bool CanReceive(ItemObject item) => Item == null;
+        public bool CanReceive(ItemObject item, IItemMover sender) => Item == null;
 
         public Item GetOutputData() => Item?.ItemData;
 

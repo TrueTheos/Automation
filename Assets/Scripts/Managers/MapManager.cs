@@ -28,10 +28,10 @@ namespace Assets.Scripts.Managers
             _generator = GetComponent<MapGenerator>();
         }
 
-        public void SpawnObject(MapObject obj, int x, int y, Direction direction)
+        public void SpawnObject(MapObject obj, int x, int y, Direction direction, bool playPlaceAnimation)
         {        
             MapObject spawnedOre = Instantiate(obj, new Vector3(x + .5f, y + .5f, 0), Quaternion.identity);
-            spawnedOre.Place(x, y, direction);
+            spawnedOre.Place(x, y, direction, playPlaceAnimation);
         }
 
         public bool CanPlaceObject(MapObject obj, int x, int y)

@@ -266,7 +266,7 @@ public class MapGenerator : MonoBehaviour
 
                         if (spawnSpace != Vector2Int.zero)
                         {
-                            _mapManager.SpawnObject(ore, spawnSpace.x, spawnSpace.y, Direction.None);
+                            _mapManager.SpawnObject(ore, spawnSpace.x, spawnSpace.y, Direction.None, false);
                         }
                     }
                 }
@@ -294,7 +294,7 @@ public class MapGenerator : MonoBehaviour
 
                         if (spawnSpace != Vector2Int.zero)
                         {
-                            _mapManager.SpawnObject(TreeObject, spawnSpace.x, spawnSpace.y, Direction.None);
+                            _mapManager.SpawnObject(TreeObject, spawnSpace.x, spawnSpace.y, Direction.None, false);
                         }
                     }
                 }

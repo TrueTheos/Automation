@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Stone
   Icon: {fileID: -209338644, guid: a36600e3d64212b44bba2a9c0a3cc035, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
   ItemType: 0
   Prefab: {fileID: 129681216205148547, guid: 93045248566b3574e927cb4c4c23a9fe, type: 3}

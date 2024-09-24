@@ -16,6 +16,7 @@ using Assets.Scripts.Managers;
 
 using Managers;
 using static Assets.Scripts.Utilities;
+using static UnityEditor.PlayerSettings;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -32,6 +33,8 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _placeObjectPreview;
+    [SerializeField] private Color _canBePlaceColor;
+    [SerializeField] private Color _cantBePlacedColor;
     private ItemSlot _selectedItem;
     public ItemSlot SelectedItem => _selectedItem;
     private Direction _selectedItemDirection = Direction.Down;
@@ -147,7 +150,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     if (_mapManager.CanPlaceObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y))
                     {
-                        _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y, _selectedItemDirection);
+                        _mapManager.SpawnObject(buildingItem.Prefab, gridMousePos.x, gridMousePos.y, _selectedItemDirection, true);
                         _inventory.RemoveItemFromSlot(1, _selectedItem);
                         UpdatePreviewSprite();
                     }
@@ -173,8 +176,16 @@ public class PlayerMovement : MonoBehaviour
                         _selectedItemDirection = nextDirection;
                         break;
                     }
-                }
-                UpdatePreviewSprite();
+                }     
+            }
+            UpdatePreviewSprite();
+            if (_mapManager.CanPlaceObject(mapItem.Prefab, gridMousePos.x, gridMousePos.y))
+            {
+                _placeObjectPreview.color = _canBePlaceColor;
+            }
+            else
+            {
+                _placeObjectPreview.color = _cantBePlacedColor;
             }
         }
         #endregion
@@ -314,8 +325,7 @@ public class PlayerMovement : MonoBehaviour
                 else
                 {
                     _placeObjectPreview.sprite = buildingItem.DirectionSprites[_selectedItemDirection];
-                }
-                
+                }               
             }
             else
             {

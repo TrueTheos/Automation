@@ -10,7 +10,7 @@ using Item = Assets.Scripts.Items.Item;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class FurnaceObject : MapObject, IItemReceiver, IRightClick
+    public class FurnaceObject : MapObject, IItemMover, IRightClick
     {
         public int InputCapacity;
         public int OutputCapacity;
@@ -18,8 +18,8 @@ namespace Assets.Scripts.MapObjects
 
         public ParticleSystem ParticleSystem;
 
-        private ItemAmount _inputItem;
-        private ItemAmount _outputItem;
+        private ItemAmount _inputItem = new(null, 0);
+        private ItemAmount _outputItem = new(null, 0);
 
         private FurnaceView _furnaceView;
 
@@ -76,7 +76,7 @@ namespace Assets.Scripts.MapObjects
         }
 
         //niezły check xd
-        public bool CanReceive(ItemObject item)
+        public bool CanReceive(ItemObject item, IItemMover sender)
         {
             if (_inputItem.Amount >= InputCapacity) return false;
             if(item.ItemData is not NormalItem normalItem) return false;

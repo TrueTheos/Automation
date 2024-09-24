@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using static Assets.Scripts.Utilities;
@@ -72,7 +73,7 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        public void Place(int x, int y, Direction direction)
+        public void Place(int x, int y, Direction direction, bool playPlaceAnimation)
         {            
             _x = x; 
             _y = y;
@@ -91,6 +92,22 @@ namespace Assets.Scripts.MapObjects
             _gameManager = GameManager.Instance;
 
             OnPlace(direction);
+
+            if(playPlaceAnimation)
+            {
+                Vector3 targetPosition = transform.position;
+                transform.position += Vector3.up * .5f;
+                Color startColor = SpriteRend.color;
+                startColor.a = 0;
+                Color endColor = startColor;
+                endColor.a = 1f;
+                SpriteRend.color = startColor;
+                Sequence sequence = DOTween.Sequence();
+                sequence.Append(transform.DOMove(targetPosition, .3f).SetEase(Ease.OutBounce));
+                sequence.Join(SpriteRend.DOColor(endColor, .3f).SetEase(Ease.InOutQuad));
+                sequence.Join(transform.DOPunchScale(Vector3.one * 0.2f, .3f, 1, 0.5f));
+                sequence.Play();
+            }
         }
 
         protected virtual void OnPlace(Direction direction)

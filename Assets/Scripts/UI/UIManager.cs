@@ -14,6 +14,7 @@ namespace Assets.Scripts.UI
         public FurnaceView FurnaceView;
         public ElectricFurnaceView ElectricFurnaceView;
         public SplitterView SplitterView;
+        public CombinerView CombinerView;
         public IronCrateView IronCrateView;
         public MultimetrView MultimetrView;
 

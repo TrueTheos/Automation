@@ -12,14 +12,13 @@ using static Assets.Scripts.Utilities;
 
 namespace Assets.Scripts.MapObjects
 {
-    public class SplitterObject : MapObject, IItemReceiver, IRightClick
+    public class SplitterObject : MapObject, IItemMover, IRightClick
     {
         public ConveyorBeltObject Input;
         public ConveyorBeltObject OutputA, OutputB;
 
         [HideInInspector] public Item FilterA, FilterB;
 
-        private bool _useInputA = true;
         private bool _useOutputA = true;
 
         [SerializeField] private SpriteRenderer _secondArtRend;
@@ -34,7 +33,7 @@ namespace Assets.Scripts.MapObjects
             {Direction.Down, new Vector2Int[] {new(0,1), new(1,1), new(0,-1), new(1,-1)}},
         };
 
-        [SerializeField] private float _itemMoveSpeed = 1f;
+        [SerializeField] private float _itemMoveSpeed => Input == null ? 1f : Input.ItemMoveSpeed;
         private ItemObject _currentItem;
         private Vector3 _itemStartPosition;
         private Vector3 _itemTargetPosition;
@@ -64,7 +63,7 @@ namespace Assets.Scripts.MapObjects
             if (_itemProgress >= 1f)
             {
                 ConveyorBeltObject outputConveyor = DetermineOutputConveyor(_currentItem);
-                if (outputConveyor != null && outputConveyor.CanReceive(_currentItem))
+                if (outputConveyor != null && outputConveyor.CanReceive(_currentItem, this))
                 {
                     outputConveyor.ReceiveItem(_currentItem);
                     _currentItem = null;
@@ -124,9 +123,13 @@ namespace Assets.Scripts.MapObjects
 
             if (input)
             {
-                if (Input == null && myPos + _connectionOffsets[Direction][0] == beltPos)
+                if (Input == null)
                 {
-                    Input = belt;
+                    if (myPos + _connectionOffsets[Direction][0] == beltPos ||
+                        myPos + _connectionOffsets[Direction][1] == beltPos)
+                    {
+                        Input = belt;
+                    }
                 }
             }
             else //output
@@ -142,12 +145,12 @@ namespace Assets.Scripts.MapObjects
             }
         }
 
-        public bool CanReceive(ItemObject item)
+        public bool CanReceive(ItemObject item, IItemMover sender)
         {
             return _currentItem == null && (OutputA != null || OutputB != null);
         }
 
-        private bool CanReceiveItem(Item item)
+        private bool CanReceiveItem(Item item, IItemMover sender)
         {
             return true;
             // todo return Filter == null || Filter.Equals(item);
@@ -166,9 +169,9 @@ namespace Assets.Scripts.MapObjects
             // Case 1: Both filters are set
             if (FilterA != null && FilterB != null)
             {
-                if (FilterA == item.ItemData && OutputA.CanReceive(item))
+                if (FilterA == item.ItemData && OutputA.CanReceive(item, this))
                     return OutputA;
-                if (FilterB == item.ItemData && OutputB.CanReceive(item))
+                if (FilterB == item.ItemData && OutputB.CanReceive(item, this))
                     return OutputB;
                 return null; // Item doesn't match any filter
             }
@@ -178,7 +181,7 @@ namespace Assets.Scripts.MapObjects
             {
                 if (FilterA == item.ItemData)
                 {
-                    if (OutputA.CanReceive(item))
+                    if (OutputA.CanReceive(item, this))
                     {
                         return OutputA;
                     }
@@ -188,7 +191,7 @@ namespace Assets.Scripts.MapObjects
                     }
                 }
                     
-                return OutputB.CanReceive(item) ? OutputB : null;
+                return OutputB.CanReceive(item, this) ? OutputB : null;
             }
 
             // Case 3: Only FilterB is set
@@ -196,7 +199,7 @@ namespace Assets.Scripts.MapObjects
             {
                 if (FilterB == item.ItemData)
                 {
-                    if (OutputB.CanReceive(item))
+                    if (OutputB.CanReceive(item, this))
                     {
                         return OutputB;
                     }
@@ -205,27 +208,27 @@ namespace Assets.Scripts.MapObjects
                         return null;
                     }
                 }
-                return OutputA.CanReceive(item) ? OutputA : null;
+                return OutputA.CanReceive(item, this) ? OutputA : null;
             }
 
             // Case 4: No filters set, alternate between outputs
             if (OutputA != null && OutputB != null)
             {
                 var selectedOutput = _useOutputA ? OutputA : OutputB;
-                if (selectedOutput.CanReceive(item))
+                if (selectedOutput.CanReceive(item, this))
                 {
                     ToggleOutput();
                     return selectedOutput;
                 }
                 // If the selected output can't receive, try the other one
                 var alternateOutput = _useOutputA ? OutputB : OutputA;
-                return alternateOutput.CanReceive(item) ? alternateOutput : null;
+                return alternateOutput.CanReceive(item, this) ? alternateOutput : null;
             }
 
             // Case 5: Only one output is available
-            if (OutputA != null && OutputA.CanReceive(item))
+            if (OutputA != null && OutputA.CanReceive(item, this))
                 return OutputA;
-            if (OutputB != null && OutputB.CanReceive(item))
+            if (OutputB != null && OutputB.CanReceive(item, this))
                 return OutputB;
 
             // No valid output found
