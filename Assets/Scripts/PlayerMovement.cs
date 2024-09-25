@@ -1,22 +1,14 @@
 using Assets.Scripts;
 using Assets.Scripts.Items;
 using Assets.Scripts.MapObjects;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
-using MapObjects.ElectricGrids;
-
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using UnityEngine.XR;
 using System;
 using UnityEditor;
 using Assets.Scripts.Managers;
-
 using Managers;
 using static Assets.Scripts.Utilities;
-using static UnityEditor.PlayerSettings;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -30,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     public float AttractionRange;
     public float MaxAttractionSpeed;
     public LayerMask PickupLayer;
+    public float MaxThrowDistance;
 
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _placeObjectPreview;
@@ -158,6 +151,8 @@ public class PlayerMovement : MonoBehaviour
             }   
         }
 
+        if (Input.GetKeyDown(PlayerKeybinds.ThrowKey)) ThrowItem ();
+
         #region Rotating Objects
         if (_selectedItem != null && _selectedItem.Item is MapItem mapItem)
         {
@@ -197,6 +192,30 @@ public class PlayerMovement : MonoBehaviour
         Animate();
     }
 
+    private void ThrowItem()
+    {
+        if(_selectedItem != null && _selectedItem.Item != null)
+        {
+            Vector2 mousePos = _cam.ScreenToWorldPoint(Input.mousePosition);
+            ItemObject thrownItem = _mapManager.SpawnItem(_selectedItem.Item, _hand.transform.position.x, transform.position.y, 1, ItemObject.ItemState.MidAir);
+
+            Vector2 throwDirection = mousePos - (Vector2)_hand.transform.position;
+            float throwDistance = throwDirection.magnitude;
+
+            // If the throw distance exceeds the max, limit it
+            if (throwDistance > MaxThrowDistance)
+            {
+                throwDirection = throwDirection.normalized;
+                mousePos = (Vector2)_hand.transform.position + throwDirection * MaxThrowDistance;
+            }
+
+            mousePos = new Vector3(mousePos.x, mousePos.y);
+            thrownItem.Throw(_hand.transform.position, mousePos);
+            _inventory.RemoveItemFromSlot(1, _selectedItem);
+            UpdatePreviewSprite();
+        }
+    }
+
     private void FixedUpdate()
     {
         int x = Mathf.RoundToInt(transform.position.x - .5f);
@@ -218,7 +237,7 @@ public class PlayerMovement : MonoBehaviour
         List<ItemObject> items = Physics2D.OverlapCircleAll(transform.position, AttractionRange, PickupLayer).Select(x => x.GetComponent<ItemObject>()).Where(x => x != null).ToList();
         foreach (var item in items)
         {
-            if (item.State == ItemObject.ItemState.OnBelt) continue;
+            if (item.State == ItemObject.ItemState.OnBelt || item.State == ItemObject.ItemState.MidAir) continue;
 
             float distanceToPlayer = Vector2.Distance(item.transform.position, transform.position);
             if (distanceToPlayer <= AttractionRange && distanceToPlayer > PickupRange)

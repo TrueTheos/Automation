@@ -12,5 +12,6 @@ namespace Assets.Scripts
         public const KeyCode SprintKey = KeyCode.LeftShift;
         public const KeyCode RotateKey = KeyCode.R;
         public const KeyCode ZoomKey = KeyCode.LeftControl;
+        public const KeyCode ThrowKey = KeyCode.Q;
     }
 }

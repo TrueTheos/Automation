@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using static Assets.Scripts.Utilities;
+using Random = UnityEngine.Random;
 namespace Assets.Scripts.MapObjects
 {
     public abstract class MapObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
@@ -154,6 +155,7 @@ namespace Assets.Scripts.MapObjects
                 Chunk chunk = MapGenerator.Instance.GetChunk(pos.x, pos.y);
                 chunk.DestroyObject(this);
             }
+            DropItem();
             DestroyImmediate(gameObject);
         }
 
@@ -168,6 +170,17 @@ namespace Assets.Scripts.MapObjects
         public void OnPointerExit(PointerEventData eventData)
         {
             GameManager.Instance.ObjectHighlight.gameObject.SetActive(false);
+        }
+
+        public virtual void DropItem()
+        {
+            float randomXOffset = Random.Range(-.6f, .6f);
+            float randomYOffset = Random.Range(-.6f, .6f);
+            MapManager.Instance.SpawnItem(MapItem,
+                   transform.position.x + randomXOffset,
+                   transform.position.y + randomYOffset,
+                   1,
+                   ItemObject.ItemState.OnGround);
         }
     }
 

@@ -16,19 +16,16 @@ namespace Assets.Scripts.MapObjects
         public Vector2Int DropCountRange;
         public TileType SpawnTileType;
 
-        public override void Break()
+        public override void DropItem()
         {
-            if (Drop != null)
-            {
-                float randomXOffset = Random.Range(-.6f, .6f);
-                float randomYOffset = Random.Range(-.6f, .6f);
-                MapManager.Instance.SpawnItem(Drop,
-                    transform.position.x + randomXOffset,
-                    transform.position.y + randomYOffset,
-                    Random.Range(DropCountRange.x, DropCountRange.y),
-                    ItemObject.ItemState.OnGround);
-            }
-            base.Break();
+            if (Drop == null) return;
+            float randomXOffset = Random.Range(-.6f, .6f);
+            float randomYOffset = Random.Range(-.6f, .6f);
+            MapManager.Instance.SpawnItem(Drop,
+                   transform.position.x + randomXOffset,
+                   transform.position.y + randomYOffset,
+                   Random.Range(DropCountRange.x, DropCountRange.y),
+                   ItemObject.ItemState.OnGround);
         }
     }
 }
