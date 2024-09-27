@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.VFX;
 using static Assets.Scripts.Utilities;
 using Random = UnityEngine.Random;
 
@@ -39,7 +40,7 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private float WaterThreshold;
 
     [Header("Chunk Settings")]
-    public int CHUNK_SIZE = 32;
+    public const int CHUNK_SIZE = 32;
     [SerializeField] private float OreGenerateTickInterval;
     [SerializeField] private float TreeGenerateTickInterval;
     [SerializeField] private int MaximumOres;
@@ -76,6 +77,8 @@ public class MapGenerator : MonoBehaviour
         {new (TileType.NONE, TileType.NONE, TileType.NONE, TileType.NONE), new Vector2Int(0,0) },
     };
 
+    [HideInInspector] public bool MapGenerated = false;
+
     private void Awake()
     {
         Instance = this;
@@ -93,7 +96,7 @@ public class MapGenerator : MonoBehaviour
         {
             for (int yChunk = 0; yChunk < _chunks.GetLength(1); yChunk++)
             {
-                _chunks[xChunk, yChunk] = new Chunk(xChunk, yChunk, CHUNK_SIZE);
+                _chunks[xChunk, yChunk] = new Chunk(xChunk, yChunk, CHUNK_SIZE, Chunk.ChunkType.Impure);
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
                     for (int y = 0; y < CHUNK_SIZE; y++)
@@ -111,6 +114,9 @@ public class MapGenerator : MonoBehaviour
         StartCoroutine(GenerateTrees());
         GenerateDualTileTilemap();
         //_mapManager.GenerateBlendTexture();
+
+        MapGenerated = true;
+        ChunkPurityManager.Instance.SetupFog();
     }
 
     private Vector2Int CalculateDualTile(Vector2Int coords)
@@ -238,7 +244,7 @@ public class MapGenerator : MonoBehaviour
         {
             return TileType.NONE;
         }
-        return GetChunk(x, y).GetType(x, y);
+        return GetChunk(x, y).GetTileType(x, y);
     }
 
     public IEnumerator GenerateOres()
@@ -305,6 +311,9 @@ public class MapGenerator : MonoBehaviour
 
 public class Chunk
 {
+    public enum ChunkType { Pure, Impure}
+    public ChunkType Type;
+    public VisualEffect Fog;
     public int X, Y;
     public int WorldX, WorldY;
     private int _chunkSize;
@@ -315,7 +324,7 @@ public class Chunk
     private TileType[,] _tiles;
     public Dictionary<TileType, int> TilesCount = new();
 
-    public Chunk(int x, int y, int chunkSize)
+    public Chunk(int x, int y, int chunkSize, ChunkType type)
     {
         X = x;
         Y = y;
@@ -329,6 +338,7 @@ public class Chunk
         {
             TilesCount[val] = 0;
         }
+        Type = type;
     }
 
     public bool IsFreeWorldPos(int x, int y)
@@ -351,7 +361,7 @@ public class Chunk
         else TilesCount[type] = 1;
     }
 
-    public TileType GetType(int x, int y)
+    public TileType GetTileType(int x, int y)
     {
         return _tiles[x - WorldX, y - WorldY];
     }

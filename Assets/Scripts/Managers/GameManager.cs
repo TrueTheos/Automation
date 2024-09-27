@@ -21,11 +21,6 @@ namespace Assets.Scripts.Managers
 
         void Start()
         {
-            Init();         
-        }
-
-        private void Init()
-        {
             MapGenerator.Instance.Generate();
         }
     }
