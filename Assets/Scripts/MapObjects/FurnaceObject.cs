@@ -105,7 +105,7 @@ namespace Assets.Scripts.MapObjects
         {
             if (_inputItem.GetItem() == null) _inputItem.SetItem(item.ItemData);
             _inputItem.Amount += item.Amount;
-            Destroy(item.gameObject);
+            DestroyImmediate(item.gameObject);
         }
 
         public void OnClick(Player player)

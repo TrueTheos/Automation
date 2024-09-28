@@ -90,7 +90,7 @@ namespace Assets.Scripts
             {
                 if (CurrentItem.ItemData.GetItem() == null || CurrentItem.ItemData.Amount <= 0)
                 {
-                    Destroy(CurrentItem.gameObject);
+                    DestroyImmediate(CurrentItem.gameObject);
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace Assets.Scripts
         {
             if(CurrentItem != null)
             {
-                Destroy(CurrentItem.gameObject);
+                DestroyImmediate(CurrentItem.gameObject);
                 CurrentItem = null;
             }
         }
@@ -162,7 +162,7 @@ namespace Assets.Scripts
                         currentItem.ItemData.Amount += draggedItem.ItemData.Amount;
                         UpdateUI();
                         OnItemChangeEvent?.Invoke();
-                        Destroy(draggedItem.gameObject);
+                        DestroyImmediate(draggedItem.gameObject);
                         return;
                     }
                 }

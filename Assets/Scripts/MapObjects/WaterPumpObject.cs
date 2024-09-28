@@ -15,7 +15,7 @@ namespace Assets.Scripts.MapObjects
         public ParticleSystem ParticleSystem;
         private ParticleSystem.EmissionModule _emissionModule;
 
-        public override Connection OutputDirection { get; set; } = Connection.Up;
+        public override Connection OutputDirection { get; set; } = Connection.Up | Connection.Right | Connection.Left;
 
         private MapGenerator _mapGenerator;
 
@@ -97,7 +97,8 @@ namespace Assets.Scripts.MapObjects
 
         public override void Connect(FluidUserObject other, Connection con)
         {
-            if (!ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)))
+            if (!ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)) 
+                && !ConnectedObjects.Values.Any(x => x is PipeObject))
             {
                 ConnectedObjects[con] = other;
                 other.Connect(this, GetOppositeConnection(con));
@@ -125,7 +126,6 @@ namespace Assets.Scripts.MapObjects
         public override bool CanConnect(FluidUserObject other, Connection comingFrom)
         {
             if (other is not PipeObject pipe) return false;
-            if (comingFrom != OutputDirection) return false;
             if (ConnectedObjects.ContainsKey(comingFrom) && ConnectedObjects[comingFrom] != null) return false;
             return true;
         }

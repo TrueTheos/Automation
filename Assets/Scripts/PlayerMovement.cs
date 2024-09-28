@@ -123,8 +123,10 @@ public class PlayerMovement : MonoBehaviour
 
         var mousePos = _cam.ScreenToWorldPoint(Input.mousePosition);
         Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
-        
-        if(Input.GetMouseButtonDown(1))
+        gridMousePos.x = Mathf.Clamp(gridMousePos.x, 0, _mapManager.Width - 1);
+        gridMousePos.y = Mathf.Clamp(gridMousePos.y, 0, _mapManager.Height - 1);
+
+        if (Input.GetMouseButtonDown(1))
         {
             Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction);

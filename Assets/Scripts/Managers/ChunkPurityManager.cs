@@ -26,7 +26,7 @@ namespace Assets.Scripts
 
         private Vector3 _lastPlayerPos;
 
-        private HashSet<VisualEffect> _enabledFogs = new HashSet<VisualEffect>();
+        //private HashSet<VisualEffect> _enabledFogs = new HashSet<VisualEffect>();
 
         private void Awake()
         {
@@ -47,11 +47,24 @@ namespace Assets.Scripts
 
             foreach(Chunk chunk in _mapGen.Chunks) 
             {
-                VisualEffect fogObject = chunk.Fog;
-                fogObject.gameObject.SetActive(true);
-                fogObject.SetBool("hasScafander", hasScafander);
-                fogObject.SetVector3("PlayerPos", _player.transform.position);
-                fogObject.SetFloat("Time", DayNightCycleManager.Instance.PercentOfDay());
+                if (chunk.Type == Chunk.ChunkType.Pure)
+                {
+                    chunk.Fog.gameObject.SetActive(false);
+                }
+                else
+                {
+                    VisualEffect fogObject = chunk.Fog;
+                    fogObject.gameObject.SetActive(true);
+                    fogObject.SetBool("hasScafander", hasScafander);
+                    fogObject.SetVector3("PlayerPos", _player.transform.position);
+                    fogObject.SetFloat("Time", DayNightCycleManager.Instance.PercentOfDay());
+                }
+            }
+
+            if(Input.GetKeyDown(KeyCode.P))
+            {
+                Chunk chunk = _mapGen.GetChunk(Mathf.RoundToInt(_player.transform.position.x), Mathf.RoundToInt(_player.transform.position.y));
+                chunk.Type = Chunk.ChunkType.Pure;
             }
 
             if(_lastPlayerPos != _player.transform.position)

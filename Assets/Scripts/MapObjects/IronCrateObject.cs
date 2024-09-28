@@ -76,7 +76,7 @@ namespace Assets.Scripts.MapObjects
                         _items[i].Item = incomingItem.ItemData;
                         _items[i].Amount = incomingItem.Amount;
                         if (_ironCrateView.IsOpen) _ironCrateView.UpdateSlot(i, _items[i]);
-                        Destroy(incomingItem.gameObject);
+                        DestroyImmediate(incomingItem.gameObject);
                         return;
                     }
                     else
@@ -99,7 +99,7 @@ namespace Assets.Scripts.MapObjects
                 }
             }
 
-            Destroy(incomingItem.gameObject);
+            DestroyImmediate(incomingItem.gameObject);
         }
 
         public Items.Item TakeOutItem()

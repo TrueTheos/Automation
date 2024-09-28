@@ -202,7 +202,7 @@ namespace Managers
             if (Cables.TryGetValue((user1, user2), out var cable))
             {
                 Cables.Remove((user1, user2));
-                UnityEngine.Object.Destroy(cable.gameObject);
+                UnityEngine.Object.DestroyImmediate(cable.gameObject);
             }
             
             if (Cables.TryGetValue((user2, user1), out var cable2))
@@ -211,7 +211,7 @@ namespace Managers
                 
                 if (!cable2.gameObject.IsDestroyed())
                 {
-                    UnityEngine.Object.Destroy(cable2.gameObject);
+                    UnityEngine.Object.DestroyImmediate(cable2.gameObject);
                 }
             }
             

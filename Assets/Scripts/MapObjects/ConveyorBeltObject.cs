@@ -2,6 +2,7 @@ using Assets.Scripts.Items;
 using Assets.Scripts.Managers;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Assets.Scripts.Utilities;
 using static UnityEngine.RuleTile.TilingRuleOutput;
@@ -61,7 +62,7 @@ namespace Assets.Scripts.MapObjects
         {
             _direction = DirectionToBeltDirection(direction);
             InputConnection = GetOppositeDirection(direction);
-            OutputConnection = direction;
+            OutputConnection = direction;   
             UpdateSprite(Direction.None);
         }
 
@@ -84,7 +85,7 @@ namespace Assets.Scripts.MapObjects
             _itemProgress += Time.deltaTime * ItemMoveSpeed;
             if (_itemProgress >= 1f)
             {
-                if (Child != null && Child.CanReceive(Item, this))
+                if (Child != null && !ReferenceEquals(Child, null) && Child.CanReceive(Item, this))
                 {
                     Child.ReceiveItem(Item);
                     Item = null;
@@ -147,6 +148,11 @@ namespace Assets.Scripts.MapObjects
 
         private void UpdateNeighbors(Direction comingFrom)
         {
+            if(comingFrom == Direction.None)
+            {
+                UpdateNeighborConnection(DirectionToVector(InputConnection), GetOppositeDirection(InputConnection), InputConnection);
+                UpdateNeighborConnection(DirectionToVector(OutputConnection), GetOppositeDirection(OutputConnection), OutputConnection);
+            }
             if (comingFrom == Direction.None || comingFrom != Direction.Down) UpdateNeighborConnection(Vector2.up, Direction.Down, Direction.Up);
             if (comingFrom == Direction.None || comingFrom != Direction.Up) UpdateNeighborConnection(Vector2.down, Direction.Up, Direction.Down);
             if (comingFrom == Direction.None || comingFrom != Direction.Right) UpdateNeighborConnection(Vector2.left, Direction.Right, Direction.Left);
@@ -218,6 +224,8 @@ namespace Assets.Scripts.MapObjects
 
         private void UpdateBeltConnection(ConveyorBeltObject belt, Direction neighborInput, Direction neighborOutput)
         {
+            if (Child == belt || Parent == belt || belt.Child == this || belt.Parent == this) return;
+
             if (IsParallelBelt(belt, neighborInput, neighborOutput)) return;
 
             if (Parent == null && belt.Child == null)
@@ -234,6 +242,9 @@ namespace Assets.Scripts.MapObjects
                 {
                     belt.InputConnection = neighborOutput;
                 }
+
+                belt.UpdateSpriteDirection();
+                UpdateSpriteDirection();
             }
             else if (Child == null && belt.Parent == null)
             {
@@ -249,10 +260,19 @@ namespace Assets.Scripts.MapObjects
                 {
                     belt.OutputConnection = neighborOutput;
                 }
+                belt.UpdateSpriteDirection();
+                UpdateSpriteDirection();
             }
-
-            belt.UpdateSprite(neighborInput);
-            UpdateSpriteDirection();
+            else if(Child == null && belt.Parent != null)
+            {
+                Child = belt;
+                OutputConnection = neighborOutput;
+                if (InputConnection == Direction.None)
+                {
+                    InputConnection = neighborInput;
+                }
+                UpdateSpriteDirection();
+            }
         }
 
         private bool IsParallelBelt(ConveyorBeltObject belt, Direction neighborInput, Direction neighborOutput)
@@ -310,7 +330,14 @@ namespace Assets.Scripts.MapObjects
         public void ReceiveItem(ItemObject item)
         {
             Item = item;
-            _itemStartPosition = Parent != null ? Parent.GetGameObject().transform.position : transform.position;
+            if(Parent != null)
+            {
+                _itemStartPosition = Parent.GetGameObject().transform.position;
+            }
+            else
+            {
+                _itemStartPosition = transform.position;
+            }
             _itemTargetPosition = transform.position;
             _itemProgress = 0f;
         }

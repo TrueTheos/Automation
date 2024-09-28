@@ -118,7 +118,7 @@ namespace Assets.Scripts
 
             foreach (Transform child in CraftingOptionsParent.transform)
             {
-                Destroy(child.gameObject);
+                DestroyImmediate(child.gameObject);
             }
 
             for (int i = 0; i < _player.AvailableRecieps.Count; i++)
@@ -288,7 +288,7 @@ namespace Assets.Scripts
                     ItemObject.ItemState.OnGround);
             }
 
-            Destroy(itemObj.gameObject);
+            DestroyImmediate(itemObj.gameObject);
         }
 
         private void UpdateHotbarUI()

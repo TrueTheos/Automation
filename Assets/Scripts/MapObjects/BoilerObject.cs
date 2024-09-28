@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Assets.Scripts.Utilities;
 
@@ -11,8 +12,8 @@ namespace Assets.Scripts.MapObjects
 {
     public class BoilerObject : FluidUserObject
     {
-        public override Connection OutputDirection { get; set; } = Connection.Right;
-        public override Connection InputDirection { get; set; } = Connection.Left;
+        public override Connection OutputDirection { get; set; } = Connection.Up | Connection.Right | Connection.Left | Connection.Down;
+        public override Connection InputDirection { get; set; } = Connection.Up | Connection.Right | Connection.Left | Connection.Down;
 
         public override float Capacity
         {
@@ -68,7 +69,8 @@ namespace Assets.Scripts.MapObjects
 
         private void PullWaterFromInput()
         {
-            if (ConnectedObjects.TryGetValue(InputDirection, out FluidUserObject inputObject))
+            FluidUserObject inputObject = ConnectedObjects.Values.FirstOrDefault(x => x is PipeObject pipe && pipe.FluidType == FluidType.Water);
+            if (inputObject != null)
             {
                 float waterToPull = Mathf.Min(_waterPullRate * Time.deltaTime, _waterCapacity - _currentWater, inputObject.CurrentFill);
                 if (waterToPull > 0)
@@ -141,6 +143,21 @@ namespace Assets.Scripts.MapObjects
         {
             if (!ConnectedObjects.Values.Contains(other) && other.CanConnect(this, GetOppositeConnection(con)))
             {
+                if (ConnectedObjects.Values.Any(x => x is PipeObject pipe && pipe.FluidType == FluidType.Water))
+                {
+                    if(other is PipeObject waterPipe && waterPipe.FluidType == FluidType.Water)
+                    {
+                        return;
+                    }              
+                }
+                if (ConnectedObjects.Values.Any(x => x is PipeObject pipe && pipe.FluidType == FluidType.Steam))
+                {
+                    if (other is PipeObject steamPipe && steamPipe.FluidType == FluidType.Steam)
+                    {
+                        return;
+                    }
+                }
+
                 ConnectedObjects[con] = other;
                 other.Connect(this, GetOppositeConnection(con));
 
@@ -168,17 +185,7 @@ namespace Assets.Scripts.MapObjects
         {
             if (other is not PipeObject pipe) return false;
             if (ConnectedObjects.ContainsKey(comingFrom) && ConnectedObjects[comingFrom] != null) return false;
-            if (comingFrom == InputDirection)
-            {
-                return pipe.FluidType == FluidType.None || pipe.FluidType == InputFluidType;
-            }
-            if (comingFrom == OutputDirection)
-            {
-
-                return pipe.FluidType == FluidType.None || pipe.FluidType == OutputFluidType;
-            }
-
-            return false;
+            return true;
         }
     }
 }
