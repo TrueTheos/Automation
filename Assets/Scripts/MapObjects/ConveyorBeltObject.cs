@@ -359,5 +359,11 @@ namespace Assets.Scripts.MapObjects
         }
 
         public GameObject GetGameObject() => gameObject;
+
+        public void OnDestroy()
+        {
+            if (Parent is ConveyorBeltObject parentBelt) parentBelt.Child = null;
+            if (Child is ConveyorBeltObject childBelt) childBelt.Parent = null;
+        }
     }
 }
