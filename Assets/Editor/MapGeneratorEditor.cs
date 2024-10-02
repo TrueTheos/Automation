@@ -16,7 +16,7 @@ public class MapGeneratorEditor : Editor
         MapGenerator mapGenerator = (MapGenerator)target;
         if(GUILayout.Button("Generate"))
         {
-            mapGenerator.Generate();
+            mapGenerator.GenerateDualTilesButton();
         }
     }
 }

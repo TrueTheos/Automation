@@ -83,6 +83,7 @@ namespace Assets.Scripts.MapObjects
             foreach (Vector2Int pos in GetOccupiedPositions(X, Y))
             {
                 Chunk chunk = MapGenerator.Instance.GetChunk(pos.x, pos.y);
+                transform.SetParent(chunk.transform);
                 chunk.SpawnObjectPart(this, pos.x, pos.y);
             }
 

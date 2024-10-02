@@ -36,8 +36,8 @@ namespace Assets.Scripts.MapObjects
 
         private void Update()
         {
-            if (_mapGenerator.GetTileTypeAtPos(X, Y - 1) != TileType.WATER &&
-                _mapGenerator.GetTileTypeAtPos(X + 1, Y - 1) != TileType.WATER) return;
+            if (_mapGenerator.GetTileTypeAtWorldPos(X, Y - 1) != TileType.WATER &&
+                _mapGenerator.GetTileTypeAtWorldPos(X + 1, Y - 1) != TileType.WATER) return;
             FluidManager.Instance.SimulatePumpFlow(this, Time.deltaTime);
 
             if(ConnectedObjects.Values.Where(x => x != null).Count() > 0)

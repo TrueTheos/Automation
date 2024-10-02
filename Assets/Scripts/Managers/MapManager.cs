@@ -18,10 +18,6 @@ namespace Assets.Scripts.Managers
 
         private MapGenerator _generator;
 
-        [Header("Map Settings")]
-        public int Width;
-        public int Height;
-
         private void Awake()
         {
             Instance = this;

@@ -31,8 +31,7 @@ namespace Assets.Scripts
         private void Awake()
         {
             Instance = this;
-            _mainCam = Camera.main;
-            _fog.SetFloat("VisionRadius", visionRadius);
+            _mainCam = Camera.main; 
         }
 
         private void Start()
@@ -45,7 +44,7 @@ namespace Assets.Scripts
         {
             if (!_mapGen.MapGenerated) return;
 
-            foreach(Chunk chunk in _mapGen.Chunks) 
+            foreach(Chunk chunk in _mapGen.Chunks.Values.Where(x => x.Visible)) 
             {
                 if (chunk.Type == Chunk.ChunkType.Pure)
                 {
@@ -54,6 +53,7 @@ namespace Assets.Scripts
                 else
                 {
                     VisualEffect fogObject = chunk.Fog;
+                    fogObject.SetFloat("VisionRadius", visionRadius);
                     fogObject.gameObject.SetActive(true);
                     fogObject.SetBool("hasScafander", hasScafander);
                     fogObject.SetVector3("PlayerPos", _player.transform.position);
@@ -105,17 +105,6 @@ namespace Assets.Scripts
 
                 _enabledFogs = currentlyVisibleFogs;
                 _lastPlayerPos = _player.transform.position;*/
-            }
-        }
-
-        public void SetupFog()
-        {
-            int chunkSize = MapGenerator.CHUNK_SIZE;
-
-            foreach (var chunk in _mapGen.Chunks)
-            {
-                var newFog = Instantiate(_fog, new Vector3(chunk.WorldX + chunkSize / 2, chunk.WorldY + chunkSize / 2, 0), Quaternion.identity);
-                chunk.Fog = newFog;
             }
         }
     }

@@ -176,7 +176,7 @@ namespace Assets.Scripts.MapObjects
         {
             //Vector2 neighborPos = (Vector2)transform.position + direction;
             //IItemReceiver neighbor = GetReceiverAtPosition(neighborPos);
-            var neighbor = _mapGenerator.GetObjectAtPos(X + (int)direction.x, Y  + (int)direction.y);
+            var neighbor = _mapGenerator.GetObjectAtWorldPos(X + (int)direction.x, Y  + (int)direction.y);
             if (neighbor is IItemMover receiver)
             {
                 if(neighbor is ConveyorBeltObject belt)

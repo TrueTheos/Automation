@@ -54,11 +54,14 @@ VisualEffect:
       - m_Value: 5
         m_Name: VisionRadius
         m_Overridden: 1
+      - m_Value: 0.66736114
+        m_Name: Time
+        m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
       m_Array:
-      - m_Value: {x: 35.005478, y: 36.786163, z: 0}
+      - m_Value: {x: 30.55, y: 10.42, z: 0}
         m_Name: PlayerPos
         m_Overridden: 1
     m_Vector4f:
@@ -146,7 +149,10 @@ VisualEffect:
     m_NamedObject:
       m_Array: []
     m_Bool:
-      m_Array: []
+      m_Array:
+      - m_Value: 0
+        m_Name: hasScafander
+        m_Overridden: 1
 --- !u!73398921 &40685849421586190
 VFXRenderer:
   serializedVersion: 1

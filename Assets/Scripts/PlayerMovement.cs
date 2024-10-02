@@ -9,6 +9,7 @@ using UnityEditor;
 using Assets.Scripts.Managers;
 using Managers;
 using static Assets.Scripts.Utilities;
+using Unity.VisualScripting;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -55,7 +56,6 @@ public class PlayerMovement : MonoBehaviour
 
     private CameraManager _cameraManager;
 
-
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -75,6 +75,9 @@ public class PlayerMovement : MonoBehaviour
         _destroyTimer = DestroyInterval;
     }
 
+    private HashSet<Chunk> _lastUpdatedChunks = new();
+    private HashSet<Chunk> _currentUpdatedChunks = new();
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -88,7 +91,40 @@ public class PlayerMovement : MonoBehaviour
         {
             return;
         }
-        
+
+        Vector2 bottomLeft = _cam.ViewportToWorldPoint(new Vector3(0, 0, _cam.nearClipPlane));
+        Vector2 topRight = _cam.ViewportToWorldPoint(new Vector3(1, 1, _cam.nearClipPlane));
+
+        for (int x = (int)bottomLeft.x; x < (int)topRight.x; x++)
+        {
+            for (int y = (int)bottomLeft.y; y < (int)topRight.y; y++)
+            {
+                Chunk chunk = MapGenerator.Instance.GetChunk(x, y);
+                chunk.ChangeVisibility(true);
+                _currentUpdatedChunks.Add(chunk);
+
+                /*foreach (var chunk in MapGenerator.Instance.Chunks.Values.ToList())
+                {
+                    if(!_lastUpdatedChunks.Contains(new(chunk.X, chunk.Y)))
+                    {
+                        //MapGenerator.Instance.GenerateDualTileTilemap(chunk);
+                        _lastUpdatedChunks.Add(new(chunk.X, chunk.Y));
+                    }
+                }*/
+            }
+        }
+
+        foreach (var chunk in _lastUpdatedChunks)
+        {
+            if(!_currentUpdatedChunks.Contains(chunk))
+            {
+                chunk.ChangeVisibility(false);
+            }
+        }
+
+        _lastUpdatedChunks = new(_currentUpdatedChunks);
+        _currentUpdatedChunks = new();
+
         _moveInput.x = Input.GetAxisRaw("Horizontal");
         _moveInput.y = Input.GetAxisRaw("Vertical");
 
@@ -123,8 +159,6 @@ public class PlayerMovement : MonoBehaviour
 
         var mousePos = _cam.ScreenToWorldPoint(Input.mousePosition);
         Vector2Int gridMousePos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.y));
-        gridMousePos.x = Mathf.Clamp(gridMousePos.x, 0, _mapManager.Width - 1);
-        gridMousePos.y = Mathf.Clamp(gridMousePos.y, 0, _mapManager.Height - 1);
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -222,7 +256,7 @@ public class PlayerMovement : MonoBehaviour
     {
         int x = Mathf.RoundToInt(transform.position.x - .5f);
         int y = Mathf.RoundToInt(transform.position.y - .75f);
-        if (MapGenerator.Instance.GetObjectAtPos(x,y) is ConveyorBeltObject belt)
+        if (MapGenerator.Instance.GetObjectAtWorldPos(x,y) is ConveyorBeltObject belt)
         {
             if (belt.Child != null && belt.Child is ConveyorBeltObject childBelt)
             {
