@@ -222,5 +222,10 @@ namespace Assets.Scripts
 
             return Vector2Int.zero;
         }
+
+        public void Purify()
+        {
+            Type = ChunkType.Pure;
+        }
     }
 }

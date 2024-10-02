@@ -64,7 +64,7 @@ namespace Assets.Scripts
             if(Input.GetKeyDown(KeyCode.P))
             {
                 Chunk chunk = _mapGen.GetChunk(Mathf.RoundToInt(_player.transform.position.x), Mathf.RoundToInt(_player.transform.position.y));
-                chunk.Type = Chunk.ChunkType.Pure;
+                chunk.Purify();
             }
 
             if(_lastPlayerPos != _player.transform.position)
