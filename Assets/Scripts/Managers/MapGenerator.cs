@@ -82,6 +82,8 @@ public class MapGenerator : MonoBehaviour
         {new (TileType.NONE, TileType.NONE, TileType.NONE, TileType.NONE), new Vector2Int(0,0) },
     };
 
+    private Tile[,] _dualTiles;
+
     [HideInInspector] public bool MapGenerated = false;
 
     private void Awake()
@@ -89,6 +91,28 @@ public class MapGenerator : MonoBehaviour
         Instance = this;
         randomX = Random.Range(-10000f, 10000f);
         randomY = Random.Range(-10000f, 10000f);
+
+        _dualTiles = new Tile[_dualTileAtlas.width / 16, _dualTileAtlas.height / 16];
+
+        for (int x = 0; x < _dualTiles.GetLength(0); x++)
+        {
+            for (int y = 0; y < _dualTiles.GetLength(1); y++)
+            {
+                int pixelX = x * 16;
+                int pixelY = y * 16;
+
+                // Create a rectangle for the sprite
+                Rect spriteRect = new Rect(pixelX, pixelY, 16, 16);
+
+                // Create the sprite
+                Sprite sprite = Sprite.Create(_dualTileAtlas, spriteRect, new Vector2(.5f, .5f), 16);
+
+                // Create and return a new tile with this sprite
+                Tile tile = ScriptableObject.CreateInstance<Tile>();
+                tile.sprite = sprite;
+                _dualTiles[x,y] = tile;
+            }
+        }
     }
 
     public void Generate()
@@ -97,7 +121,7 @@ public class MapGenerator : MonoBehaviour
 
         Chunk chunk = CreateNewChunk(0, 0);
         chunk.Purify();
-        //GenerateDualTileTilemap(chunk);
+        GenerateDualTileTilemap(chunk);
 
         StartCoroutine(GenerateOres());
         StartCoroutine(GenerateTrees());
@@ -171,7 +195,7 @@ public class MapGenerator : MonoBehaviour
                 {
                     Vector2Int newPos = new Vector2Int(x, y) - NEIGHBOURS[i];
                     Vector2Int tilePos = CalculateDualTile(newPos);
-                    int pixelX = tilePos.x * 16;
+                    /*int pixelX = tilePos.x * 16;
                     int pixelY = tilePos.y * 16;
 
                     // Create a rectangle for the sprite
@@ -182,8 +206,8 @@ public class MapGenerator : MonoBehaviour
 
                     // Create and return a new tile with this sprite
                     Tile tile = ScriptableObject.CreateInstance<Tile>();
-                    tile.sprite = sprite;
-                    DualTileTilemap.SetTile(new Vector3Int(newPos.x, newPos.y, 0), tile);
+                    tile.sprite = sprite;*/
+                    DualTileTilemap.SetTile(new Vector3Int(newPos.x, newPos.y, 0), _dualTiles[tilePos.x, tilePos.y]);
                 }            
             }
         }
@@ -234,7 +258,7 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    public Chunk GetChunk(int x, int y)
+    public Chunk GetChunk(int x, int y, bool createIfNull = true)
     {
         int chunkX = Mathf.FloorToInt(x / (float)CHUNK_SIZE);
         int chunkY = Mathf.FloorToInt(y / (float)CHUNK_SIZE);
@@ -242,15 +266,24 @@ public class MapGenerator : MonoBehaviour
         // 3. Check if the chunk exists, and create it if it doesn't.
         if (!Chunks.ContainsKey(new(chunkX, chunkY)))
         {
-            // Generate the chunk at the calculated position.
-            CreateNewChunk(chunkX, chunkY);
+            /*if (createIfNull)
+            {
+                CreateNewChunk(chunkX, chunkY);
+            }
+            else
+            {
+                return null;
+            }*/
+            return null;
         }
         return Chunks[new(chunkX, chunkY)];
     }
 
     public MapObject GetObjectAtWorldPos(int x, int y)
     {
-        return GetChunk(x, y).GetObjectAtPos(x,y);
+        Chunk chunk = GetChunk(x, y);
+        if (chunk == null) return null;
+        return chunk.GetObjectAtPos(x,y);
     }
 
     public TileType GetTileTypeAtWorldPos(Vector2Int pos)
@@ -260,6 +293,8 @@ public class MapGenerator : MonoBehaviour
 
     public TileType GetTileTypeAtWorldPos(int x, int y)
     {
+        Chunk chunk = GetChunk(x, y);
+        if (chunk == null) return TileType.NONE;
         return GetChunk(x, y).GetTileTypeAtWorldPos(x, y);
     }
 

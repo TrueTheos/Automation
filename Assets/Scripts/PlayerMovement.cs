@@ -56,6 +56,8 @@ public class PlayerMovement : MonoBehaviour
 
     private CameraManager _cameraManager;
 
+    private int _chunkSize;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -68,6 +70,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        _chunkSize = MapGenerator.CHUNK_SIZE;
         _cameraManager = CameraManager.Instance;
         _mapManager = MapManager.Instance;
         _selectedItem = _inventory.HotbarItems[0];
@@ -77,6 +80,7 @@ public class PlayerMovement : MonoBehaviour
 
     private HashSet<Chunk> _lastUpdatedChunks = new();
     private HashSet<Chunk> _currentUpdatedChunks = new();
+    private HashSet<Vector2Int> _allChunks = new();
 
     private void Update()
     {
@@ -95,14 +99,22 @@ public class PlayerMovement : MonoBehaviour
         Vector2 bottomLeft = _cam.ViewportToWorldPoint(new Vector3(0, 0, _cam.nearClipPlane));
         Vector2 topRight = _cam.ViewportToWorldPoint(new Vector3(1, 1, _cam.nearClipPlane));
 
-        for (int x = (int)bottomLeft.x; x < (int)topRight.x; x++)
+        for (int x = (int)bottomLeft.x - _chunkSize / 2; x < (int)topRight.x + _chunkSize / 2; x += _chunkSize / 2)
         {
-            for (int y = (int)bottomLeft.y; y < (int)topRight.y; y++)
+            for (int y = (int)bottomLeft.y - _chunkSize / 2; y < (int)topRight.y + _chunkSize / 2; y += _chunkSize / 2)
             {
                 Chunk chunk = MapGenerator.Instance.GetChunk(x, y);
+
+                if(chunk == null)
+                {
+                    int chunkX = Mathf.FloorToInt(x / (float)_chunkSize);
+                    int chunkY = Mathf.FloorToInt(y / (float)_chunkSize);
+                    chunk = MapGenerator.Instance.CreateNewChunk(chunkX, chunkY);
+                    _allChunks.Add(new Vector2Int(chunk.X, chunk.Y));
+                    MapGenerator.Instance.GenerateDualTileTilemap(chunk);
+                }
                 chunk.ChangeVisibility(true);
                 _currentUpdatedChunks.Add(chunk);
-
                 /*foreach (var chunk in MapGenerator.Instance.Chunks.Values.ToList())
                 {
                     if(!_lastUpdatedChunks.Contains(new(chunk.X, chunk.Y)))
