@@ -96,6 +96,7 @@ public class MapGenerator : MonoBehaviour
         Random.InitState(Seed);
 
         Chunk chunk = CreateNewChunk(0, 0);
+        chunk.Purify();
         //GenerateDualTileTilemap(chunk);
 
         StartCoroutine(GenerateOres());

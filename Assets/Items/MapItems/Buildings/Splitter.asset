@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Splitter
   Icon: {fileID: -1793099873, guid: 0febfbf47af1d8840aad71ae1c7f8f68, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
   ItemType: 1
   Prefab: {fileID: 9014068675371668990, guid: 0ed10bf2fb30eed44a071562bc920d2e, type: 3}

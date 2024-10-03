@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Boiler
   Icon: {fileID: -1408291454, guid: 102c8263366675f43b7ccc8986cc361f, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
+  ItemType: 0
   Prefab: {fileID: 8712166950813494181, guid: b661ed85aab928a45bede5f8078d3445, type: 3}
   MaxDurability: 20
   CanBeRotated: 0
+  PickRandomSprite: 0
+  SpriteRandomVariants: []
   DefaultDirection: 2
   DirectionSprites:
     dictionary:

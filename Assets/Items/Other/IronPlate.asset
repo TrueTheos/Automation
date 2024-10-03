@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Iron Plate
   Icon: {fileID: 21300000, guid: e0c8a800bf3953847b21bb15ab67fca1, type: 3}
-  MaxStack: 100
+  MaxStack: 200
   ItemFlags: 0
+  ItemType: 0
   SmeltedResult: {fileID: 0}

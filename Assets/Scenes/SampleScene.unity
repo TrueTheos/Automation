@@ -1652,6 +1652,80 @@ MonoBehaviour:
   _fog: {fileID: 4108061051987298786, guid: 46aec81d2742dd344bd4a6b6c8f3bb83, type: 3}
   hasScafander: 0
   visionRadius: 5
+--- !u!1 &454217522
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 454217524}
+  - component: {fileID: 454217523}
+  m_Layer: 0
+  m_Name: ResearchStation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &454217523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454217522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c0d3d6f6d6643b419a7435e6caf6fa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ResearchTiers:
+    dictionary:
+    - Key: 1
+      Value:
+      - {fileID: 11400000, guid: 8145b7329de615741a682cbe62c8ce0a, type: 2}
+    - Key: 2
+      Value:
+      - {fileID: 11400000, guid: ffe903f653d0781439e04d14a58f0f38, type: 2}
+      - {fileID: 11400000, guid: ea13fc7644150414e8881772c899811d, type: 2}
+      - {fileID: 11400000, guid: 31ef4bb9fd500144a81810a683caf133, type: 2}
+      - {fileID: 11400000, guid: 3b69b3198fe5d5340b27860a5a487939, type: 2}
+      - {fileID: 11400000, guid: e0760229dd2735c4b81bf3a38caeee6c, type: 2}
+      - {fileID: 11400000, guid: 95a040f76f8dd044da4881d21f848ae8, type: 2}
+      - {fileID: 11400000, guid: 7caf198db5396d2469267a27d8902bda, type: 2}
+    - Key: 3
+      Value:
+      - {fileID: 11400000, guid: fd0c0e722b40ab6439160f083abc96e3, type: 2}
+      - {fileID: 11400000, guid: de21fe2e69bb3a7449287eab618f60cd, type: 2}
+      - {fileID: 11400000, guid: 94e0a27b868d29247b615cc334f49d5d, type: 2}
+      - {fileID: 11400000, guid: c6f057d8859a79b4c8f8fe809008e83e, type: 2}
+      - {fileID: 11400000, guid: 2f8af0f64296b0a4fa4e6c88b80320ef, type: 2}
+      - {fileID: 11400000, guid: d461fa6f9d46c3548b9470fa17990976, type: 2}
+    - Key: 4
+      Value:
+      - {fileID: 11400000, guid: 563a50b6545f4c04dbaa4d0dadcd9ae0, type: 2}
+      - {fileID: 11400000, guid: 5096078d50dff924598adb3a39d4d947, type: 2}
+      - {fileID: 11400000, guid: e8769eefa424c8244bbbba06d5596eda, type: 2}
+      - {fileID: 11400000, guid: baba9dfee2229ec4e95dc56ed6438ce0, type: 2}
+      - {fileID: 11400000, guid: af2eb5a2a40e1814e90015bf931009a1, type: 2}
+  CurrentResearchTier: 0
+--- !u!4 &454217524
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454217522}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &478648853 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3499528422361561990, guid: 26f2bab26a8f5f54aae6b7a224f87572, type: 3}
@@ -3886,8 +3960,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Art: {fileID: 158156721}
-  AvailableRecieps:
-  - {fileID: 11400000, guid: e0760229dd2735c4b81bf3a38caeee6c, type: 2}
+  AvailableRecieps: []
 --- !u!114 &1160012601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3926,7 +3999,7 @@ Transform:
   m_GameObject: {fileID: 1160012598}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.55, y: 10.42, z: 0}
+  m_LocalPosition: {x: 16, y: 16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7052,3 +7125,4 @@ SceneRoots:
   - {fileID: 440468497}
   - {fileID: 2086676718}
   - {fileID: 1623384765}
+  - {fileID: 454217524}

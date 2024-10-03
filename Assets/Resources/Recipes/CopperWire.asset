@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3722d1300d8e7c848b79673459db7aa0, type: 3}
   m_Name: CopperWire
   m_EditorClassIdentifier: 
-  Requirements: []
+  Requirements:
+  - Item: {fileID: 11400000, guid: 22e5b02a8b692df43be872d74ca69058, type: 2}
+    Amount: 0
   Result:
     Item: {fileID: 11400000, guid: 9c1be96e4dd9c3648a9d0d4b60e37248, type: 2}
-    Amount: 5
+    Amount: 2

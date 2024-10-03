@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 159b2f86cd494d349af108cd89750ccd, type: 3}
-  m_Name: Iron
+  m_Name: IronOre
   m_EditorClassIdentifier: 
-  Name: Iron
+  Name: Iron Ore
   Icon: {fileID: -1646164329, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
-  MaxStack: 50
+  MaxStack: 1
   ItemFlags: 1
   ItemType: 0
   Prefab: {fileID: 129681216205148547, guid: 25fdac0e9799a4745858f4d19fd5cd8b, type: 3}

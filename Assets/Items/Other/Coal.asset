@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Coal
   Icon: {fileID: 846515663, guid: ff1be09361ea5fb40a72c551a3172f56, type: 3}
-  MaxStack: 50
+  MaxStack: 100
   ItemFlags: 2
+  ItemType: 0
   SmeltedResult: {fileID: 0}

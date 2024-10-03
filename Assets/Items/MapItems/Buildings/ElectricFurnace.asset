@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Electric Furnace
   Icon: {fileID: -551512628, guid: 102c8263366675f43b7ccc8986cc361f, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
   ItemType: 1
   Prefab: {fileID: 6045272719439814571, guid: 160fd65789ab2de4d9e01eedc3ed2e4a, type: 3}

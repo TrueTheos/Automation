@@ -14,12 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Solar Panel
   Icon: {fileID: 753135028, guid: 62a58bc046ddbb24fac9d26439c74c68, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
   ItemType: 1
   Prefab: {fileID: 2986005951027674093, guid: b0346596aafdabd4ab8bc5ed7a9b7ea3, type: 3}
   MaxDurability: 20
   CanBeRotated: 0
+  PickRandomSprite: 0
+  SpriteRandomVariants: []
   DefaultDirection: 2
   DirectionSprites:
     dictionary:

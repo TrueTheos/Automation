@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Accumulator
   Icon: {fileID: -1669018724, guid: 0ce6f958b19186a4db631d36d868fd18, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
   ItemType: 0
   Prefab: {fileID: 6866019410470086155, guid: a8eeadc9aeb70ba4ca7c7bdaab81ac31, type: 3}

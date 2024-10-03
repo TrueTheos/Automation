@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3722d1300d8e7c848b79673459db7aa0, type: 3}
   m_Name: SteamEngine
   m_EditorClassIdentifier: 
-  Requirements: []
+  Requirements:
+  - Item: {fileID: 11400000, guid: 8fbf00bc7572bf24eb3f1da1e6a1c70e, type: 2}
+    Amount: 6
+  - Item: {fileID: 11400000, guid: 0c5ed698edc947042b873267df9471db, type: 2}
+    Amount: 12
+  - Item: {fileID: 11400000, guid: bfcebb5f7a53c1d4fae3e0a86ded1c64, type: 2}
+    Amount: 4
   Result:
     Item: {fileID: 11400000, guid: a8db6ef6441b47244990c628dc68e18a, type: 2}
     Amount: 1

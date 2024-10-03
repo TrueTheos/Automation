@@ -14,11 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Furnace
   Icon: {fileID: -1391931000, guid: 102c8263366675f43b7ccc8986cc361f, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
+  ItemType: 0
   Prefab: {fileID: 7721624960510594945, guid: 8dc664ab2aab1a545a4ff737e6c87fce, type: 3}
   MaxDurability: 40
   CanBeRotated: 0
+  PickRandomSprite: 0
+  SpriteRandomVariants: []
   DefaultDirection: 2
   DirectionSprites:
     dictionary:

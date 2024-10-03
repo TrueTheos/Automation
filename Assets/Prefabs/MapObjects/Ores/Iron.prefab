@@ -104,7 +104,7 @@ MonoBehaviour:
   MapItem: {fileID: 11400000, guid: e0af175ea7d9ac743aa7403b39a55057, type: 2}
   Speed: 1
   Drop: {fileID: 11400000, guid: d4c4a6cd452f2f143ad6550c215baea3, type: 2}
-  DropCountRange: {x: 5, y: 10}
+  DropCountRange: {x: 1, y: 4}
   SpawnTileType: 2
 --- !u!58 &4759165741794800950
 CircleCollider2D:

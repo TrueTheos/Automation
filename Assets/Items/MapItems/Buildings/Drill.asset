@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Drill
   Icon: {fileID: 673896504, guid: 1c9eb2534f06c7043a9de6d62f3fbfe8, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
   ItemType: 1
   Prefab: {fileID: 8486049588258699100, guid: 65ed5dda0bd484444b29a1232dd01886, type: 3}

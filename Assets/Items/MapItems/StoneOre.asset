@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 159b2f86cd494d349af108cd89750ccd, type: 3}
-  m_Name: Stone
+  m_Name: StoneOre
   m_EditorClassIdentifier: 
   Name: Stone
   Icon: {fileID: -209338644, guid: a36600e3d64212b44bba2a9c0a3cc035, type: 3}
-  MaxStack: 50
+  MaxStack: 1
   ItemFlags: 0
   ItemType: 0
   Prefab: {fileID: 129681216205148547, guid: 93045248566b3574e927cb4c4c23a9fe, type: 3}

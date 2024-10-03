@@ -133,6 +133,7 @@ namespace Assets.Scripts
         public void OnDrop(PointerEventData eventData)
         {
             DraggableItem draggedItem = eventData.pointerDrag.GetComponent<DraggableItem>();
+            ItemAmount draggedItemData = new ItemAmount(draggedItem.ItemData.Item, draggedItem.ItemData.Amount);
 
             ItemSlot draggedItemSlot = draggedItem.ParentAfterDrag.GetComponent<ItemSlot>();
             if (draggedItemSlot != null)
@@ -145,13 +146,14 @@ namespace Assets.Scripts
             {
                 DraggableItem currentItem = transform.GetChild(0).gameObject.GetComponent<DraggableItem>();
 
-                if (currentItem.ItemData.GetItem() == draggedItem.ItemData.GetItem())
+                if (currentItem.ItemData.GetItem() == draggedItemData.GetItem())
                 {
-                    if (currentItem.ItemData.Amount + draggedItem.ItemData.Amount > currentItem.ItemData.Item.MaxStack)
+                    if (currentItem.ItemData.Amount + draggedItemData.Amount > currentItem.ItemData.Item.MaxStack)
                     {
                         int amountToAdd = currentItem.ItemData.Item.MaxStack - currentItem.ItemData.Amount;
                         currentItem.ItemData.Amount += amountToAdd;
-                        draggedItem.ItemData.Amount -= amountToAdd;
+                        draggedItemData.Amount -= amountToAdd;
+                        draggedItem.ItemData = draggedItemData;
                         draggedItem.UpdateUI();
                         UpdateUI();
                         OnItemChangeEvent?.Invoke();
@@ -159,7 +161,7 @@ namespace Assets.Scripts
                     }
                     else
                     {
-                        currentItem.ItemData.Amount += draggedItem.ItemData.Amount;
+                        currentItem.ItemData.Amount += draggedItemData.Amount;
                         UpdateUI();
                         OnItemChangeEvent?.Invoke();
                         DestroyImmediate(draggedItem.gameObject);
@@ -172,6 +174,7 @@ namespace Assets.Scripts
                 slot.CurrentItem = currentItem;
             }
             draggedItem.ParentAfterDrag = transform;
+            draggedItem.ItemData = draggedItemData;
             CurrentItem = draggedItem;
             OnItemChangeEvent?.Invoke();
             UpdateUI();

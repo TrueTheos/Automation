@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Combiner
   Icon: {fileID: 497615800, guid: 8dfc75781c0cf574a84b4fd29698f271, type: 3}
-  MaxStack: 1
+  MaxStack: 50
   ItemFlags: 0
   ItemType: 1
   Prefab: {fileID: 5793443858674060470, guid: bd31f7e7365f8a14fa32f121cface970, type: 3}
